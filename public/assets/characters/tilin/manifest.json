@@ -1,0 +1,25 @@
+{
+  "characterId": "tilin",
+  "name": "Tilin",
+  "assetPath": "/assets/characters/tilin/",
+  "animations": {
+    "IDLE":           ["IDLE_1.JPG", "IDLE_2.JPG"],
+    "WALK_FORWARD":   ["WALK_FORWARD_1.JPG", "WALK_FORWARD_2.JPG"],
+    "WALK_BACKWARD":  ["WALK_BACKWARD_1.JPG", "WALK_BACKWARD_2.JPG"],
+    "DASH":           ["DASH_1.JPG", "DASH_2.JPG"],
+    "CROUCH":         ["CROUCH_1.JPG", "CROUCH_2.JPG"],
+    "JUMP":           ["JUMP_1.JPG", "JUMP_2.JPG", "JUMP_3.JPG"],
+    "LIGHT_PUNCH":    ["LIGHT_PUNCH_1.JPG", "LIGHT_PUNCH_2.JPG"],
+    "HEAVY_PUNCH":    ["HEAVY_PUNCH_1.JPG", "HEAVY_PUNCH_2.JPG", "HEAVY_PUNCH_3.JPG"],
+    "LIGHT_KICK":     ["LIGHT_KICK_1.JPG", "LIGHT_KICK_2.JPG"],
+    "HEAVY_KICK":     ["HEAVY_KICK_1.JPG", "HEAVY_KICK_2.JPG", "HEAVY_KICK_3.JPG"],
+    "BLOCK":          ["BLOCK_1.JPG", "BLOCK_2.JPG"],
+    "HIT_REACTION":   ["HIT_REACTION_1.JPG", "HIT_REACTION_2.JPG"],
+    "KNOCKDOWN":      ["KNOCKDOWN_1.JPG", "KNOCKDOWN_2.JPG", "KNOCKDOWN_3.JPG"],
+    "GET_UP":         [],
+    "TAUNT":          ["TAUNT_1.JPG", "TAUNT_2.JPG"],
+    "VICTORY":        ["VICTORY_1.JPG", "VICTORY_2.JPG", "VICTORY_3.JPG"],
+    "DEFEAT":         ["DEFEAT_1.JPG", "DEFEAT_2.JPG"],
+    "SPECIAL_ATTACK": ["SPECIAL_ATTACK_1.JPG", "SPECIAL_ATTACK_2.JPG"]
+  }
+}
