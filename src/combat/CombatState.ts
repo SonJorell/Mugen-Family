@@ -12,12 +12,15 @@ export type FighterState =
   | 'ATTACKING'
   | 'BLOCKING'
   | 'HIT'
+  | 'STUNNED'
+  | 'LANDING'
   | 'KNOCKED_DOWN'
   | 'GETTING_UP'
   | 'TAUNTING'
   | 'VICTORY'
   | 'DEFEAT'
-  | 'SPECIAL';
+  | 'SPECIAL'
+  | 'SUPER_CAUGHT';
 
 /** Map fighter state to animation name */
 export const STATE_TO_ANIMATION: Record<FighterState, string> = {
@@ -30,24 +33,29 @@ export const STATE_TO_ANIMATION: Record<FighterState, string> = {
   ATTACKING:        'IDLE',     // overridden by specific attack name
   BLOCKING:         'BLOCK',
   HIT:              'HIT_REACTION',
+  STUNNED:          'STUN',
+  LANDING:          'LANDING',
   KNOCKED_DOWN:     'KNOCKDOWN',
   GETTING_UP:       'GET_UP',
   TAUNTING:         'TAUNT',
   VICTORY:          'VICTORY',
   DEFEAT:           'DEFEAT',
   SPECIAL:          'SPECIAL_ATTACK',
+  SUPER_CAUGHT:     'STUN',
 };
 
 /** States during which the fighter cannot move */
 export const LOCKED_STATES: Set<FighterState> = new Set([
   'ATTACKING',
   'HIT',
+  'STUNNED',
   'KNOCKED_DOWN',
   'GETTING_UP',
   'TAUNTING',
   'VICTORY',
   'DEFEAT',
   'SPECIAL',
+  'SUPER_CAUGHT',
 ]);
 
 export class CombatState {

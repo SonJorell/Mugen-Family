@@ -1,0 +1,11 @@
+{
+  "tool": "image_gen (built-in)",
+  "sources": {
+    "SPECIAL_ATTACK": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-72b4974f-05f0-4cf3-bcab-a55f87d1ec7d.png",
+    "STUN": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-3eedfba2-06ae-4af8-952b-bac557e5823f.png",
+    "AIR_PUNCH": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-0cc3b3e2-2154-4d89-b675-447e9b873171.png",
+    "AIR_KICK": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-27432c7c-bf02-4814-991d-be5f68531975.png",
+    "DOUBLE_JUMP": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-a1292d21-8dbe-48a3-8053-ce6b7ccd5194.png",
+    "LANDING": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-df84a455-7e2b-441d-bc92-fe4c223451d6.png"
+  }
+}

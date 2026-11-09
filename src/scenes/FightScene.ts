@@ -5,28 +5,40 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
-import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
+import { SpriteSheetLoader, SpriteSheetOptions } from '../animation/SpriteSheetLoader';
 import { PlayerFighter } from '../characters/PlayerFighter';
 import { TrainingOpponent } from '../characters/TrainingOpponent';
+import { ComputerOpponent } from '../characters/ComputerOpponent';
+import { Fighter } from '../characters/Fighter';
+import { PhysicsSystem } from '../systems/PhysicsSystem';
 import { InputManager } from '../input/InputManager';
 import { FacingSystem } from '../systems/FacingSystem';
 import { FighterController } from '../systems/FighterController';
-import { RoundSystem } from '../systems/RoundSystem';
+import { RoundSystem, RoundWinner, RoundEndReason } from '../systems/RoundSystem';
 import { HUD } from '../ui/HUD';
 import { FightMessages } from '../ui/FightMessages';
+import { isolateSceneKeyboard } from '../input/SceneKeyboard';
+import { GameAudio, musicControls } from '../systems/GameAudio';
+import { FighterChoice, fighterPalette, normalizeChoice } from '../config/roster';
+import { SuperMove } from '../combat/SuperMove';
 
 interface CharacterManifest {
   characterId: string;
   name: string;
   assetPath: string;
   animations: Record<string, string[]>;
+  spriteSheet?: SpriteSheetOptions;
 }
 
 export class FightScene extends Phaser.Scene {
   private manifest!: CharacterManifest;
 
   private player!: PlayerFighter;
-  private opponent!: TrainingOpponent;
+  private opponent!: Fighter;
+  private mode: 'cpu' | 'training' = 'cpu';
+  private playerChoice = normalizeChoice();
+  private opponentChoice = normalizeChoice(undefined, 'amethyst');
+  private bodyPhysics = new PhysicsSystem();
 
   private registry2!: AnimationRegistry;
   private loader!: SpriteSheetLoader;
@@ -35,15 +47,16 @@ export class FightScene extends Phaser.Scene {
 
   private facingSystem = new FacingSystem();
   private fighterController = new FighterController();
+  private superMove!: SuperMove;
   private roundSystem!: RoundSystem;
   private hud!: HUD;
   private messages!: FightMessages;
 
-  private isPaused: boolean = false;
   private debugKey!: Phaser.Input.Keyboard.Key;
   private inputManager!: InputManager;
   private stageIndex: number = 0;
   private stageBgImage!: Phaser.GameObjects.Image;
+  private fighterShadows: Phaser.GameObjects.Ellipse[] = [];
 
   // Stage graphics
   private stageLayer!: Phaser.GameObjects.Container;
@@ -52,12 +65,26 @@ export class FightScene extends Phaser.Scene {
     super({ key: 'FightScene' });
   }
 
-  init(data: { manifest: CharacterManifest; stageIndex?: number }): void {
-    this.manifest = data?.manifest;
-    this.stageIndex = data?.stageIndex ?? 0;
+  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: 'cpu' | 'training'; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
+    this.manifest = data?.manifest ?? this.cache.json.get('tilin_manifest');
+    this.stageIndex = GAME_CONFIG.STAGES[data?.stageIndex ?? 0] ? data?.stageIndex ?? 0 : 0;
+    this.mode = data?.mode === 'training' ? 'training' : 'cpu';
+    this.playerChoice = normalizeChoice(data?.playerChoice);
+    this.opponentChoice = normalizeChoice(data?.opponentChoice, 'amethyst');
   }
 
   create(): void {
+    isolateSceneKeyboard(this);
+    const audio = GameAudio.for(this);
+    audio.play('music-fight');
+    musicControls(this, 1250, 138);
+    this.events.on(Phaser.Scenes.Events.PAUSE, audio.pause, audio);
+    this.events.on(Phaser.Scenes.Events.RESUME, audio.resume, audio);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.events.off(Phaser.Scenes.Events.PAUSE, audio.pause, audio);
+      this.events.off(Phaser.Scenes.Events.RESUME, audio.resume, audio);
+      audio.stop();
+    });
     const htmlVideo = document.getElementById('menu-video-bg') as HTMLVideoElement | null;
     if (htmlVideo) {
       htmlVideo.style.display = 'none';
@@ -73,7 +100,17 @@ export class FightScene extends Phaser.Scene {
     this.createStage();
     this.setupAnimations();
     this.createFighters();
+    this.fighterShadows = [this.player, this.opponent].map(fighter =>
+      this.add.ellipse(fighter.x, GAME_CONFIG.FLOOR_Y + 2, 150, 16, 0x09121a, 0.26).setDepth(1));
     this.createSystems();
+    this.add.text(GAME_CONFIG.WIDTH / 2, 682,
+      'A D / ← →  Mover    W / ↑ ×2  Doble salto    S / ↓  Agacharse    J K  Puños    U I  Patadas    L  Bloquear    O  Canto',
+      { fontFamily: 'Arial', fontSize: '16px', color: '#eee8d9', backgroundColor: '#12151c', padding: { x: 16, y: 10 } }
+    ).setOrigin(0.5).setDepth(60).setScrollFactor(0);
+    this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
+      fontFamily: 'Arial', fontSize: '18px', color: '#ffdd77', backgroundColor: '#12151c', padding: { x: 12, y: 8 },
+    }).setOrigin(1, 0).setScrollFactor(0).setDepth(60).setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => this.pauseFight());
 
     this.debugKey = this.input.keyboard!.addKey('F1');
     this.input.keyboard!.on('keydown-F1', () => {
@@ -85,7 +122,12 @@ export class FightScene extends Phaser.Scene {
       if (!this.scale.isFullscreen) this.scale.startFullscreen();
       else this.scale.stopFullscreen();
     });
-    this.input.keyboard!.on('keydown-ESC', () => this.togglePause());
+    this.input.keyboard!.on('keydown-ESC', (event: KeyboardEvent) => { if (!event.repeat) this.pauseFight(); });
+    this.game.events.on(Phaser.Core.Events.BLUR, this.pauseFight, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.game.events.off(Phaser.Core.Events.BLUR, this.pauseFight, this);
+      this.inputManager.destroy();
+    });
   }
 
   // ── Stage ─────────────────────────────────────────────────
@@ -102,9 +144,6 @@ export class FightScene extends Phaser.Scene {
     } else {
       this.drawCityBackground(W, H);
     }
-
-    // Floor shadow line for contact
-    this.add.rectangle(W / 2, GAME_CONFIG.FLOOR_Y + 10, W, 20, 0x000000, 0.35).setDepth(1);
 
     // Stage boundary indicators
     this.add.rectangle(40, GAME_CONFIG.FLOOR_Y - 100, 6, 200, 0xcc3333, 0.4).setDepth(3);
@@ -125,7 +164,9 @@ export class FightScene extends Phaser.Scene {
     }
 
     // Camera setup
-    this.cameras.main.setBounds(0, 0, W, GAME_CONFIG.HEIGHT);
+    // The top 80 px remain covered by the fixed HUD when following a double jump.
+    this.cameras.main.setBounds(0, -80, W, GAME_CONFIG.HEIGHT + 80);
+    this.cameras.main.scrollY = 0;
     this.cameras.main.setZoom(GAME_CONFIG.CAMERA_ZOOM);
   }
 
@@ -186,11 +227,11 @@ export class FightScene extends Phaser.Scene {
   private setupAnimations(): void {
     // Player animations
     this.registry2 = new AnimationRegistry();
-    this.loader = new SpriteSheetLoader(this, this.registry2, 'tilin', '/assets/characters/tilin/');
+    this.loader = new SpriteSheetLoader(this, this.registry2, 'tilin', this.manifest.assetPath, null, this.manifest.spriteSheet);
 
     // Opponent reuses tilin's already-processed frame textures via sourceCharacterId
     this.opponentRegistry = new AnimationRegistry();
-    this.opponentLoader = new SpriteSheetLoader(this, this.opponentRegistry, 'dummy', '/assets/characters/tilin/', 'tilin');
+    this.opponentLoader = new SpriteSheetLoader(this, this.opponentRegistry, 'dummy', this.manifest.assetPath, 'tilin', this.manifest.spriteSheet);
 
     const { animations } = this.manifest;
 
@@ -209,7 +250,7 @@ export class FightScene extends Phaser.Scene {
         continue;
       }
       const sorted = sortFiles(files);
-      const urls = sorted.map(f => `/assets/characters/tilin/${animName}/${f}`);
+      const urls = sorted.map(f => f.startsWith('/') ? f : `${this.manifest.assetPath}${animName}/${f}`);
       this.loader.loadAnimationFromUrls(animName, urls);
     }
 
@@ -239,7 +280,8 @@ export class FightScene extends Phaser.Scene {
       scale: GAME_CONFIG.CHAR_SCALE,
     }, this.inputManager);
 
-    this.opponent = new TrainingOpponent({
+    const OpponentClass = this.mode === 'training' ? TrainingOpponent : ComputerOpponent;
+    this.opponent = new OpponentClass({
       scene: this,
       registry: this.opponentRegistry,
       loader: this.opponentLoader,
@@ -249,16 +291,22 @@ export class FightScene extends Phaser.Scene {
       maxHealth: GAME_CONFIG.MAX_HEALTH,
       scale: GAME_CONFIG.CHAR_SCALE,
     });
+    this.player.sprite.setTint(fighterPalette(this.playerChoice).tint);
+    this.opponent.sprite.setTint(fighterPalette(this.opponentChoice).tint);
+    this.facingSystem.update(this.player, this.opponent);
   }
 
   // ── Systems ───────────────────────────────────────────────
 
   private createSystems(): void {
+    this.superMove = new SuperMove(this);
+    this.fighterController.onSuperHit = (attacker, defender) => this.superMove.start(attacker, defender);
     this.roundSystem = new RoundSystem(this);
-    this.roundSystem.onRoundEnd = (winner) => this.onRoundEnd(winner);
+    this.roundSystem.onRoundEnd = (winner, reason) => this.onRoundEnd(winner, reason);
 
-    this.hud = new HUD(this, 'TILIN', 'DUMMY');
+    this.hud = new HUD(this, 'TILIN · JUGADOR', this.mode === 'training' ? 'MUÑECO · PRÁCTICA' : 'TILIN · CPU');
     this.messages = new FightMessages(this);
+    this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
 
     this.roundSystem.startRound();
   }
@@ -266,6 +314,11 @@ export class FightScene extends Phaser.Scene {
   // ── Camera follow ─────────────────────────────────────────
 
   private updateCamera(): void {
+    for (const [i, fighter] of [this.player, this.opponent].entries()) {
+      const height = Math.max(0, GAME_CONFIG.FLOOR_Y - fighter.y);
+      this.fighterShadows[i].setX(fighter.x).setScale(1 / (1 + height / 600))
+        .setAlpha(0.26 / (1 + height / 300));
+    }
     const midX = (this.player.x + this.opponent.x) / 2;
     const targetX = Phaser.Math.Clamp(
       midX - GAME_CONFIG.WIDTH / 2,
@@ -277,72 +330,54 @@ export class FightScene extends Phaser.Scene {
       targetX,
       0.08
     );
+    const targetY = Phaser.Math.Clamp(Math.min(this.player.y, this.opponent.y) - (GAME_CONFIG.FLOOR_Y - 220), -80, 0);
+    this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, targetY, 0.12);
   }
 
   // ── Round callbacks ───────────────────────────────────────
 
-  private onRoundEnd(winner: 'player' | 'opponent' | 'timeout'): void {
-    if (winner === 'timeout') {
-      this.messages.showTimeover();
-      const playerWon = this.player.currentHealth >= this.opponent.currentHealth;
-      if (playerWon) {
-        this.player.combatState.setState('VICTORY');
-        this.player.playAnimation('VICTORY', true);
-        this.opponent.combatState.setState('DEFEAT');
-        this.opponent.playAnimation('DEFEAT', true);
-      } else {
-        this.opponent.combatState.setState('VICTORY');
-        this.opponent.playAnimation('VICTORY', true);
-        this.player.combatState.setState('DEFEAT');
-        this.player.playAnimation('DEFEAT', true);
-      }
-    } else if (winner === 'player') {
-      this.messages.showWinner('Tilin');
-      // Winner plays VICTORY
-      this.player.combatState.setState('VICTORY');
-      this.player.playAnimation('VICTORY', true);
-      // Defeated plays DEFEAT
-      this.opponent.combatState.setState('DEFEAT');
-      this.opponent.playAnimation('DEFEAT', true);
-    } else {
-      this.messages.showKO();
-      // Winner plays VICTORY
-      this.opponent.combatState.setState('VICTORY');
-      this.opponent.playAnimation('VICTORY', true);
-      // Defeated plays DEFEAT
-      this.player.combatState.setState('DEFEAT');
-      this.player.playAnimation('DEFEAT', true);
-    }
+  private onRoundEnd(winner: RoundWinner, reason: RoundEndReason): void {
+    this.superMove.cancel();
+    this.messages.showResult(winner, reason);
+    this.player.finishRound(winner === 'draw' ? 'IDLE' : winner === 'player' ? 'VICTORY' : 'DEFEAT');
+    this.opponent.finishRound(winner === 'draw' ? 'IDLE' : winner === 'opponent' ? 'VICTORY' : 'DEFEAT');
 
     // Return to menu after delay
     this.time.delayedCall(4500, () => {
-      this.scene.start('MenuScene', { manifest: this.manifest, stageIndex: this.stageIndex });
+      this.scene.start('MenuScene', this.getMatchData());
     });
   }
 
   // ── Pause ─────────────────────────────────────────────────
 
-  private togglePause(): void {
-    this.isPaused = !this.isPaused;
-    if (this.isPaused) {
-      this.physics.pause();
-      this.scene.launch('PauseScene');
-      this.scene.bringToTop('PauseScene');
-    } else {
-      this.physics.resume();
-      this.scene.stop('PauseScene');
-    }
+  private pauseFight(): void {
+    if (!this.scene.isActive() || this.scene.isActive('PauseScene')) return;
+    this.input.keyboard?.resetKeys();
+    this.scene.launch('PauseScene', this.getMatchData());
+    this.scene.pause();
+  }
+
+  getMatchData() {
+    return { manifest: this.manifest, stageIndex: this.stageIndex, mode: this.mode,
+      playerChoice: { ...this.playerChoice }, opponentChoice: { ...this.opponentChoice } };
   }
 
   // ── Update ────────────────────────────────────────────────
 
   update(_time: number, delta: number): void {
-    if (this.isPaused) return;
+    if (!this.roundSystem || !this.player || !this.opponent) return;
+    delta = Math.min(Math.max(delta, 0), 50);
+    if (this.superMove.active) {
+      this.superMove.update(delta);
+      this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
+      if (!this.superMove.active) this.roundSystem.update(0, this.player.currentHealth, this.opponent.currentHealth);
+      return;
+    }
 
     // During round end, keep advancing animations so VICTORY and DEFEAT play out completely
     if (this.roundSystem.phase === 'END') {
-      this.player.update(delta);
-      this.opponent.update(delta);
+      this.player.updatePresentation(delta);
+      this.opponent.updatePresentation(delta);
       this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
       this.updateCamera();
       return;
@@ -351,19 +386,27 @@ export class FightScene extends Phaser.Scene {
     if (this.roundSystem.phase !== 'FIGHT') {
       // Still update round intro
       this.roundSystem.update(delta, this.player.currentHealth, this.opponent.currentHealth);
+      this.player.updatePresentation(delta);
+      this.opponent.updatePresentation(delta);
+      this.facingSystem.update(this.player, this.opponent);
+      this.updateCamera();
       return;
     }
 
     // Update fighters
+    this.facingSystem.update(this.player, this.opponent);
+    if (this.opponent instanceof ComputerOpponent) this.opponent.think(delta, this.player);
     this.player.update(delta);
     this.opponent.update(delta);
+    this.bodyPhysics.resolve(this.player, this.opponent);
 
     // Facing
     this.facingSystem.update(this.player, this.opponent);
 
     // Collision detection (both directions)
     this.fighterController.checkCollisions(this.player, this.opponent);
-    this.fighterController.checkCollisions(this.opponent, this.player);
+    if (!this.superMove.active) this.fighterController.checkCollisions(this.opponent, this.player);
+    if (this.superMove.active) { this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft); return; }
 
     // Round logic
     this.roundSystem.update(delta, this.player.currentHealth, this.opponent.currentHealth);

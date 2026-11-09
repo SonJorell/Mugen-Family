@@ -13,4 +13,7 @@ export interface AnimationDefinition {
   repeat: number;
   /** Whether this animation is available (assets loaded) */
   available: boolean;
+  /** Pose range matching the active combat window (end exclusive). */
+  impactStart?: number;
+  impactEnd?: number;
 }

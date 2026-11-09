@@ -10,6 +10,7 @@ import { MenuScene } from './scenes/MenuScene';
 import { FightScene } from './scenes/FightScene';
 import { CharacterTestScene } from './scenes/CharacterTestScene';
 import { PauseScene } from './scenes/PauseScene';
+import { SelectionScene } from './scenes/SelectionScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -25,6 +26,7 @@ const config: Phaser.Types.Core.GameConfig = {
     BootScene,
     PreloadScene,
     MenuScene,
+    SelectionScene,
     FightScene,
     CharacterTestScene,
     PauseScene,

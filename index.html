@@ -57,15 +57,13 @@
         object-fit: contain;
         display: block;
         margin: auto;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: pixelated;
-        image-rendering: crisp-edges;
+        image-rendering: auto;
       }
     </style>
   </head>
   <body>
     <div id="game-container">
-      <video id="menu-video-bg" src="/assets/menu/MENU%20VIDEO.mp4" autoplay loop muted playsinline preload="auto"></video>
+      <video id="menu-video-bg" src="/assets/menu/MENU%20VIDEO.mp4" loop muted playsinline preload="none"></video>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

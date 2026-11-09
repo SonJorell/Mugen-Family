@@ -6,6 +6,8 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 
 export type RoundPhase = 'INTRO' | 'FIGHT' | 'END';
+export type RoundWinner = 'player' | 'opponent' | 'draw';
+export type RoundEndReason = 'ko' | 'timeout';
 
 export class RoundSystem {
   private scene: Phaser.Scene;
@@ -19,7 +21,7 @@ export class RoundSystem {
   private roundText: Phaser.GameObjects.Text;
   private fightText: Phaser.GameObjects.Text;
 
-  onRoundEnd?: (winner: 'player' | 'opponent' | 'timeout') => void;
+  onRoundEnd?: (winner: RoundWinner, reason: RoundEndReason) => void;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -78,20 +80,18 @@ export class RoundSystem {
 
     this._timeLeft -= delta / 1000;
 
-    if (this._timeLeft <= 0) {
+    if (playerHP <= 0 || opponentHP <= 0) {
+      this.endRound(playerHP <= 0 && opponentHP <= 0 ? 'draw' : playerHP <= 0 ? 'opponent' : 'player', 'ko');
+    } else if (this._timeLeft <= 0) {
       this._timeLeft = 0;
-      this.endRound(playerHP > opponentHP ? 'player' : opponentHP > playerHP ? 'opponent' : 'timeout');
-    } else if (playerHP <= 0) {
-      this.endRound('opponent');
-    } else if (opponentHP <= 0) {
-      this.endRound('player');
+      this.endRound(playerHP > opponentHP ? 'player' : opponentHP > playerHP ? 'opponent' : 'draw', 'timeout');
     }
   }
 
-  private endRound(winner: 'player' | 'opponent' | 'timeout'): void {
+  private endRound(winner: RoundWinner, reason: RoundEndReason): void {
     if (this._phase === 'END') return;
     this._phase = 'END';
     this._timerRunning = false;
-    this.onRoundEnd?.(winner);
+    this.onRoundEnd?.(winner, reason);
   }
 }

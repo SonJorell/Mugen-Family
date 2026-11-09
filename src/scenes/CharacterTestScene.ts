@@ -5,15 +5,18 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
-import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
+import { SpriteSheetLoader, SpriteSheetOptions } from '../animation/SpriteSheetLoader';
 import { Fighter } from '../characters/Fighter';
 import { TEST_SCENE_BININGS } from '../input/InputMapping';
+import { isolateSceneKeyboard } from '../input/SceneKeyboard';
+import { GameAudio, musicControls } from '../systems/GameAudio';
 
 interface CharacterManifest {
   characterId: string;
   name: string;
   assetPath: string;
   animations: Record<string, string[]>;
+  spriteSheet?: SpriteSheetOptions;
 }
 
 export class CharacterTestScene extends Phaser.Scene {
@@ -34,10 +37,17 @@ export class CharacterTestScene extends Phaser.Scene {
   }
 
   init(data: { manifest: CharacterManifest }): void {
-    this.manifest = data?.manifest;
+    this.manifest = data?.manifest ?? this.cache.json.get('tilin_manifest');
+    this.currentAnimIdx = 0;
+    this.currentStageIdx = -1;
+    this.stageBgImage = null;
+    this.availableAnims = [];
   }
 
   create(): void {
+    isolateSceneKeyboard(this);
+    GameAudio.for(this).play('music-menu');
+    musicControls(this, 1250, 24);
     const htmlVideo = document.getElementById('menu-video-bg') as HTMLVideoElement | null;
     if (htmlVideo) {
       htmlVideo.style.display = 'none';
@@ -98,7 +108,7 @@ export class CharacterTestScene extends Phaser.Scene {
 
   private setupAnimations(): void {
     this.registry2 = new AnimationRegistry();
-    this.loader = new SpriteSheetLoader(this, this.registry2, 'tilin', '/assets/characters/tilin/');
+    this.loader = new SpriteSheetLoader(this, this.registry2, 'tilin', this.manifest.assetPath, null, this.manifest.spriteSheet);
 
     const { animations } = this.manifest;
 
@@ -112,7 +122,7 @@ export class CharacterTestScene extends Phaser.Scene {
         const nb = parseInt(b.match(/_(\d+)\./)?.[1] ?? '0', 10);
         return na - nb;
       });
-      const urls = sorted.map(f => `/assets/characters/tilin/${animName}/${f}`);
+      const urls = sorted.map(f => f.startsWith('/') ? f : `${this.manifest.assetPath}${animName}/${f}`);
       this.loader.loadAnimationFromUrls(animName, urls);
     }
 
@@ -138,7 +148,7 @@ export class CharacterTestScene extends Phaser.Scene {
     const W = GAME_CONFIG.WIDTH;
 
     // Title
-    this.add.text(W / 2, 20, 'CHARACTER TEST MODE', {
+    this.add.text(W / 2, 20, 'GALERÍA DE MOVIMIENTOS', {
       fontFamily: 'Arial Black',
       fontSize: '20px',
       color: '#00ff88',
@@ -157,7 +167,7 @@ export class CharacterTestScene extends Phaser.Scene {
     void dbgBg;
 
     // Animation list panel
-    const listBg = this.add.rectangle(W - 8, 80, 230, 400, 0x000000, 0.75)
+    const listBg = this.add.rectangle(W - 8, 80, 230, 520, 0x000000, 0.75)
       .setOrigin(1, 0).setDepth(50);
     this.animListText = this.add.text(W - 230, 86, '', {
       fontFamily: 'Courier New',
@@ -168,7 +178,7 @@ export class CharacterTestScene extends Phaser.Scene {
 
     // Controls legend
     this.add.text(W / 2, GAME_CONFIG.HEIGHT - 30, 
-      '1-0 Keys: Animations  |  ← → : Cycle  |  F2: Toggle Stage  |  F1: Debug  |  ESC: Menu',
+      '1–0  Animaciones   |   ← →  Elegir   |   A  Girar   |   F2  Escenario   |   F1  Colisiones   |   Esc  Menú',
       { fontFamily: 'Arial', fontSize: '13px', color: '#8888cc' }
     ).setOrigin(0.5).setDepth(50);
 
@@ -257,7 +267,8 @@ export class CharacterTestScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
-    this.fighter.update(delta);
+    if (!this.fighter) return;
+    this.fighter.updatePresentation(Math.min(delta, 50));
     this.updateDebugText();
   }
 }

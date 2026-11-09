@@ -15,6 +15,19 @@ import { AnimationRegistry } from './AnimationRegistry';
 
 const FRAMES_PER_IMAGE = 3;
 
+export interface SpriteGridLayout {
+  columns: number;
+  rows: number;
+  frameCount: number;
+  /** A standing pose used to keep physical body scale consistent across moves. */
+  referenceFrame?: number;
+  alignFeet?: boolean;
+}
+
+export interface SpriteSheetOptions extends SpriteGridLayout {
+  animations?: Record<string, Partial<SpriteGridLayout> & { frameRate?: number; repeat?: number; impactStart?: number; impactEnd?: number }>;
+}
+
 export interface AnimationManifestEntry {
   /** Animation key, e.g. "IDLE" */
   name: string;
@@ -29,6 +42,9 @@ export class SpriteSheetLoader {
   private basePath: string;
   /** If set, reuse processed frame textures from this character ID instead of reprocessing */
   private sourceCharacterId: string | null = null;
+  private sheetOptions?: SpriteSheetOptions;
+
+  get displayScale(): number { return this.sheetOptions ? 2 : 1; }
 
   constructor(
     scene: Phaser.Scene,
@@ -36,12 +52,14 @@ export class SpriteSheetLoader {
     characterId: string,
     basePath: string,
     sourceCharacterId: string | null = null,
+    sheetOptions?: SpriteSheetOptions,
   ) {
     this.scene = scene;
     this.registry = registry;
     this.characterId = characterId;
     this.basePath = basePath;
     this.sourceCharacterId = sourceCharacterId;
+    this.sheetOptions = sheetOptions;
   }
 
   /**
@@ -100,7 +118,9 @@ export class SpriteSheetLoader {
       }
 
       // Apply chroma key and split into 3 frames
-      const frameKeys = this.splitAndChroma(rawKey, animName, imgIdx);
+      const frameKeys = this.sheetOptions
+        ? this.splitTransparentGrid(rawKey, animName, imgIdx)
+        : this.splitAndChroma(rawKey, animName, imgIdx);
       allFrameKeys.push(...frameKeys);
     });
 
@@ -132,6 +152,77 @@ export class SpriteSheetLoader {
       frameRate: this.getFrameRate(animName),
       repeat: this.getRepeat(animName),
       available: true,
+      impactStart: this.sheetOptions?.animations?.[animName]?.impactStart,
+      impactEnd: this.sheetOptions?.animations?.[animName]?.impactEnd,
+    });
+  }
+
+  private splitTransparentGrid(rawKey: string, animName: string, imgIdx: number): string[] {
+    const layout = { ...this.sheetOptions!, ...this.sheetOptions?.animations?.[animName] };
+    const src = this.scene.textures.get(rawKey).getSourceImage() as HTMLImageElement;
+    const count = Math.min(layout.frameCount, layout.columns * layout.rows);
+    const sourceCanvas = document.createElement('canvas'); sourceCanvas.width = src.width; sourceCanvas.height = src.height;
+    const sourceCtx = sourceCanvas.getContext('2d', { willReadFrequently: true })!;
+    sourceCtx.drawImage(src, 0, 0);
+    const sourcePixels = sourceCtx.getImageData(0, 0, src.width, src.height).data;
+    // Find a nearby transparent gutter instead of cutting a shoe or outstretched hand.
+    const cut = (horizontal: boolean, expected: number, radius: number, from: number, to: number): number => {
+      const center = Math.round(expected);
+      for (let d = 0; d <= radius; d++) for (const offset of d === 0 ? [0] : [d, -d]) {
+        const candidate = center + offset;
+        let empty = true;
+        for (let p = from; p < to; p++) {
+          const x = horizontal ? p : candidate, y = horizontal ? candidate : p;
+          if (sourcePixels[(y * src.width + x) * 4 + 3] > 32) { empty = false; break; }
+        }
+        if (empty) return candidate;
+      }
+      return center;
+    };
+    const rowCuts = [0];
+    for (let r = 1; r < layout.rows; r++) rowCuts.push(cut(true, r * src.height / layout.rows, src.height / layout.rows * 0.2, 0, src.width));
+    rowCuts.push(src.height);
+    const colCuts = Array.from({ length: layout.rows }, (_, r) => {
+      const cuts = [0];
+      for (let c = 1; c < layout.columns; c++) cuts.push(cut(false, c * src.width / layout.columns, src.width / layout.columns * 0.2, rowCuts[r], rowCuts[r + 1]));
+      return [...cuts, src.width];
+    });
+    const frames: { canvas: HTMLCanvasElement; left: number; right: number; top: number; bottom: number; offsetX: number; offsetY: number }[] = [];
+    for (let i = 0; i < count; i++) {
+      // Rounded cell edges also support dimensions that are not exact grid multiples.
+      const col = i % layout.columns, row = Math.floor(i / layout.columns);
+      const sx = colCuts[row][col], sy = rowCuts[row];
+      const w = colCuts[row][col + 1] - sx, h = rowCuts[row + 1] - sy;
+      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+      ctx.drawImage(src, sx, sy, w, h, 0, 0, w, h);
+      const pixels = ctx.getImageData(0, 0, w, h).data;
+      let left = w, right = 0, top = h, bottom = 0;
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        if (pixels[(y * w + x) * 4 + 3] > 32) {
+          left = Math.min(left, x); right = Math.max(right, x);
+          top = Math.min(top, y); bottom = Math.max(bottom, y);
+        }
+      }
+      frames.push({ canvas, left, right, top, bottom, offsetX: sx - col * src.width / layout.columns, offsetY: sy - row * src.height / layout.rows });
+    }
+    const reference = frames[layout.referenceFrame ?? 0];
+    const referenceHeight = Math.max(1, reference.bottom - reference.top + 1);
+    const scale = 330 / referenceHeight;
+    const anchorX = (reference.left + reference.right) / 2 + reference.offsetX;
+    return frames.map((frame, i) => {
+      const key = `${this.characterId}_${animName}_${imgIdx * count + i}`;
+      if (!this.scene.textures.exists(key)) {
+        // Large fixed canvases preserve limbs, alpha, and one consistent foot origin.
+        const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 384;
+        const ctx = canvas.getContext('2d')!;
+        ctx.imageSmoothingEnabled = false;
+        const baseline = layout.alignFeet === false ? reference.bottom + reference.offsetY - frame.offsetY + 1 : frame.bottom + 1;
+        ctx.drawImage(frame.canvas, 256 + (frame.offsetX - anchorX) * scale, 374.5 - baseline * scale,
+          frame.canvas.width * scale, frame.canvas.height * scale);
+        this.scene.textures.addCanvas(key, canvas);
+      }
+      return key;
     });
   }
 
@@ -393,11 +484,11 @@ export class SpriteSheetLoader {
   }
 
   private getFrameRate(animName: string): number {
-    return GAME_CONFIG.ANIM_FRAMERATES[animName]?.frameRate ?? 8;
+    return this.sheetOptions?.animations?.[animName]?.frameRate ?? GAME_CONFIG.ANIM_FRAMERATES[animName]?.frameRate ?? 8;
   }
 
   private getRepeat(animName: string): number {
-    return GAME_CONFIG.ANIM_FRAMERATES[animName]?.repeat ?? 0;
+    return this.sheetOptions?.animations?.[animName]?.repeat ?? GAME_CONFIG.ANIM_FRAMERATES[animName]?.repeat ?? 0;
   }
 
   /**
@@ -421,8 +512,9 @@ export class SpriteSheetLoader {
     // Collect already-processed frame keys from source character
     const allFrameKeys: string[] = [];
     for (let imgIdx = 0; imgIdx < fileCount; imgIdx++) {
-      for (let f = 0; f < FRAMES_PER_IMAGE; f++) {
-        const frameKey = `${srcId}_${animName}_${imgIdx * FRAMES_PER_IMAGE + f}`;
+      const frameCount = this.sheetOptions?.animations?.[animName]?.frameCount ?? this.sheetOptions?.frameCount ?? FRAMES_PER_IMAGE;
+      for (let f = 0; f < frameCount; f++) {
+        const frameKey = `${srcId}_${animName}_${imgIdx * frameCount + f}`;
         if (this.scene.textures.exists(frameKey)) {
           allFrameKeys.push(frameKey);
         }
@@ -457,6 +549,8 @@ export class SpriteSheetLoader {
       frameRate: this.getFrameRate(animName),
       repeat: this.getRepeat(animName),
       available: true,
+      impactStart: this.sheetOptions?.animations?.[animName]?.impactStart,
+      impactEnd: this.sheetOptions?.animations?.[animName]?.impactEnd,
     });
   }
 }

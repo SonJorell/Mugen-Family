@@ -1,25 +1,195 @@
 {
   "characterId": "tilin",
   "name": "Tilin",
-  "assetPath": "/assets/characters/tilin/",
+  "assetPath": "/assets/characters/tilin-v2/",
+  "version": 3,
+  "spriteSheet": {
+    "columns": 4,
+    "rows": 3,
+    "frameCount": 12,
+    "animations": {
+      "IDLE": {
+        "frameRate": 14,
+        "repeat": -1
+      },
+      "WALK_FORWARD": {
+        "frameRate": 18,
+        "repeat": -1
+      },
+      "WALK_BACKWARD": {
+        "frameRate": 16,
+        "repeat": -1
+      },
+      "DASH": {
+        "frameRate": 28,
+        "repeat": 0
+      },
+      "CROUCH": {
+        "frameRate": 36,
+        "repeat": 0
+      },
+      "JUMP": {
+        "frameRate": 14,
+        "repeat": 0,
+        "alignFeet": false
+      },
+      "LIGHT_PUNCH": {
+        "frameRate": 30,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 6
+      },
+      "HEAVY_PUNCH": {
+        "frameRate": 28,
+        "repeat": 0,
+        "impactStart": 4,
+        "impactEnd": 7
+      },
+      "LIGHT_KICK": {
+        "frameRate": 30,
+        "repeat": 0,
+        "impactStart": 4,
+        "impactEnd": 7
+      },
+      "HEAVY_KICK": {
+        "frameRate": 26,
+        "repeat": 0,
+        "impactStart": 4,
+        "impactEnd": 7
+      },
+      "BLOCK": {
+        "frameRate": 48,
+        "repeat": 0
+      },
+      "HIT_REACTION": {
+        "frameRate": 30,
+        "repeat": 0
+      },
+      "KNOCKDOWN": {
+        "frameRate": 24,
+        "repeat": 0
+      },
+      "GET_UP": {
+        "frameRate": 24,
+        "repeat": 0,
+        "referenceFrame": 11
+      },
+      "TAUNT": {
+        "frameRate": 16,
+        "repeat": 0
+      },
+      "VICTORY": {
+        "frameRate": 12,
+        "repeat": -1
+      },
+      "DEFEAT": {
+        "frameRate": 18,
+        "repeat": 0
+      },
+      "SPECIAL_ATTACK": {
+        "frameRate": 24,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 8
+      },
+      "STUN": {
+        "frameRate": 16,
+        "repeat": -1
+      },
+      "AIR_PUNCH": {
+        "frameRate": 30,
+        "repeat": 0,
+        "impactStart": 5,
+        "impactEnd": 8,
+        "alignFeet": false
+      },
+      "AIR_KICK": {
+        "frameRate": 30,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 7,
+        "alignFeet": false
+      },
+      "DOUBLE_JUMP": {
+        "frameRate": 18,
+        "repeat": 0,
+        "alignFeet": false
+      },
+      "LANDING": {
+        "frameRate": 48,
+        "repeat": 0
+      }
+    }
+  },
   "animations": {
-    "IDLE":           ["IDLE_1.JPG", "IDLE_2.JPG"],
-    "WALK_FORWARD":   ["WALK_FORWARD_1.JPG", "WALK_FORWARD_2.JPG"],
-    "WALK_BACKWARD":  ["WALK_BACKWARD_1.JPG", "WALK_BACKWARD_2.JPG"],
-    "DASH":           ["DASH_1.JPG", "DASH_2.JPG"],
-    "CROUCH":         ["CROUCH_1.JPG", "CROUCH_2.JPG"],
-    "JUMP":           ["JUMP_1.JPG", "JUMP_2.JPG", "JUMP_3.JPG"],
-    "LIGHT_PUNCH":    ["LIGHT_PUNCH_1.JPG", "LIGHT_PUNCH_2.JPG"],
-    "HEAVY_PUNCH":    ["HEAVY_PUNCH_1.JPG", "HEAVY_PUNCH_2.JPG", "HEAVY_PUNCH_3.JPG"],
-    "LIGHT_KICK":     ["LIGHT_KICK_1.JPG", "LIGHT_KICK_2.JPG"],
-    "HEAVY_KICK":     ["HEAVY_KICK_1.JPG", "HEAVY_KICK_2.JPG", "HEAVY_KICK_3.JPG"],
-    "BLOCK":          ["BLOCK_1.JPG", "BLOCK_2.JPG"],
-    "HIT_REACTION":   ["HIT_REACTION_1.JPG", "HIT_REACTION_2.JPG"],
-    "KNOCKDOWN":      ["KNOCKDOWN_1.JPG", "KNOCKDOWN_2.JPG", "KNOCKDOWN_3.JPG"],
-    "GET_UP":         [],
-    "TAUNT":          ["TAUNT_1.JPG", "TAUNT_2.JPG"],
-    "VICTORY":        ["VICTORY_1.JPG", "VICTORY_2.JPG", "VICTORY_3.JPG"],
-    "DEFEAT":         ["DEFEAT_1.JPG", "DEFEAT_2.JPG"],
-    "SPECIAL_ATTACK": ["SPECIAL_ATTACK_1.JPG", "SPECIAL_ATTACK_2.JPG"]
+    "IDLE": [
+      "IDLE.png"
+    ],
+    "WALK_FORWARD": [
+      "WALK_FORWARD.png"
+    ],
+    "WALK_BACKWARD": [
+      "WALK_BACKWARD.png"
+    ],
+    "DASH": [
+      "DASH.png"
+    ],
+    "CROUCH": [
+      "CROUCH.png"
+    ],
+    "JUMP": [
+      "JUMP.png"
+    ],
+    "LIGHT_PUNCH": [
+      "LIGHT_PUNCH.png"
+    ],
+    "HEAVY_PUNCH": [
+      "HEAVY_PUNCH.png"
+    ],
+    "LIGHT_KICK": [
+      "LIGHT_KICK.png"
+    ],
+    "HEAVY_KICK": [
+      "HEAVY_KICK.png"
+    ],
+    "BLOCK": [
+      "BLOCK.png"
+    ],
+    "HIT_REACTION": [
+      "HIT_REACTION.png"
+    ],
+    "KNOCKDOWN": [
+      "KNOCKDOWN.png"
+    ],
+    "GET_UP": [
+      "GET_UP.png"
+    ],
+    "TAUNT": [
+      "TAUNT.png"
+    ],
+    "VICTORY": [
+      "VICTORY.png"
+    ],
+    "DEFEAT": [
+      "DEFEAT.png"
+    ],
+    "SPECIAL_ATTACK": [
+      "/assets/characters/tilin-v3/SPECIAL_ATTACK/SPECIAL_ATTACK.png"
+    ],
+    "STUN": [
+      "/assets/characters/tilin-v3/STUN/STUN.png"
+    ],
+    "AIR_PUNCH": [
+      "/assets/characters/tilin-v3/AIR_PUNCH/AIR_PUNCH.png"
+    ],
+    "AIR_KICK": [
+      "/assets/characters/tilin-v3/AIR_KICK/AIR_KICK.png"
+    ],
+    "DOUBLE_JUMP": [
+      "/assets/characters/tilin-v3/DOUBLE_JUMP/DOUBLE_JUMP.png"
+    ],
+    "LANDING": [
+      "/assets/characters/tilin-v3/LANDING/LANDING.png"
+    ]
   }
 }

@@ -1,0 +1,24 @@
+{
+  "tool": "image_gen (built-in)",
+  "generatedDirectory": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f",
+  "sources": {
+    "IDLE": "eedf4c4f-0ae4-4347-a428-c4aaaad534ac",
+    "WALK_FORWARD": "dec9fc9a-e600-4f9a-bf61-96affc1aabba",
+    "WALK_BACKWARD": "7733c144-6f3c-422a-97e4-3824846ee6e6",
+    "DASH": "4365561a-7293-4053-b0d4-9ed9f528bc9b",
+    "CROUCH": "ff24dd8d-bf99-41cc-8276-e6c9322feaf0",
+    "JUMP": "cf978f7b-6b23-4658-904a-3d184ccd71c9",
+    "LIGHT_PUNCH": "a9c26016-24d3-44be-bf82-ffd0a6286490",
+    "HEAVY_PUNCH": "046ed5d8-47f3-4024-b7cc-6f3af8a3ba0c",
+    "LIGHT_KICK": "e3b4a5c8-3d7a-4c98-8d72-e74b850cd30a",
+    "HEAVY_KICK": "76d4a801-f3da-4db1-a891-b93058f9ca61",
+    "BLOCK": "f3d135dd-3652-48ae-a9c0-172015878163",
+    "HIT_REACTION": "2b79ac27-0264-4c9c-baf2-443a1420d2c6",
+    "KNOCKDOWN": "a33eee35-7434-4909-8046-d96b277884fe",
+    "GET_UP": "8f610950-1aad-4f27-900a-75247e95f71d",
+    "TAUNT": "4700137a-7897-4b12-92cb-136c300cde3b",
+    "VICTORY": "69e39de6-8f96-4648-a648-f40983e8fd4f",
+    "DEFEAT": "0ead1a13-c372-41d9-a538-441b8ef292b2",
+    "SPECIAL_ATTACK": "6df8fded-7882-4b27-938e-0743f86dcbb4"
+  }
+}

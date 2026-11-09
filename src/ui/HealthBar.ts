@@ -29,7 +29,7 @@ export class HealthBar {
     this._y = y;
     this._width = width;
     this.maxHealth = maxHealth;
-    this.currentHealth = maxHealth;
+    this.currentHealth = -1;
     this.flipped = flipped;
 
     const H = 24;
@@ -50,9 +50,11 @@ export class HealthBar {
       name.toUpperCase(),
       { fontFamily: 'Arial Black', fontSize: '16px', color: '#fff', stroke: '#000', strokeThickness: 4 }
     ).setOrigin(flipped ? 1 : 0, 0).setDepth(52).setScrollFactor(0);
+    this.setHealth(maxHealth);
   }
 
   setHealth(value: number): void {
+    if (this.currentHealth === value) return;
     this.currentHealth = Phaser.Math.Clamp(value, 0, this.maxHealth);
     const ratio = this.currentHealth / this.maxHealth;
     const barW = Math.floor(this._width * ratio);

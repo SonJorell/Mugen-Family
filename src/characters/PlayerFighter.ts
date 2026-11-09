@@ -28,7 +28,23 @@ export class PlayerFighter extends Fighter {
   private handleMovement(state: InputState, _delta: number): void {
     if (!this.combatState.canAct()) return;
 
+    if (state.block && this.isGrounded) {
+      this.velocityX = 0;
+      this.hurtbox.rect = DEFAULT_HURTBOX;
+      if (this.combatState.state !== 'BLOCKING') {
+        this.combatState.setState('BLOCKING');
+        this.playAnimation('BLOCK');
+      }
+      return;
+    }
+    if (this.combatState.state === 'BLOCKING') {
+      this.combatState.setState('IDLE');
+      this.playAnimation('IDLE');
+    }
+
     if (state.jump) {
+      this.hurtbox.rect = DEFAULT_HURTBOX;
+      this.velocityX = (Number(!!state.moveRight) - Number(!!state.moveLeft)) * GAME_CONFIG.WALK_SPEED;
       this.jump();
       return;
     }
@@ -49,10 +65,9 @@ export class PlayerFighter extends Fighter {
       this.playAnimation('IDLE');
     }
 
-    if (state.moveRight) {
-      this.velocityX = this.facingRight
-        ? GAME_CONFIG.WALK_SPEED
-        : -GAME_CONFIG.WALK_SPEED;
+    this.hurtbox.rect = DEFAULT_HURTBOX;
+    if (state.moveRight && !state.moveLeft) {
+      this.velocityX = GAME_CONFIG.WALK_SPEED;
 
       if (this.isGrounded) {
         const newState = this.facingRight ? 'WALKING_FORWARD' : 'WALKING_BACKWARD';
@@ -61,10 +76,8 @@ export class PlayerFighter extends Fighter {
           this.playAnimation(this.facingRight ? 'WALK_FORWARD' : 'WALK_BACKWARD');
         }
       }
-    } else if (state.moveLeft) {
-      this.velocityX = this.facingRight
-        ? -GAME_CONFIG.WALK_SPEED
-        : GAME_CONFIG.WALK_SPEED;
+    } else if (state.moveLeft && !state.moveRight) {
+      this.velocityX = -GAME_CONFIG.WALK_SPEED;
 
       if (this.isGrounded) {
         const newState = this.facingRight ? 'WALKING_BACKWARD' : 'WALKING_FORWARD';
@@ -85,15 +98,6 @@ export class PlayerFighter extends Fighter {
       if (this.isGrounded) this.velocityX = 0;
     }
 
-    if (state.block && this.isGrounded && this.combatState.canAct()) {
-      if (this.combatState.state !== 'BLOCKING') {
-        this.combatState.setState('BLOCKING');
-        this.playAnimation('BLOCK');
-      }
-    } else if (!state.block && this.combatState.state === 'BLOCKING') {
-      this.combatState.setState('IDLE');
-      this.playAnimation('IDLE');
-    }
   }
 
   private handleCombat(state: InputState): void {

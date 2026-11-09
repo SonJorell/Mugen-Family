@@ -14,6 +14,27 @@ export const GAME_CONFIG = {
   DEFAULT_STAGE_INDEX: 0,
   STAGES: [
     {
+      id: 'arica_morro',
+      name: 'Costanera del Morro',
+      textureKey: 'stage_arica_morro',
+      imagePath: '/assets/stages/arica/morro.png',
+      floorY: 580,
+    },
+    {
+      id: 'arica_chinchorro',
+      name: 'Playa Chinchorro',
+      textureKey: 'stage_arica_chinchorro',
+      imagePath: '/assets/stages/arica/chinchorro.png',
+      floorY: 580,
+    },
+    {
+      id: 'arica_catedral',
+      name: 'Catedral San Marcos',
+      textureKey: 'stage_arica_catedral',
+      imagePath: '/assets/stages/arica/catedral.png',
+      floorY: 580,
+    },
+    {
       id: 'arena_urbana',
       name: 'Arena Urbana Nocturna',
       textureKey: 'stage_arena_urbana',
@@ -27,11 +48,20 @@ export const GAME_CONFIG = {
       imagePath: '/assets/stages/TEMPLO ANTIGUO/TEMPLO ANTIGUO.jpg',
       floorY: 580,
     },
+    {
+      id: 'azotea',
+      name: 'Azotea de Rascacielos',
+      textureKey: 'stage_azotea',
+      imagePath: '/assets/stages/AZOTEA DE RASCACIELOS/AZOTEA DE RASCACIELOS.jpg',
+      floorY: 580,
+    },
   ],
 
   // Physics
   GRAVITY: 1800,
   JUMP_VELOCITY: -820,
+  DOUBLE_JUMP_VELOCITY: -650,
+  MAX_JUMPS: 2,
   WALK_SPEED: 260,
   DASH_SPEED: 500,
   MAX_VELOCITY_X: 400,
@@ -101,6 +131,11 @@ export const GAME_CONFIG = {
     'VICTORY',
     'DEFEAT',
     'SPECIAL_ATTACK',
+    'STUN',
+    'AIR_PUNCH',
+    'AIR_KICK',
+    'DOUBLE_JUMP',
+    'LANDING',
   ] as const,
 };
 

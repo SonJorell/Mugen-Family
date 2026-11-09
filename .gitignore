@@ -34,3 +34,8 @@ ehthumbs.db
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Browser verification artifacts
+test-results/
+playwright-report/
+artifacts/

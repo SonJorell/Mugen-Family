@@ -69,13 +69,13 @@ export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
   },
   SPECIAL_ATTACK: {
     name: 'SPECIAL_ATTACK',
-    startup: 4,
-    active: 10,
-    recovery: 20,
-    damage: 20,
-    hitstun: 30,
-    knockback: 300,
-    causesKnockdown: true,
+    startup: 21,
+    active: 8,
+    recovery: 52,
+    damage: 0, // The opener confirms the cinematic; SuperMove owns its damage timeline.
+    hitstun: 105,
+    knockback: 90,
+    causesKnockdown: false,
     hitbox: { x: 30, y: -230, width: 155, height: 160 },
   },
 };

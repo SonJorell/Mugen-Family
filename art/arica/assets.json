@@ -1,0 +1,32 @@
+{
+  "generator": "Built-in ImageGen",
+  "created": "2026-11-09",
+  "promptFile": "prompts.json",
+  "assets": [
+    {
+      "key": "morro",
+      "path": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-3316a3e5-e367-4edd-877f-007a6c449d56.png",
+      "target": "D:\\TODO\\DOCUMENTOS\\MUGEN\\mugen-web-fighter\\public\\assets\\stages\\arica\\morro.png"
+    },
+    {
+      "key": "chinchorro",
+      "path": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-9cedf29c-1c48-400f-9811-3896715bd026.png",
+      "target": "D:\\TODO\\DOCUMENTOS\\MUGEN\\mugen-web-fighter\\public\\assets\\stages\\arica\\chinchorro.png"
+    },
+    {
+      "key": "catedral",
+      "path": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-a5384cfa-25c7-420d-bf17-8cc4617d47b1.png",
+      "target": "D:\\TODO\\DOCUMENTOS\\MUGEN\\mugen-web-fighter\\public\\assets\\stages\\arica\\catedral.png"
+    },
+    {
+      "key": "menu-coast",
+      "path": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-9fb54c1e-77b0-4c0d-8526-bd43afc03300.png",
+      "target": "D:\\TODO\\DOCUMENTOS\\MUGEN\\mugen-web-fighter\\public\\assets\\menu\\arica-coast.png"
+    },
+    {
+      "key": "tilin-3d",
+      "path": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-fe0a3814-a9a4-4535-a03a-055584f5d04b.png",
+      "target": "D:\\TODO\\DOCUMENTOS\\MUGEN\\mugen-web-fighter\\public\\assets\\menu\\tilin-3d.png"
+    }
+  ]
+}

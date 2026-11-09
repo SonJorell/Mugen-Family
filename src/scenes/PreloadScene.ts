@@ -14,13 +14,16 @@ interface CharacterManifest {
 
 export class PreloadScene extends Phaser.Scene {
   private manifest!: CharacterManifest;
+  private failed = false;
 
   constructor() {
     super({ key: 'PreloadScene' });
   }
 
   preload(): void {
+    this.failed = false;
     this.createLoadingBar();
+    this.load.on('loaderror', () => { this.failed = true; });
 
     // Load character manifest
     this.load.json('tilin_manifest', '/assets/characters/tilin/manifest.json');
@@ -42,7 +45,7 @@ export class PreloadScene extends Phaser.Scene {
       strokeThickness: 8,
     }).setOrigin(0.5);
 
-    const sub = this.add.text(W / 2, H / 2 - 30, 'Loading assets...', {
+    const sub = this.add.text(W / 2, H / 2 - 30, 'Cargando escenarios y movimientos…', {
       fontFamily: 'Arial',
       fontSize: '18px',
       color: '#cccccc',
@@ -64,26 +67,51 @@ export class PreloadScene extends Phaser.Scene {
     this.load.off('complete', this.onFirstLoadComplete, this);
 
     this.manifest = this.cache.json.get('tilin_manifest') as CharacterManifest;
-    if (!this.manifest) {
-      console.error('[PreloadScene] Failed to load tilin manifest!');
-      this.scene.start('MenuScene', { manifest: null });
+    if (!this.manifest || typeof this.manifest.characterId !== 'string' || typeof this.manifest.assetPath !== 'string' ||
+      !this.manifest.animations || !Array.isArray(this.manifest.animations.IDLE) || this.manifest.animations.IDLE.length === 0 ||
+      !Object.values(this.manifest.animations).every(files => Array.isArray(files) && files.every(f => typeof f === 'string'))) {
+      this.showLoadError();
       return;
     }
 
-    // Queue stage images and menu video
+    // Queue stage images and the layered title-screen artwork.
     GAME_CONFIG.STAGES.forEach(stage => {
       this.load.image(stage.textureKey, stage.imagePath);
     });
-    this.load.video('menu_video', '/assets/menu/MENU%20VIDEO.mp4', true);
+    this.load.image('menu_arica_coast', '/assets/menu/arica-coast.png');
+    this.load.image('menu_tilin_3d', '/assets/menu/tilin-3d.png');
+    this.load.image('tilin_super_portrait', '/assets/effects/tilin-super-canto.png');
+    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'music-menu', 'music-fight']) {
+      this.load.audio(key, `/assets/audio/${key}.wav`);
+    }
+    // The native HTML video owns loading and playback; avoid downloading it twice.
 
     // Queue all character images
     this.queueCharacterImages();
 
     this.load.on('complete', () => {
+      if (this.failed) {
+        this.showLoadError();
+        return;
+      }
+      for (const key of ['menu_arica_coast', 'menu_tilin_3d', 'tilin_super_portrait', ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
+        this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
+      }
       this.scene.start('MenuScene', { manifest: this.manifest });
     });
 
     this.load.start();
+  }
+
+  private showLoadError(): void {
+    this.add.rectangle(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, 800, 250, 0x12121c).setDepth(10);
+    this.add.text(GAME_CONFIG.WIDTH / 2, 320, 'No se pudieron cargar los archivos del juego.\nComprueba la conexión y vuelve a intentarlo.', {
+      fontFamily: 'Arial', fontSize: '24px', color: '#ffffff', align: 'center',
+    }).setOrigin(0.5).setDepth(11);
+    this.add.text(GAME_CONFIG.WIDTH / 2, 410, 'Reintentar · Enter', {
+      fontFamily: 'Arial Black', fontSize: '26px', color: '#ffdd00',
+    }).setOrigin(0.5).setDepth(11).setInteractive({ useHandCursor: true }).on('pointerdown', () => window.location.reload());
+    this.input.keyboard?.once('keydown-ENTER', () => window.location.reload());
   }
 
   private queueCharacterImages(): void {
@@ -106,7 +134,7 @@ export class PreloadScene extends Phaser.Scene {
 
       sorted.forEach((fileName, idx) => {
         const key = `${characterId}_RAW_${animName}_${idx}`;
-        const url = `${assetPath}${animName}/${fileName}`;
+        const url = fileName.startsWith('/') ? fileName : `${assetPath}${animName}/${fileName}`;
         this.load.image(key, url);
         totalFiles++;
       });

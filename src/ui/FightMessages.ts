@@ -24,11 +24,16 @@ export class FightMessages {
     this.flash('TIME OVER', '#ffffff', '#0000cc');
   }
 
+  showResult(winner: 'player' | 'opponent' | 'draw', reason: 'ko' | 'timeout'): void {
+    const result = winner === 'draw' ? 'EMPATE' : winner === 'player' ? '¡GANASTE!' : 'GANA EL RIVAL';
+    this.flash(`${reason === 'timeout' ? 'TIEMPO' : 'K.O.'}\n${result}`, winner === 'opponent' ? '#ff7777' : '#ffdd00', '#111122');
+  }
+
   private flash(msg: string, color: string, stroke: string): void {
     const text = this.scene.add.text(
       GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2,
       msg,
-      { fontFamily: 'Arial Black', fontSize: '80px', color, stroke, strokeThickness: 10 }
+      { fontFamily: 'Arial Black', fontSize: '64px', color, stroke, strokeThickness: 8, align: 'center' }
     ).setOrigin(0.5).setDepth(300).setAlpha(0).setScrollFactor(0);
 
     this.scene.tweens.add({
