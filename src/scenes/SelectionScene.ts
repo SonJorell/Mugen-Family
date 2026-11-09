@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { FighterChoice, FIGHTER_PALETTES, FIGHTER_ROSTER, fighterPalette, normalizeChoice } from '../config/roster';
+import { FighterChoice, FIGHTER_PALETTES, FIGHTER_ROSTER, fighterPalette, normalizeChoice, rosterEntry } from '../config/roster';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader, SpriteSheetOptions } from '../animation/SpriteSheetLoader';
+import { animationUrls, getManifest } from '../config/characters';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
 
@@ -28,12 +29,13 @@ export class SelectionScene extends Phaser.Scene {
   private steps!: Phaser.GameObjects.Text;
   private help!: Phaser.GameObjects.Text;
   private transition?: Phaser.Time.TimerEvent;
-  private idleKey = '';
+  /** IDLE animation key per character id. */
+  private idleKeys = new Map<string, string>();
   private hitTargets: { bounds: Phaser.Geom.Rectangle; action: () => void }[] = [];
 
   constructor() { super({ key: 'SelectionScene' }); }
   init(data: SelectionData): void {
-    this.manifest = data?.manifest ?? this.cache.json.get('tilin_manifest');
+    this.manifest = data?.manifest ?? getManifest(this, FIGHTER_ROSTER[0].id);
     this.playerChoice = normalizeChoice(data?.playerChoice);
     this.opponentChoice = normalizeChoice(data?.opponentChoice, 'amethyst');
     this.stageIndex = GAME_CONFIG.STAGES[data?.stageIndex ?? 0] ? data?.stageIndex ?? 0 : 0;
@@ -60,10 +62,12 @@ export class SelectionScene extends Phaser.Scene {
       const target = [...this.hitTargets].reverse().find(item => item.bounds.contains(pointer.x, pointer.y));
       target?.action();
     });
-    const registry = new AnimationRegistry();
-    const loader = new SpriteSheetLoader(this, registry, 'tilin', this.manifest.assetPath, null, this.manifest.spriteSheet);
-    loader.loadAnimationFromUrls('IDLE', this.manifest.animations.IDLE);
-    this.idleKey = loader.getPhaserAnimKey('IDLE');
+    for (const fighter of FIGHTER_ROSTER) {
+      const manifest = getManifest(this, fighter.id);
+      const loader = new SpriteSheetLoader(this, new AnimationRegistry(), fighter.id, manifest.assetPath, null, manifest.spriteSheet);
+      loader.loadAnimationFromUrls('IDLE', animationUrls(manifest, 'IDLE'));
+      this.idleKeys.set(fighter.id, loader.getPhaserAnimKey('IDLE'));
+    }
     musicControls(this);
     const key = (name: string, action: () => void) => this.input.keyboard!.on('keydown-' + name, (event: KeyboardEvent) => {
       event.preventDefault(); if (!event.repeat) action();
@@ -98,8 +102,8 @@ export class SelectionScene extends Phaser.Scene {
     return rect.setInteractive({ useHandCursor: true });
   }
   private preview(x: number, y: number, scale: number, choice: FighterChoice, flip = false) {
-    const sprite = this.add.sprite(x, y, 'tilin_IDLE_0').setOrigin(0.5, 0.975).setScale(scale * 2)
-      .setTint(fighterPalette(choice).tint).setFlipX(flip).play(this.idleKey);
+    const sprite = this.add.sprite(x, y, `${choice.characterId}_IDLE_0`).setOrigin(0.5, 0.975).setScale(scale * 2)
+      .setTint(fighterPalette(choice).tint).setFlipX(flip).play(this.idleKeys.get(choice.characterId) ?? '');
     this.content.add(sprite); return sprite;
   }
   private render(): void {
@@ -121,7 +125,7 @@ export class SelectionScene extends Phaser.Scene {
         .setStrokeStyle(this.activeSide === side ? 3 : 1, accent, this.activeSide === side ? 1 : 0.35),
         () => { this.activeSide = side; this.render(); });
       this.text(x - 186, 155, player ? '1P · Tu personaje' : this.mode === 'cpu' ? 'CPU · Rival' : 'Práctica · Rival', 19, player ? '#ef9dbb' : '#a1ece5');
-      this.text(x - 186, 185, 'TILIN', 45, '#fae8cb', false, true);
+      this.text(x - 186, 185, rosterEntry(choice.characterId).name.toUpperCase(), 45, '#fae8cb', false, true);
       this.preview(x + 30, 495, 0.43, choice, !player);
       this.text(x, 506, 'Color · ' + fighterPalette(choice).name, 18, '#fae8cb', true);
       FIGHTER_PALETTES.forEach((palette, index) => {
@@ -133,13 +137,20 @@ export class SelectionScene extends Phaser.Scene {
       });
     }
     this.text(640, 148, 'VS', 62, '#ef709d', true, true);
-    this.text(640, 235, FIGHTER_ROSTER[0].power, 24, '#a1ece5', true);
-    this.text(640, 270, 'Daño y aturdimiento\na distancia', 17, '#c9b8da', true).setAlign('center');
-    this.clickable(this.rectangle(640, 399, 174, 164, 0x473b72).setStrokeStyle(2, 0xfae8cb), () => {
-        (this.activeSide === 'player' ? this.playerChoice : this.opponentChoice).characterId = 'tilin'; this.render();
+    const activeChoice = this.activeSide === 'player' ? this.playerChoice : this.opponentChoice;
+    const activeFighter = rosterEntry(activeChoice.characterId);
+    this.text(640, 235, activeFighter.power, 24, '#a1ece5', true);
+    this.text(640, 270, activeFighter.description, 17, '#c9b8da', true).setAlign('center').setWordWrapWidth(240);
+    // One portrait tile per roster entry, centred as a row under the VS.
+    FIGHTER_ROSTER.forEach((fighter, index) => {
+      const x = 640 + (index - (FIGHTER_ROSTER.length - 1) / 2) * 184;
+      const selected = activeChoice.characterId === fighter.id;
+      this.clickable(this.rectangle(x, 399, 174, 164, 0x473b72).setStrokeStyle(selected ? 2 : 1, selected ? 0xfae8cb : 0x726182), () => {
+        activeChoice.characterId = fighter.id; this.render();
       });
-    this.preview(640, 466, 0.2, this.activeSide === 'player' ? this.playerChoice : this.opponentChoice);
-    this.text(640, 486, 'Tilin · Seleccionada', 18, '#fae8cb', true);
+      this.preview(x, 466, 0.2, { ...activeChoice, characterId: fighter.id });
+      this.text(x, 486, fighter.name + (selected ? ' · Seleccionada' : ''), 18, selected ? '#fae8cb' : '#b6a6c7', true);
+    });
     this.button(640, 565, 220, this.mode === 'cpu' ? 'Rival: CPU' : 'Rival: Práctica', () => {
       this.mode = this.mode === 'cpu' ? 'training' : 'cpu'; this.render();
     });
@@ -155,8 +166,8 @@ export class SelectionScene extends Phaser.Scene {
     this.content.add(image);
     this.rectangle(890, 218, 650, 174, 0x000000, 0).setStrokeStyle(2, 0xa1ece5);
     this.text(58, 137, stage.name, 35, '#fae8cb', false, true).setWordWrapWidth(450);
-    this.text(60, 214, 'Tilin · ' + fighterPalette(this.playerChoice).name, 20, '#ef9dbb');
-    this.text(60, 245, 'vs. Tilin · ' + fighterPalette(this.opponentChoice).name, 20, '#a1ece5');
+    this.text(60, 214, rosterEntry(this.playerChoice.characterId).name + ' · ' + fighterPalette(this.playerChoice).name, 20, '#ef9dbb');
+    this.text(60, 245, 'vs. ' + rosterEntry(this.opponentChoice.characterId).name + ' · ' + fighterPalette(this.opponentChoice).name, 20, '#a1ece5');
     this.text(60, 280, this.mode === 'cpu' ? 'Combate contra CPU' : 'Muñeco de práctica', 17, '#c9b8da');
     GAME_CONFIG.STAGES.forEach((entry, i) => {
       const x = 230 + (i % 3) * 410, y = 386 + Math.floor(i / 3) * 142, selected = this.stageIndex === i;
@@ -179,8 +190,8 @@ export class SelectionScene extends Phaser.Scene {
     this.preview(330, 570, 0.5, this.playerChoice);
     this.preview(950, 570, 0.5, this.opponentChoice, true);
     this.text(640, 270, 'VS', 112, '#fae8cb', true, true);
-    this.text(310, 145, 'TILIN', 52, '#ef9dbb', true, true);
-    this.text(970, 145, 'TILIN', 52, '#a1ece5', true, true);
+    this.text(310, 145, rosterEntry(this.playerChoice.characterId).name.toUpperCase(), 52, '#ef9dbb', true, true);
+    this.text(970, 145, rosterEntry(this.opponentChoice.characterId).name.toUpperCase(), 52, '#a1ece5', true, true);
     this.text(310, 207, fighterPalette(this.playerChoice).name + ' · 1P', 21, '#fae8cb', true);
     this.text(970, 207, fighterPalette(this.opponentChoice).name + (this.mode === 'cpu' ? ' · CPU' : ' · Práctica'), 21, '#fae8cb', true);
     this.rectangle(640, 622, 680, 50, 0x14101e, 0.95);

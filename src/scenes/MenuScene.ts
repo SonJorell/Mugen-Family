@@ -3,7 +3,8 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { SpriteSheetOptions } from '../animation/SpriteSheetLoader';
 import { GameAudio, musicControls } from '../systems/GameAudio';
-import { FighterChoice, fighterPalette, normalizeChoice } from '../config/roster';
+import { FighterChoice, FIGHTER_ROSTER, fighterPalette, normalizeChoice } from '../config/roster';
+import { manifestKey } from '../config/characters';
 
 interface MenuManifest {
   assetPath: string;
@@ -47,7 +48,7 @@ export class MenuScene extends Phaser.Scene {
   constructor() { super({ key: 'MenuScene' }); }
 
   init(data: { manifest?: MenuManifest; stageIndex?: number; mode?: 'cpu' | 'training'; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
-    this.manifest = data?.manifest ?? this.cache.json.get('tilin_manifest');
+    this.manifest = data?.manifest ?? this.cache.json.get(manifestKey(FIGHTER_ROSTER[0].id));
     this.selectedStageIndex = data?.stageIndex ?? this.selectedStageIndex;
     this.mode = data?.mode ?? this.mode;
     this.playerChoice = normalizeChoice(data?.playerChoice ?? this.playerChoice);

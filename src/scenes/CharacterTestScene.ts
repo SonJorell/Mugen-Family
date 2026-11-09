@@ -3,21 +3,16 @@
 // ============================================================
 
 import Phaser from 'phaser';
+import { FighterChoice, FIGHTER_ROSTER, normalizeChoice } from '../config/roster';
+import { CharacterManifest, createCharacterLoader, getManifest } from '../config/characters';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
-import { SpriteSheetLoader, SpriteSheetOptions } from '../animation/SpriteSheetLoader';
+import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { Fighter } from '../characters/Fighter';
 import { TEST_SCENE_BININGS } from '../input/InputMapping';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
 
-interface CharacterManifest {
-  characterId: string;
-  name: string;
-  assetPath: string;
-  animations: Record<string, string[]>;
-  spriteSheet?: SpriteSheetOptions;
-}
 
 export class CharacterTestScene extends Phaser.Scene {
   private manifest!: CharacterManifest;
@@ -36,8 +31,10 @@ export class CharacterTestScene extends Phaser.Scene {
     super({ key: 'CharacterTestScene' });
   }
 
-  init(data: { manifest: CharacterManifest }): void {
-    this.manifest = data?.manifest ?? this.cache.json.get('tilin_manifest');
+  init(data: { manifest?: CharacterManifest; playerChoice?: FighterChoice }): void {
+    // The gallery shows the fighter the player picked; menu data may still carry a manifest.
+    this.manifest = data?.playerChoice ? getManifest(this, normalizeChoice(data.playerChoice).characterId)
+      : data?.manifest ?? getManifest(this, FIGHTER_ROSTER[0].id);
     this.currentAnimIdx = 0;
     this.currentStageIdx = -1;
     this.stageBgImage = null;
@@ -107,25 +104,9 @@ export class CharacterTestScene extends Phaser.Scene {
   }
 
   private setupAnimations(): void {
-    this.registry2 = new AnimationRegistry();
-    this.loader = new SpriteSheetLoader(this, this.registry2, 'tilin', this.manifest.assetPath, null, this.manifest.spriteSheet);
-
-    const { animations } = this.manifest;
-
-    for (const [animName, files] of Object.entries(animations)) {
-      if (!files || files.length === 0) {
-        this.loader.loadAnimationFromUrls(animName, []);
-        continue;
-      }
-      const sorted = [...files].sort((a, b) => {
-        const na = parseInt(a.match(/_(\d+)\./)?.[1] ?? '0', 10);
-        const nb = parseInt(b.match(/_(\d+)\./)?.[1] ?? '0', 10);
-        return na - nb;
-      });
-      const urls = sorted.map(f => f.startsWith('/') ? f : `${this.manifest.assetPath}${animName}/${f}`);
-      this.loader.loadAnimationFromUrls(animName, urls);
-    }
-
+    const { registry, loader } = createCharacterLoader(this, this.manifest);
+    this.registry2 = registry;
+    this.loader = loader;
     this.availableAnims = this.registry2.getAvailable();
   }
 
@@ -134,7 +115,7 @@ export class CharacterTestScene extends Phaser.Scene {
       scene: this,
       registry: this.registry2,
       loader: this.loader,
-      characterId: 'tilin',
+      characterId: this.manifest.characterId,
       x: GAME_CONFIG.WIDTH / 2,
       y: GAME_CONFIG.FLOOR_Y,
       scale: GAME_CONFIG.CHAR_SCALE,

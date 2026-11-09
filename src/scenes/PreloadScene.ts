@@ -4,16 +4,11 @@
 
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-
-interface CharacterManifest {
-  characterId: string;
-  name: string;
-  assetPath: string;
-  animations: Record<string, string[]>;
-}
+import { FIGHTER_ROSTER } from '../config/roster';
+import { CharacterManifest, isValidManifest, manifestKey, sortAnimationFiles, superPortraitKey } from '../config/characters';
 
 export class PreloadScene extends Phaser.Scene {
-  private manifest!: CharacterManifest;
+  private manifests: CharacterManifest[] = [];
   private failed = false;
 
   constructor() {
@@ -25,8 +20,8 @@ export class PreloadScene extends Phaser.Scene {
     this.createLoadingBar();
     this.load.on('loaderror', () => { this.failed = true; });
 
-    // Load character manifest
-    this.load.json('tilin_manifest', '/assets/characters/tilin/manifest.json');
+    // Load every roster manifest
+    for (const fighter of FIGHTER_ROSTER) this.load.json(manifestKey(fighter.id), fighter.manifestPath);
 
     // We can't dynamically load files without the manifest, so on complete
     // we'll chain a second load phase
@@ -66,12 +61,15 @@ export class PreloadScene extends Phaser.Scene {
   private onFirstLoadComplete(): void {
     this.load.off('complete', this.onFirstLoadComplete, this);
 
-    this.manifest = this.cache.json.get('tilin_manifest') as CharacterManifest;
-    if (!this.manifest || typeof this.manifest.characterId !== 'string' || typeof this.manifest.assetPath !== 'string' ||
-      !this.manifest.animations || !Array.isArray(this.manifest.animations.IDLE) || this.manifest.animations.IDLE.length === 0 ||
-      !Object.values(this.manifest.animations).every(files => Array.isArray(files) && files.every(f => typeof f === 'string'))) {
-      this.showLoadError();
-      return;
+    this.manifests = [];
+    for (const fighter of FIGHTER_ROSTER) {
+      const manifest = this.cache.json.get(manifestKey(fighter.id));
+      if (!isValidManifest(manifest) || manifest.characterId !== fighter.id) {
+        console.error(`[PreloadScene] Invalid manifest for ${fighter.id}`);
+        this.showLoadError();
+        return;
+      }
+      this.manifests.push(manifest);
     }
 
     // Queue stage images and the layered title-screen artwork.
@@ -80,24 +78,24 @@ export class PreloadScene extends Phaser.Scene {
     });
     this.load.image('menu_arica_coast', '/assets/menu/arica-coast.png');
     this.load.image('menu_tilin_3d', '/assets/menu/tilin-3d.png');
-    this.load.image('tilin_super_portrait', '/assets/effects/tilin-super-canto.png');
+    for (const fighter of FIGHTER_ROSTER) this.load.image(superPortraitKey(fighter.id), fighter.superPortraitPath);
     for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'music-menu', 'music-fight']) {
       this.load.audio(key, `/assets/audio/${key}.wav`);
     }
     // The native HTML video owns loading and playback; avoid downloading it twice.
 
     // Queue all character images
-    this.queueCharacterImages();
+    this.manifests.forEach(manifest => this.queueCharacterImages(manifest));
 
     this.load.on('complete', () => {
       if (this.failed) {
         this.showLoadError();
         return;
       }
-      for (const key of ['menu_arica_coast', 'menu_tilin_3d', 'tilin_super_portrait', ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
+      for (const key of ['menu_arica_coast', 'menu_tilin_3d', ...FIGHTER_ROSTER.map(f => superPortraitKey(f.id)), ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
         this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
       }
-      this.scene.start('MenuScene', { manifest: this.manifest });
+      this.scene.start('MenuScene', { manifest: this.manifests[0] });
     });
 
     this.load.start();
@@ -114,8 +112,8 @@ export class PreloadScene extends Phaser.Scene {
     this.input.keyboard?.once('keydown-ENTER', () => window.location.reload());
   }
 
-  private queueCharacterImages(): void {
-    const { assetPath, animations, characterId } = this.manifest;
+  private queueCharacterImages(manifest: CharacterManifest): void {
+    const { assetPath, animations, characterId } = manifest;
 
     let totalFiles = 0;
 
@@ -125,12 +123,7 @@ export class PreloadScene extends Phaser.Scene {
         continue;
       }
 
-      // Sort numerically
-      const sorted = [...files].sort((a, b) => {
-        const na = parseInt(a.match(/_(\d+)\./)?.[1] ?? '0', 10);
-        const nb = parseInt(b.match(/_(\d+)\./)?.[1] ?? '0', 10);
-        return na - nb;
-      });
+      const sorted = sortAnimationFiles(files);
 
       sorted.forEach((fileName, idx) => {
         const key = `${characterId}_RAW_${animName}_${idx}`;

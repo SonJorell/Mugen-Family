@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { Fighter } from '../characters/Fighter';
+import { RosterEntry } from '../config/roster';
+import { superPortraitKey } from '../config/characters';
 
 const BEATS = [
   { at: 0, damage: 4 }, { at: 900, damage: 7 }, { at: 1200, damage: 7 },
@@ -33,7 +35,7 @@ export class SuperMove {
   private pauseAudio = () => this.sound?.pause();
   private resumeAudio = () => { if (this.sound?.isPaused) this.sound.resume(); };
 
-  constructor(private scene: Phaser.Scene) {
+  constructor(private scene: Phaser.Scene, private identify: (fighter: Fighter) => RosterEntry) {
     scene.events.on(Phaser.Scenes.Events.PAUSE, this.pauseAudio);
     scene.events.on(Phaser.Scenes.Events.RESUME, this.resumeAudio);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -70,14 +72,15 @@ export class SuperMove {
     this.victim = s.add.image(this.victimX, 605, this.defender!.sprite.texture.key).setOrigin(0.5, 0.975)
       .setScale(1.06).setFlipX(!this.fromRight).setTint(this.defender!.sprite.tintTopLeft);
     this.layer.add([this.caster, this.victim]);
-    this.portrait = s.add.image(this.fromRight ? 890 : 390, 399, 'tilin_super_portrait')
+    const caster = this.identify(this.attacker!);
+    this.portrait = s.add.image(this.fromRight ? 890 : 390, 399, superPortraitKey(caster.id))
       .setDisplaySize(780, 520).setFlipX(this.fromRight).setTint(this.attacker!.sprite.tintTopLeft);
     this.layer.add(this.portrait);
-    this.title = s.add.text(this.fromRight ? 360 : 900, 220, 'CANTO\nRESONANTE', {
+    this.title = s.add.text(this.fromRight ? 360 : 900, 220, caster.superName, {
       fontFamily: 'Impact, Arial Black', fontSize: '66px', color: '#fff3d8', align: 'center',
       stroke: '#143a51', strokeThickness: 4, lineSpacing: -6,
     }).setOrigin(0.5, 0);
-    this.counter = s.add.text(this.fromRight ? 360 : 900, 402, 'El poder de Tilin', {
+    this.counter = s.add.text(this.fromRight ? 360 : 900, 402, `El poder de ${caster.name}`, {
       fontFamily: 'Trebuchet MS', fontSize: '22px', color: '#f5bd75',
     }).setOrigin(0.5, 0);
     this.layer.add([this.title, this.counter]);

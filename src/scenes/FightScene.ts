@@ -5,7 +5,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
-import { SpriteSheetLoader, SpriteSheetOptions } from '../animation/SpriteSheetLoader';
+import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { PlayerFighter } from '../characters/PlayerFighter';
 import { TrainingOpponent } from '../characters/TrainingOpponent';
 import { ComputerOpponent } from '../characters/ComputerOpponent';
@@ -19,19 +19,14 @@ import { HUD } from '../ui/HUD';
 import { FightMessages } from '../ui/FightMessages';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
-import { FighterChoice, fighterPalette, normalizeChoice } from '../config/roster';
+import { FighterChoice, fighterPalette, normalizeChoice, rosterEntry } from '../config/roster';
+import { CharacterManifest, createAliasLoader, createCharacterLoader, getManifest } from '../config/characters';
 import { SuperMove } from '../combat/SuperMove';
-
-interface CharacterManifest {
-  characterId: string;
-  name: string;
-  assetPath: string;
-  animations: Record<string, string[]>;
-  spriteSheet?: SpriteSheetOptions;
-}
 
 export class FightScene extends Phaser.Scene {
   private manifest!: CharacterManifest;
+  private playerManifest!: CharacterManifest;
+  private opponentManifest!: CharacterManifest;
 
   private player!: PlayerFighter;
   private opponent!: Fighter;
@@ -66,11 +61,14 @@ export class FightScene extends Phaser.Scene {
   }
 
   init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: 'cpu' | 'training'; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
-    this.manifest = data?.manifest ?? this.cache.json.get('tilin_manifest');
     this.stageIndex = GAME_CONFIG.STAGES[data?.stageIndex ?? 0] ? data?.stageIndex ?? 0 : 0;
     this.mode = data?.mode === 'training' ? 'training' : 'cpu';
     this.playerChoice = normalizeChoice(data?.playerChoice);
     this.opponentChoice = normalizeChoice(data?.opponentChoice, 'amethyst');
+    this.playerManifest = getManifest(this, this.playerChoice.characterId);
+    this.opponentManifest = getManifest(this, this.opponentChoice.characterId);
+    // Menu and selection scenes still receive this to return to the same state.
+    this.manifest = data?.manifest ?? this.playerManifest;
   }
 
   create(): void {
@@ -91,7 +89,7 @@ export class FightScene extends Phaser.Scene {
       htmlVideo.pause();
     }
 
-    if (!this.manifest) {
+    if (!this.playerManifest || !this.opponentManifest) {
       console.error('[FightScene] No manifest found — returning to menu.');
       this.scene.start('MenuScene');
       return;
@@ -225,43 +223,21 @@ export class FightScene extends Phaser.Scene {
   // ── Animation Setup ───────────────────────────────────────
 
   private setupAnimations(): void {
-    // Player animations
-    this.registry2 = new AnimationRegistry();
-    this.loader = new SpriteSheetLoader(this, this.registry2, 'tilin', this.manifest.assetPath, null, this.manifest.spriteSheet);
-
-    // Opponent reuses tilin's already-processed frame textures via sourceCharacterId
-    this.opponentRegistry = new AnimationRegistry();
-    this.opponentLoader = new SpriteSheetLoader(this, this.opponentRegistry, 'dummy', this.manifest.assetPath, 'tilin', this.manifest.spriteSheet);
-
-    const { animations } = this.manifest;
-
-    // Sort helper
-    const sortFiles = (files: string[]) =>
-      [...files].sort((a, b) => {
-        const na = parseInt(a.match(/_(\d+)\./)?.[1] ?? '0', 10);
-        const nb = parseInt(b.match(/_(\d+)\./)?.[1] ?? '0', 10);
-        return na - nb;
-      });
-
-    // Process all animations for player (loads and processes textures)
-    for (const [animName, files] of Object.entries(animations)) {
-      if (!files || files.length === 0) {
-        this.loader.loadAnimationFromUrls(animName, []);
-        continue;
-      }
-      const sorted = sortFiles(files);
-      const urls = sorted.map(f => f.startsWith('/') ? f : `${this.manifest.assetPath}${animName}/${f}`);
-      this.loader.loadAnimationFromUrls(animName, urls);
+    // Each fighter's textures are processed under its own character id.
+    const player = createCharacterLoader(this, this.playerManifest);
+    this.registry2 = player.registry;
+    this.loader = player.loader;
+    if (this.opponentManifest.characterId !== this.playerManifest.characterId) {
+      createCharacterLoader(this, this.opponentManifest);
     }
 
-    // Process all animations for dummy (reuses tilin's processed frame textures)
-    for (const [animName, files] of Object.entries(animations)) {
-      this.opponentLoader.loadAnimationFromUrls(animName, files ?? []);
-    }
+    // The rival reuses those processed textures through a per-character alias, so its
+    // animation keys never collide with the player's nor with a different earlier rival.
+    const rival = createAliasLoader(this, `${this.opponentManifest.characterId}_rival`, this.opponentManifest);
+    this.opponentRegistry = rival.registry;
+    this.opponentLoader = rival.loader;
 
-    // Log available animations
-    const avail = this.registry2.getAvailable();
-    console.log(`[FightScene] Available animations: ${avail.join(', ')}`);
+    console.log(`[FightScene] Available animations: ${this.registry2.getAvailable().join(', ')}`);
   }
 
   // ── Fighters ──────────────────────────────────────────────
@@ -273,7 +249,7 @@ export class FightScene extends Phaser.Scene {
       scene: this,
       registry: this.registry2,
       loader: this.loader,
-      characterId: 'tilin',
+      characterId: this.playerManifest.characterId,
       x: GAME_CONFIG.STAGE_WIDTH * 0.35,
       y: GAME_CONFIG.FLOOR_Y,
       maxHealth: GAME_CONFIG.MAX_HEALTH,
@@ -299,12 +275,15 @@ export class FightScene extends Phaser.Scene {
   // ── Systems ───────────────────────────────────────────────
 
   private createSystems(): void {
-    this.superMove = new SuperMove(this);
+    this.superMove = new SuperMove(this, fighter =>
+      rosterEntry(fighter === this.player ? this.playerChoice.characterId : this.opponentChoice.characterId));
     this.fighterController.onSuperHit = (attacker, defender) => this.superMove.start(attacker, defender);
     this.roundSystem = new RoundSystem(this);
     this.roundSystem.onRoundEnd = (winner, reason) => this.onRoundEnd(winner, reason);
 
-    this.hud = new HUD(this, 'TILIN · JUGADOR', this.mode === 'training' ? 'MUÑECO · PRÁCTICA' : 'TILIN · CPU');
+    const playerName = rosterEntry(this.playerChoice.characterId).name.toUpperCase();
+    const opponentName = rosterEntry(this.opponentChoice.characterId).name.toUpperCase();
+    this.hud = new HUD(this, `${playerName} · JUGADOR`, this.mode === 'training' ? 'MUÑECO · PRÁCTICA' : `${opponentName} · CPU`);
     this.messages = new FightMessages(this);
     this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
 
