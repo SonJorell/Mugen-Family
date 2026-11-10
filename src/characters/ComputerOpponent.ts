@@ -22,6 +22,7 @@ export class ComputerOpponent extends Fighter {
   private judgedAttack = -1;
   private judgedJump = false;
   private judgedRecovery = false;
+  private judgedCombo = -1;
 
   constructor(opts: FighterOptions, cpu: CpuOptions = {}) {
     super(opts);
@@ -52,6 +53,12 @@ export class ComputerOpponent extends Fighter {
     if (target.isGrounded) this.judgedJump = false;
     const recovering = !!targetAttack && target.combatState.stateTimer * 60 / 1000 >= targetAttack.startup + targetAttack.active;
     if (!recovering) this.judgedRecovery = false;
+    // Combo: a light hit that connected may be cancelled into a heavy one, once per swing.
+    if (this.judgedCombo !== this.attackSerial && ['HIT', 'STUNNED'].includes(target.combatState.state)
+      && this.canCancelInto('HEAVY_PUNCH')) {
+      this.judgedCombo = this.attackSerial;
+      if (this.chance(this.profile.comboChance)) { this.executeAttack('HEAVY_PUNCH'); return; }
+    }
     if (!this.combatState.canAct() || this.decisionTimer > 0) return;
     this.decisionTimer = this.profile.reactionMs;
     // Keep the original direction in the air so crossing over does not turn into orbiting.

@@ -42,6 +42,17 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] PEL-06 · Contador de combos y cancelación de golpes suaves
+- **Hoy:** un golpe suave deja al atacante en −2: no existen combos.
+- **Hacer:** `cancelsInto` en `AttackDefinition` (puño suave → patada suave, puño o patada
+  fuertes; patada suave → fuertes), solo en el suelo y tras tocar al rival; contador «N HITS»
+  con daño total mientras el rival sigue aturdido; la CPU encadena según su dificultad.
+- **Terminado cuando:** pruebas verifican el combo de 2 y de 3 golpes (también con César), que
+  no se cancela al fallar ni de fuerte a suave, que el contador desaparece y que la CPU Difícil
+  encadena.
+- **Hecho:** `systems/ComboTracker.ts`, `ui/ComboDisplay.ts`, `GAME_CONFIG.COMBO`,
+  `comboChance` por dificultad. Pruebas en `tests/combo.spec.ts`.
+
 ### [x] PEL-04 · Lista de movimientos en la pausa
 - **Hoy:** `PauseScene` no muestra controles.
 - **Hacer:** opción "Movimientos" que lista teclas por luchador (leídas de `InputMapping.ts` y

@@ -15,6 +15,8 @@ import { InputManager } from '../input/InputManager';
 import { FacingSystem } from '../systems/FacingSystem';
 import { FighterController, ImpactEvent } from '../systems/FighterController';
 import { ImpactEffects } from '../ui/ImpactEffects';
+import { ComboTracker } from '../systems/ComboTracker';
+import { ComboDisplay } from '../ui/ComboDisplay';
 import { RoundSystem, RoundWinner, RoundEndReason } from '../systems/RoundSystem';
 import { HUD } from '../ui/HUD';
 import { FightMessages } from '../ui/FightMessages';
@@ -52,6 +54,8 @@ export class FightScene extends Phaser.Scene {
   private fighterController = new FighterController();
   private superMove!: SuperMove;
   private impacts!: ImpactEffects;
+  private combos = new ComboTracker();
+  private comboDisplay!: ComboDisplay;
   /** Remaining freeze after a hit connects (ms). Fighters stand still; the clock runs. */
   private hitstopMs = 0;
   private roundSystem!: RoundSystem;
@@ -294,7 +298,15 @@ export class FightScene extends Phaser.Scene {
     this.superMove = new SuperMove(this, fighter =>
       rosterEntry(fighter === this.player ? this.playerChoice.characterId : this.opponentChoice.characterId),
       () => GAME_CONFIG.STAGES[this.stageIndex].textureKey);
-    this.fighterController.onSuperHit = (attacker, defender) => { this.hitstopMs = 0; this.superMove.start(attacker, defender); };
+    this.fighterController.onSuperHit = (attacker, defender) => {
+      this.hitstopMs = 0; this.combos.reset(); this.comboDisplay.clear();
+      this.superMove.start(attacker, defender);
+    };
+    this.comboDisplay = new ComboDisplay(this);
+    this.combos = new ComboTracker();
+    this.combos.onChange = (attacker, combo) => this.comboDisplay.show(attacker === this.player ? 0 : 1, combo);
+    this.combos.onEnd = attacker => this.comboDisplay.end(attacker === this.player ? 0 : 1);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.comboDisplay.destroy());
     this.impacts = new ImpactEffects(this);
     this.fighterController.onImpact = event => this.onImpact(event);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.impacts.destroy());
@@ -348,6 +360,7 @@ export class FightScene extends Phaser.Scene {
       : event.attack.causesKnockdown ? 'knockdown'
         : event.attack.name.startsWith('HEAVY') ? 'heavy' : 'light';
     this.hitstopMs = Math.max(this.hitstopMs, feel.HITSTOP_MS[strength]);
+    if (event.result === 'hit') this.combos.registerHit(event.attacker, event.defender, event.attack.damage);
     this.impacts.spawn(event.x, event.y, strength === 'knockdown' ? 'heavy' : strength, event.defender.facingRight);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!reduced && (strength === 'heavy' || strength === 'knockdown')) {
@@ -364,6 +377,8 @@ export class FightScene extends Phaser.Scene {
   private onRoundEnd(winner: RoundWinner, reason: RoundEndReason): void {
     this.superMove.cancel();
     this.hitstopMs = 0;
+    this.combos.reset();
+    this.comboDisplay.end(0); this.comboDisplay.end(1);
     const wins = this.roundSystem.wins;
     this.hud.setRoundWins(wins.player, wins.opponent);
     this.player.finishRound(winner === 'draw' ? 'IDLE' : winner === 'player' ? 'VICTORY' : 'DEFEAT');
@@ -459,6 +474,7 @@ export class FightScene extends Phaser.Scene {
     this.fighterController.checkCollisions(this.player, this.opponent);
     if (!this.superMove.active) this.fighterController.checkCollisions(this.opponent, this.player);
     if (this.superMove.active) { this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft); return; }
+    this.combos.update();
 
     // Round logic
     this.roundSystem.update(delta, this.healthPct(this.player), this.healthPct(this.opponent));

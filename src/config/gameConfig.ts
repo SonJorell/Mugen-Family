@@ -13,6 +13,8 @@ export interface CpuProfile {
   punishChance: number;
   jumpCooldownMs: number;
   attacks: [number, number, number, number];
+  /** Chance to cancel a light hit that connected into a heavy follow-up. */
+  comboChance: number;
 }
 export function normalizeDifficulty(value?: string): CpuDifficulty {
   return CPU_DIFFICULTIES.includes(value as CpuDifficulty) ? value as CpuDifficulty : 'normal';
@@ -106,14 +108,18 @@ export const GAME_CONFIG = {
    * reactionMs: pause between decisions · blockChance: guard against an incoming attack ·
    * attackCooldownMs: [min, max] gap between attacks · antiAirChance: heavy punch at a close jump ·
    * punishChance: strike a whiffed or blocked attack during its recovery · jumpCooldownMs: gap
-   * between approach jumps · attacks: weights for LIGHT_PUNCH, LIGHT_KICK, HEAVY_PUNCH, HEAVY_KICK.
+   * between approach jumps · attacks: weights for LIGHT_PUNCH, LIGHT_KICK, HEAVY_PUNCH, HEAVY_KICK ·
+   * comboChance: cancel a light hit that connected into a heavy one.
    */
   CPU_DIFFICULTY: {
-    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1] },
-    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2] },
-    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3] },
+    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0 },
+    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35 },
+    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8 },
   } as Record<CpuDifficulty, CpuProfile>,
   DEFAULT_CPU_DIFFICULTY: 'normal' as CpuDifficulty,
+
+  /** Combo counter: shown from this many hits, and kept on screen this long after it ends. */
+  COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900 },
 
   /** Hit feel: freeze on contact, camera shake and sparks. Times in ms. */
   HIT_FEEL: {

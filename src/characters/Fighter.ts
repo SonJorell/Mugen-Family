@@ -266,8 +266,18 @@ export class Fighter {
 
   // ── Combat ───────────────────────────────────────────────
 
+  /**
+   * A grounded attack that already touched the defender may be cancelled into one of the
+   * attacks listed in its `cancelsInto`, which is what lets light hits chain into heavy ones.
+   */
+  canCancelInto(attackName: string): boolean {
+    const current = this.currentAttackDef;
+    return this.combatState.state === 'ATTACKING' && this.isGrounded && this.hasHitThisSwing
+      && !!current?.cancelsInto?.includes(attackName);
+  }
+
   executeAttack(attackName: string): void {
-    if (!this.combatState.canAct()) return;
+    if (!this.combatState.canAct() && !this.canCancelInto(attackName)) return;
     if (attackName === 'SPECIAL_ATTACK' && (!this.superReady || !this.isGrounded)) return;
 
     const driveGrab = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'drive';

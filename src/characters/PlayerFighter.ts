@@ -114,7 +114,7 @@ export class PlayerFighter extends Fighter {
       this.bufferedAttack.age += delta;
       if (this.bufferedAttack.age > GAME_CONFIG.INPUT_BUFFER_MS) this.bufferedAttack = null;
     }
-    if (this.bufferedAttack && this.combatState.canAct()) {
+    if (this.bufferedAttack && (this.combatState.canAct() || this.canCancelInto(this.bufferedAttack.name))) {
       const { name } = this.bufferedAttack;
       this.bufferedAttack = null;
       this.executeAttack(name);

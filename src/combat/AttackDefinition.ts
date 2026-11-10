@@ -22,6 +22,8 @@ export interface AttackDefinition {
   blockstun: number;
   /** Horizontal push (px/s, before friction) given to a defender who blocks. */
   blockPushback: number;
+  /** Attacks this one may be cancelled into once it has touched the defender (hit or block). */
+  cancelsInto?: string[];
   /** Hitbox relative to fighter center (x, y, width, height) */
   hitbox: { x: number; y: number; width: number; height: number };
 }
@@ -45,6 +47,7 @@ export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
     causesKnockdown: false,
     blockstun: 13,
     blockPushback: 220,
+    cancelsInto: ['LIGHT_KICK', 'HEAVY_PUNCH', 'HEAVY_KICK'],
     hitbox: { x: 35, y: -210, width: 105, height: 60 },
   },
   HEAVY_PUNCH: {
@@ -71,6 +74,7 @@ export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
     causesKnockdown: false,
     blockstun: 13,
     blockPushback: 240,
+    cancelsInto: ['HEAVY_PUNCH', 'HEAVY_KICK'],
     hitbox: { x: 35, y: -120, width: 110, height: 65 },
   },
   HEAVY_KICK: {
