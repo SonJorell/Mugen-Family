@@ -282,7 +282,8 @@ export class FightScene extends Phaser.Scene {
 
   private createSystems(): void {
     this.superMove = new SuperMove(this, fighter =>
-      rosterEntry(fighter === this.player ? this.playerChoice.characterId : this.opponentChoice.characterId));
+      rosterEntry(fighter === this.player ? this.playerChoice.characterId : this.opponentChoice.characterId),
+      () => GAME_CONFIG.STAGES[this.stageIndex].textureKey);
     this.fighterController.onSuperHit = (attacker, defender) => this.superMove.start(attacker, defender);
     this.roundSystem = new RoundSystem(this);
     this.roundSystem.onRoundEnd = (winner, reason) => this.onRoundEnd(winner, reason);

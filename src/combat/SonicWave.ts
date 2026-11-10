@@ -6,7 +6,7 @@ export type WaveStyle = 'sonic' | 'quake';
 
 /**
  * One travelling super opener: world-space hitbox and artwork share the same position.
- * 'sonic' is Tilin's flying note; 'quake' is César's slower shockwave along the floor.
+ * 'sonic' is Tilin's flying note; the optional 'quake' variant travels along the floor.
  */
 export class SonicWave {
   active = true;

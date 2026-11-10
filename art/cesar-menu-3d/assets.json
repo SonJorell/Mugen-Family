@@ -1,0 +1,20 @@
+{
+  "generator": "Built-in ImageGen",
+  "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-9cbd3f01-6946-4c59-af4b-7debf6b42c90.png",
+  "saved": "public/assets/menu/cesar-3d-v2.png",
+  "references": [
+    {
+      "path": "public/assets/menu/tilin-3d.png",
+      "role": "Smooth cinematic 3D rendering and lighting"
+    },
+    {
+      "path": "public/assets/menu/cesar-3d.png",
+      "role": "César identity, pose, proportions and clothes"
+    }
+  ],
+  "size": [
+    1024,
+    1536
+  ],
+  "alphaPreserved": true
+}

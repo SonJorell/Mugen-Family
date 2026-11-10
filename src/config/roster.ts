@@ -16,8 +16,8 @@ export interface FighterStats {
   damage: number;
   /** Knockback received is divided by it. */
   weight: number;
-  /** Projectile that opens the super with O. */
-  special: 'sonic' | 'quake';
+  /** Opener for the super with O: a sonic wave or a close-range grab. */
+  special: 'sonic' | 'drive';
 }
 
 export const DEFAULT_STATS: FighterStats = {
@@ -62,15 +62,15 @@ export const FIGHTER_ROSTER: readonly RosterEntry[] = [
   {
     id: 'cesar',
     name: 'César',
-    power: 'Pisotón sísmico',
-    description: 'Una onda por el suelo; se esquiva saltando.',
+    power: 'Furia del i30',
+    description: 'Acércate y agarra con O. Requiere energía completa.',
     manifestPath: '/assets/characters/cesar/manifest.json',
     superPortraitPath: '/assets/effects/cesar-super.png',
     menuArtPath: '/assets/menu/cesar-3d-v2.png',
-    motto: 'Haz temblar\nel Morro.',
-    superName: 'TERREMOTO\nDEL MORRO',
+    motto: 'A fondo\npor Arica.',
+    superName: 'FURIA\nDEL i30',
     // Big and heavy: more health and damage, slower legs and fists, barely moved by hits.
-    stats: { size: 1.14, maxHealth: 125, walkSpeed: 0.72, jumpPower: 0.86, attackSpeed: 0.8, damage: 1.3, weight: 1.7, special: 'quake' },
+    stats: { size: 1.14, maxHealth: 125, walkSpeed: 0.72, jumpPower: 0.86, attackSpeed: 0.8, damage: 1.3, weight: 1.7, special: 'drive' },
   },
 ];
 

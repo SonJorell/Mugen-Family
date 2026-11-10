@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { FIGHTER_ROSTER } from '../config/roster';
+import { DRIVE_ASSETS } from '../combat/driveAssets';
 import { CharacterManifest, isValidManifest, manifestKey, menuArtKey, sortAnimationFiles, superPortraitKey, UI_SOUNDS } from '../config/characters';
 
 export class PreloadScene extends Phaser.Scene {
@@ -81,7 +82,8 @@ export class PreloadScene extends Phaser.Scene {
       this.load.image(menuArtKey(fighter.id), fighter.menuArtPath);
       this.load.image(superPortraitKey(fighter.id), fighter.superPortraitPath);
     }
-    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'music-menu', 'music-fight', ...UI_SOUNDS]) {
+    for (const [key, path] of Object.entries(DRIVE_ASSETS)) this.load.image(key, path);
+    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'super-drive', 'music-menu', 'music-fight', ...UI_SOUNDS]) {
       this.load.audio(key, `/assets/audio/${key}.wav`);
     }
     // The native HTML video owns loading and playback; avoid downloading it twice.
@@ -94,7 +96,7 @@ export class PreloadScene extends Phaser.Scene {
         this.showLoadError();
         return;
       }
-      for (const key of ['menu_arica_coast', ...FIGHTER_ROSTER.flatMap(f => [menuArtKey(f.id), superPortraitKey(f.id)]), ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
+      for (const key of ['menu_arica_coast', ...Object.keys(DRIVE_ASSETS), ...FIGHTER_ROSTER.flatMap(f => [menuArtKey(f.id), superPortraitKey(f.id)]), ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
         this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
       }
       this.scene.start('MenuScene', { manifest: this.manifests[0] });

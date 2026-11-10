@@ -9,7 +9,7 @@ import { AnimationDefinition } from '../animation/AnimationDefinition';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { CombatState, FighterState } from '../combat/CombatState';
 import { Hitbox, Hurtbox, DEFAULT_HURTBOX } from '../combat/Hitbox';
-import { AttackDefinition, ATTACK_DEFINITIONS } from '../combat/AttackDefinition';
+import { AttackDefinition, ATTACK_DEFINITIONS, DRIVE_GRAB_ATTACK } from '../combat/AttackDefinition';
 import { SonicWave } from '../combat/SonicWave';
 import { DEFAULT_STATS, FighterStats } from '../config/roster';
 
@@ -268,7 +268,8 @@ export class Fighter {
     if (!this.combatState.canAct()) return;
     if (attackName === 'SPECIAL_ATTACK' && (!this.superReady || !this.isGrounded)) return;
 
-    const baseDef = ATTACK_DEFINITIONS[attackName];
+    const driveGrab = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'drive';
+    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : ATTACK_DEFINITIONS[attackName];
     if (!baseDef) return;
     const attackDef = this.scaleAttack(baseDef);
 
@@ -283,11 +284,11 @@ export class Fighter {
     if (attackName === 'SPECIAL_ATTACK') this.energyValue = 0;
 
     this.combatState.setState('ATTACKING', attackName);
-    const aerial = !this.isGrounded && attackName !== 'SPECIAL_ATTACK'
+    const aerial = driveGrab ? 'HEAVY_PUNCH' : !this.isGrounded && attackName !== 'SPECIAL_ATTACK'
       ? (attackName.includes('KICK') ? 'AIR_KICK' : 'AIR_PUNCH') : attackName;
     this.playAnimation(this.registry.has(aerial) ? aerial : attackName, true);
 
-    if (attackName === 'SPECIAL_ATTACK') { this.hitbox = null; return; }
+    if (attackName === 'SPECIAL_ATTACK' && !driveGrab) { this.hitbox = null; return; }
 
     // Create hitbox (Hitbox.getWorldRect handles facing direction cleanly without double inversion)
     this.hitbox = new Hitbox(this.characterId, {
@@ -303,12 +304,11 @@ export class Fighter {
     if (!this.currentAttackDef) return;
     const { startup, active, recovery } = this.currentAttackDef;
     const elapsedFrames = this.combatState.stateTimer * 60 / 1000;
-    if (this.currentAttackDef.name === 'SPECIAL_ATTACK' && !this.sonicReleased && elapsedFrames + 1e-6 >= startup) {
+    if (this.currentAttackDef.name === 'SPECIAL_ATTACK' && this.stats.special === 'sonic' && !this.sonicReleased && elapsedFrames + 1e-6 >= startup) {
       this.sonicReleased = true;
       const direction = this.facingRight ? 1 : -1;
-      const quake = this.stats.special === 'quake';
-      this.sonicWaves.push(new SonicWave(this.scene, this.x + direction * (quake ? 90 * this.stats.size : 65), quake ? this.y - 70 : this.y - 215, direction, this.stats.special));
-      this.playImpactSound(quake ? 'hit-heavy' : 'voice-canto');
+      this.sonicWaves.push(new SonicWave(this.scene, this.x + direction * 65, this.y - 215, direction));
+      this.playImpactSound('voice-canto');
     }
     if (elapsedFrames + 1e-6 >= startup + active + recovery) {
       this.endAttack();

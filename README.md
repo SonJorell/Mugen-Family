@@ -18,7 +18,7 @@ Abrir http://localhost:3000. El juego está pensado para teclado. El lienzo se a
 **Elegir luchadores** abre el selector arcade. El plantel tiene dos luchadores, cada uno con cuatro colores (Original, Amatista, Menta y Coral):
 
 - **Tilin:** ágil, con canto sónico.
-- **César:** grande y pesado. Tiene 125 de vida y pega un 30 % más fuerte, pero camina, salta y ataca más lento, y casi no retrocede al recibir golpes. Su poder es el *Pisotón sísmico*, una onda que recorre el suelo y se esquiva saltando. Su súper es *Terremoto del Morro*. Sus 23 animaciones usan ahora 276 cuadros redibujados, con apoyos y articulaciones naturales; dirección visual, prompts y procedencia en `art/cesar-v2/`. La versión anterior se conserva en `art/cesar/`.
+- **César:** grande y pesado. Tiene 125 de vida y pega un 30 % más fuerte, pero camina, salta y ataca más lento, y casi no retrocede al recibir golpes. Su súper, *Furia del i30*, comienza con un agarre cercano: lanza al rival al extremo opuesto, sube a su Hyundai i30, lo atropella en una secuencia arcade y vuelve a su posición con una Monster. Sus 23 animaciones usan 276 cuadros redibujados; dirección visual, prompts y procedencia en `art/cesar-v2/`. Los recursos de la cinemática están documentados en `art/cesar-drive/`.
 
 Q / E cambia de luchador en el lado activo. Los colores no cambian las estadísticas. Para sumar un luchador: crea su carpeta en `public/assets/characters/<id>/` con `manifest.json` y agrega una entrada en `src/config/roster.ts`, con su ilustración de portada (`menuArtPath`, PNG transparente 2:3) y su lema (`motto`).
 
@@ -38,7 +38,7 @@ Las elecciones se conservan al volver al menú y reiniciar. **Cambiar selección
 
 La portada es una escena animada con efecto 3D sobre la costa de Arica. Al abrirse reproduce una entrada cinemática de 1,6 s: la cámara retrocede, las dos líneas del título caen desde la pantalla con sacudida, el luchador gira en perspectiva hasta su guardia y las opciones se despliegan como cartas. Después quedan vivos los rayos del sol, chispas en perspectiva real (las cercanas se mueven más con el puntero), ondas en el suelo y un título extruido cuyo relieve cambia con el punto de vista. El luchador gira hacia el puntero; la opción elegida se adelanta con un barrido de luz, y al confirmar la cámara se zambulle en la pantalla. Las opciones nunca se desplazan de lado. La preferencia del navegador **Reducir movimiento** muestra el menú terminado al instante y desactiva la entrada, la transición, los efectos ambientales y la respuesta al puntero, incluso si cambia con el menú abierto.
 
-La portada presenta a los luchadores del plantel en orden aleatorio y los rota cada 6,5 s: el actual gira de canto, y el siguiente entra girando con su nombre, lema y poder. La ilustración de César (`public/assets/menu/cesar-3d.png`) se obtuvo recortando el fondo verde de `assets/Characters/Cesar/WATON MAIN.jpg`.
+La portada presenta a los luchadores del plantel en orden aleatorio y los rota cada 6,5 s: el actual gira de canto, y el siguiente entra girando con su nombre, lema y poder. La ilustración de César (`public/assets/menu/cesar-3d-v2.png`) usa el mismo acabado 3D suave de Tilin; fue generada con ImageGen integrado y su procedencia está en `art/cesar-menu-3d/`.
 
 El selector comparte el lenguaje visual. Detrás hay un suelo de rejilla en perspectiva que avanza hacia el jugador, con horizonte luminoso y chispas. En **luchadores**, las tarjetas entran desde los lados, cada personaje está sobre un pedestal con anillos y foco, el VS en relieve cae con sacudida, y el personaje salta al cambiar de luchador o color. En **escenarios**, las miniaturas se levantan una tras otra, la vista grande se abre como una puerta y recorre la arena lentamente sin deformarla. En **combate listo**, los dos luchadores entran corriendo, un VS grande golpea la pantalla y la cruza una hoja de luz. Cada cambio reconstruye la pantalla en su posición final y anima encima, así que ninguna animación bloquea teclas ni clics. Con **Reducir movimiento** todo aparece quieto y completo.
 
@@ -60,7 +60,7 @@ El HUD de combate está animado. Las barras de vida se llenan al abrir la ronda,
 | Puño suave / fuerte | J / K |
 | Patada suave / fuerte | U / I |
 | Bloquear de frente | L |
-| Canto sónico | O |
+| Súper del personaje (energía completa) | O |
 | Activar / silenciar música | M o botón de música |
 | Volumen de música | , / . o botones − / + |
 | Provocar | P |
@@ -77,7 +77,7 @@ Los impactos tienen cuatro sonidos originales: suave, fuerte, especial y bloqueo
 
 La interfaz tiene tres sonidos propios, generados con `node scripts/generate-menu-sounds.mjs`: `menu-impact` (golpe grave al caer el título y el VS), `menu-whoosh` (barrido de aire en transiciones y cambios de luchador) y `menu-move` (tic al mover el cursor). Los navegadores bloquean el audio hasta el primer clic o tecla, así que la primera entrada de la portada es muda; después suenan siempre.
 
-## Canto y música
+## Súper y música
 
 **O** activa el súper de Tilin únicamente con **100 % de energía** y estando en el suelo. La barra empieza vacía: un golpe normal acertado aporta el doble de su daño más 6 puntos; recibirlo aporta su daño más 2. Un contacto bloqueado aporta 4 al atacante y 8 al defensor. Fallar o esperar no carga energía. La barra se limita a 100 y cada intento consume toda la carga, aunque falle o se bloquee. La CPU sigue las mismas reglas.
 
@@ -86,6 +86,10 @@ Tras 0,35 segundos de anticipación, Tilin libera el **golpe sónico inicial**. 
 Si el primer golpe conecta sin bloqueo, comienza **Canto resonante**: retrato de Tilin cantando, ondas musicales, cinco pulsos y remate, durante 3 segundos. Sus siete impactos suman **60 de daño** y dejan al rival aturdido durante 0,9 segundos. Durante la secuencia se detienen el reloj y los movimientos; su daño no recarga energía. El K.O. se resuelve al finalizar la secuencia. **Esc** pausa también la animación y su sonido; reiniciar o salir limpia el efecto. El movimiento reducido del navegador elimina las sacudidas y el desplazamiento de las ondas.
 
 El retrato original está en `public/assets/effects/tilin-super-canto.png`, generado con ImageGen integrado. El prompt y la dirección visual están en `art/super-canto/`. `node scripts/generate-super-sound.mjs` regenera el crescendo vocal y sus impactos originales; `node scripts/inspect-super.mjs` guarda capturas y verifica el daño de la secuencia completa.
+
+**César — Furia del i30:** con la barra al 100 %, **O** intenta un agarre de corta distancia. La preparación permite interrumpirlo con un golpe; bloquear de frente con **L**, saltar o alejarse evita la secuencia. Cada intento consume la barra. Al conectar, el agarre causa 4 de daño, el lanzamiento 12 y el atropello 44: **60 en total**. La secuencia dura 5,8 s, detiene el reloj y no recarga energía. César regresa al punto donde agarró; el rival queda aturdido en el extremo opuesto. Incluso un golpe fatal espera al regreso con la Monster antes de cerrar la ronda. Esc pausa también el motor; cancelar o reiniciar elimina el auto y todo daño pendiente. El movimiento reducido elimina las sacudidas y las estelas rápidas.
+
+Los cinco PNG de la secuencia están en `public/assets/effects/cesar-drive/`. `node scripts/generate-drive-sound.mjs` regenera el audio original de agarre, lanzamiento, puerta, motor, atropello y lata. `node scripts/inspect-drive.mjs` revisa ambas direcciones y guarda las capturas y el informe en `artifacts/cesar-drive/`; acepta `GAME_URL` para revisar una compilación de producción.
 
 La música original tiene dos arreglos en bucle: menú a 96 BPM y combate a 128 BPM. La pausa detiene la música del combate; al cambiar de escena no se superponen pistas. **M** silencia solo la música, manteniendo audibles los golpes y el canto. El volumen y la preferencia se guardan localmente. `node scripts/generate-music.mjs` regenera las dos pistas y el efecto vocal sintetizado, sin grabaciones externas.
 

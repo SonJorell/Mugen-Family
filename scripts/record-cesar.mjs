@@ -37,7 +37,11 @@ await page.keyboard.press('KeyW', { delay: 60 }); await page.waitForTimeout(300)
 await page.keyboard.press('KeyW', { delay: 60 }); await page.keyboard.press('KeyU', { delay: 60 });
 await page.waitForTimeout(1500);
 await page.evaluate(() => {
-  const s = window.__game.scene.getScene('FightScene'); s.player.gainEnergy(100);
+  const s = window.__game.scene.getScene('FightScene');
+  s.player.finishRound('IDLE'); s.opponent.finishRound('IDLE');
+  s.player.x = 700; s.opponent.x = 815;
+  s.player.updateFacing(s.opponent.x); s.opponent.updateFacing(s.player.x);
+  s.player.gainEnergy(100);
 });
 await page.keyboard.press('KeyO', { delay: 60 });
 await page.waitForFunction(() => window.__game.scene.getScene('FightScene').superMove.active);
@@ -47,4 +51,4 @@ assert.deepEqual(errors, []);
 await context.close();
 await copyFile(await page.video().path(), `${output}/gameplay.webm`);
 await browser.close();
-console.log('Recorded César walking, retreating, four strikes, crouch, guard, double jump, aerial kick and the seismic super without runtime errors.');
+console.log('Recorded César walking, retreating, four strikes, crouch, guard, double jump, aerial kick and the i30 grab super without runtime errors.');

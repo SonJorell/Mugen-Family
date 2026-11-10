@@ -32,6 +32,18 @@ export class FighterController {
       if (!attackDef) return;
 
       const fromRight = attacker.x > defender.x;
+      if (attackDef.name === 'SPECIAL_ATTACK' && attacker.stats.special === 'drive') {
+        // Airborne opponents escape a grounded grab; frontal guard also stops the opener.
+        if (!defender.isGrounded || !defender.canReceiveHit) return;
+        attacker.hasHitThisSwing = true;
+        attacker.hitbox.active = false;
+        if (defender.combatState.state === 'BLOCKING' && defender.facingRight === fromRight) {
+          defender.receiveHit(0, 0, 0, false, fromRight);
+        } else {
+          this.onSuperHit?.(attacker, defender);
+        }
+        return;
+      }
       const result = defender.receiveHit(
         attackDef.damage,
         attackDef.hitstun,

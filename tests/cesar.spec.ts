@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-test('César can be picked with E, is bigger and sturdier, and his floor quake opens the super', async ({ page }) => {
+test('César can be picked with E, is bigger and sturdier, and his close grab opens the i30 super', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
@@ -32,13 +32,13 @@ test('César can be picked with E, is bigger and sturdier, and his floor quake o
   await page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('FightScene');
     s.player.finishRound('IDLE'); s.opponent.finishRound('IDLE');
-    s.player.x = 700; s.opponent.x = 1100;
+    s.player.x = 700; s.opponent.x = 815;
     s.player.updateFacing(s.opponent.x); s.opponent.updateFacing(s.player.x);
     s.player.gainEnergy(100);
   });
   await page.keyboard.press('o', { delay: 60 });
-  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').player.sonicWaves.some((w: any) => w.style === 'quake'));
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').superMove.active);
+  expect(await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').superMove.sound?.key)).toBe('super-drive');
   expect(await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').player.energy)).toBe(0);
   expect(errors).toEqual([]);
 });

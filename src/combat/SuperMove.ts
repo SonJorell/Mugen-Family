@@ -2,6 +2,9 @@ import Phaser from 'phaser';
 import { Fighter } from '../characters/Fighter';
 import { RosterEntry } from '../config/roster';
 import { superPortraitKey } from '../config/characters';
+import { GAME_CONFIG } from '../config/gameConfig';
+import { CesarDriveSequence } from './CesarDriveSequence';
+import { DRIVE_BEATS, DRIVE_DURATION } from './driveAssets';
 
 const BEATS = [
   { at: 0, damage: 4 }, { at: 900, damage: 7 }, { at: 1200, damage: 7 },
@@ -32,11 +35,14 @@ export class SuperMove {
   private fromRight = false;
   private expanded = false;
   private controls?: Phaser.GameObjects.Text;
+  private drive?: CesarDriveSequence;
+  private casterOrigin = { x: 0, y: 0 };
   private readonly motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   private pauseAudio = () => this.sound?.pause();
   private resumeAudio = () => { if (this.sound?.isPaused) this.sound.resume(); };
 
-  constructor(private scene: Phaser.Scene, private identify: (fighter: Fighter) => RosterEntry) {
+  constructor(private scene: Phaser.Scene, private identify: (fighter: Fighter) => RosterEntry,
+    private stageTexture: () => string = () => GAME_CONFIG.STAGES[0].textureKey) {
     scene.events.on(Phaser.Scenes.Events.PAUSE, this.pauseAudio);
     scene.events.on(Phaser.Scenes.Events.RESUME, this.resumeAudio);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -52,14 +58,19 @@ export class SuperMove {
     this.attacker = attacker; this.defender = defender;
     this.active = true; this.elapsed = 0; this.beat = 0; this.damage = 0; this.expanded = false;
     this.fromRight = attacker.x > defender.x;
+    this.casterOrigin = { x: attacker.x, y: attacker.y };
     this.casterX = this.fromRight ? 950 : 330; this.victimX = this.fromRight ? 330 : 950;
     attacker.enterSuper(true); defender.enterSuper(false);
     attacker.sprite.setVisible(false); defender.sprite.setVisible(false);
     this.controls = this.scene.children.getByName('fight-controls') as Phaser.GameObjects.Text | undefined;
     this.controls?.setVisible(false);
-    this.createArt();
-    if (this.scene.cache.audio.exists('super-canto')) {
-      this.sound = this.scene.sound.add('super-canto', { volume: 0.72 }) as SuperSound;
+    if (attacker.stats.special === 'drive') {
+      this.drive = new CesarDriveSequence(this.scene, attacker, defender, this.identify(defender).id, this.stageTexture(), this.fromRight);
+      this.layer = this.drive.layer;
+    } else this.createArt();
+    const soundKey = this.drive ? 'super-drive' : 'super-canto';
+    if (this.scene.cache.audio.exists(soundKey)) {
+      this.sound = this.scene.sound.add(soundKey, { volume: 0.72 }) as SuperSound;
       this.sound.play();
     }
     this.scene.sound.play('hit-special', { volume: 0.65 });
@@ -98,15 +109,32 @@ export class SuperMove {
 
   update(delta: number): void {
     if (!this.active || !this.attacker || !this.defender) return;
-    this.elapsed = Math.min(DURATION, this.elapsed + Math.max(0, delta));
-    while (this.beat < BEATS.length && this.elapsed + 0.001 >= BEATS[this.beat].at) {
-      this.damage += this.defender.takeSuperDamage(BEATS[this.beat].damage);
+    const beats = this.drive ? DRIVE_BEATS : BEATS, duration = this.drive ? DRIVE_DURATION : DURATION;
+    this.elapsed = Math.min(duration, this.elapsed + Math.max(0, delta));
+    while (this.beat < beats.length && this.elapsed + 0.001 >= beats[this.beat].at) {
+      this.damage += this.defender.takeSuperDamage(beats[this.beat].damage);
       this.beat++;
-      if (this.beat === BEATS.length) this.defender.playAnimation('KNOCKDOWN', true);
+      if (this.beat === beats.length) this.defender.playAnimation('KNOCKDOWN', true);
     }
     this.attacker.updatePresentation(delta); this.defender.updatePresentation(delta);
-    this.render();
-    if (this.elapsed >= DURATION) this.cancel();
+    if (this.drive) this.drive.render(this.elapsed, this.damage, this.motion.matches);
+    else this.render();
+    if (this.elapsed >= duration) {
+      if (this.drive) {
+        // Commit the throw only on completion; cancelling never teleports either fighter.
+        this.attacker.x = this.casterOrigin.x; this.attacker.y = this.casterOrigin.y;
+        this.defender.x = this.fromRight ? 180 : GAME_CONFIG.STAGE_WIDTH - 180;
+        this.defender.y = GAME_CONFIG.FLOOR_Y;
+        this.defender.isGrounded = true; this.defender.velocityY = 0;
+        this.attacker.sprite.setPosition(this.attacker.x, this.attacker.y);
+        this.defender.sprite.setPosition(this.defender.x, this.defender.y);
+        this.scene.cameras.main.scrollX = Phaser.Math.Clamp(
+          (this.attacker.x + this.defender.x - GAME_CONFIG.WIDTH) / 2,
+          0, GAME_CONFIG.STAGE_WIDTH - GAME_CONFIG.WIDTH);
+        this.scene.cameras.main.scrollY = 0;
+      }
+      this.cancel();
+    }
   }
 
   private render(): void {
@@ -172,6 +200,7 @@ export class SuperMove {
     if (restoreFighters && this.controls?.scene) this.controls.setVisible(true);
     this.controls = undefined;
     this.layer?.destroy(); this.layer = undefined;
+    this.drive = undefined;
     this.sound?.destroy(); this.sound = undefined;
     this.attacker = undefined; this.defender = undefined;
   }

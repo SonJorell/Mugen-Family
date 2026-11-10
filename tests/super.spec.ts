@@ -125,9 +125,10 @@ test('pausing a cinematic freezes its damage and restart clears the scene, sound
     const s = (window as any).__game.scene.getScene('FightScene');
     s.player.x = 600; s.opponent.x = 850; s.player.gainEnergy?.(100);
   });
-  await page.keyboard.press('KeyO');
+  // Gameplay polls JustDown once per frame; an instant down/up can be lost before that poll.
+  await page.keyboard.press('KeyO', { delay: 60 });
   await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('FightScene').superMove?.active)).toBe(true);
-  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape', { delay: 60 });
   await page.waitForFunction(() => (window as any).__game.scene.isActive('PauseScene'));
   const snapshot = () => page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('FightScene');
@@ -135,10 +136,10 @@ test('pausing a cinematic freezes its damage and restart clears the scene, sound
   });
   const paused = await snapshot(); expect(paused.soundPaused).toBe(true);
   await page.waitForTimeout(450); expect(await snapshot()).toEqual(paused);
-  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape', { delay: 60 });
   await expect.poll(async () => (await snapshot()).time).toBeGreaterThan(paused.time);
   expect((await snapshot()).soundPaused).toBe(false);
-  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape', { delay: 60 });
   await page.waitForFunction(() => (window as any).__game.scene.isActive('PauseScene'));
   await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
   await expect.poll(async () => ({ errors, active: await page.evaluate(() => (window as any).__game.scene.isActive('FightScene')) }))
@@ -163,11 +164,19 @@ for (const defense of ['guard', 'double jump'] as const) for (const fromRight of
     if (defense === 'double jump') {
       // Keep each press across a rendered frame: Phaser clears JustDown on keyup.
       await page.keyboard.press('KeyW', { delay: 60 });
-      await page.waitForTimeout(370);
+      // Jump again at the apex so the feet stay above the wave until its trailing edge passes.
+      // Wall-clock waits can fire too early when rendering slows the simulation.
+      await page.waitForFunction(() => {
+        const p = (window as any).__game.scene.getScene('FightScene').player;
+        return p.jumpsUsed === 1 && !p.isGrounded && p.velocityY >= 0;
+      });
       await page.keyboard.press('KeyW', { delay: 60 });
       expect(await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').player.jumpsUsed)).toBe(2);
     }
-    await page.waitForTimeout(1500);
+    await page.waitForFunction(() => {
+      const o = (window as any).__game.scene.getScene('FightScene').opponent;
+      return !o.getActiveAttackDef() && o.sonicWaves.length === 0;
+    });
     const result = await page.evaluate(() => {
       const s = (window as any).__game.scene.getScene('FightScene');
       return { health: s.player.currentHealth, energy: s.opponent.energy, active: s.superMove.active };

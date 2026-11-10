@@ -22,6 +22,13 @@ export interface AttackDefinition {
   hitbox: { x: number; y: number; width: number; height: number };
 }
 
+/** César's telegraphed grounded grab. Damage is owned by the confirmed cinematic. */
+export const DRIVE_GRAB_ATTACK: AttackDefinition = {
+  name: 'SPECIAL_ATTACK', startup: 18, active: 7, recovery: 40,
+  damage: 0, hitstun: 0, knockback: 0, causesKnockdown: false,
+  hitbox: { x: 28, y: -230, width: 95, height: 170 },
+};
+
 export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
   LIGHT_PUNCH: {
     name: 'LIGHT_PUNCH',

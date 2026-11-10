@@ -1,0 +1,29 @@
+{
+  "generator": "Built-in ImageGen",
+  "assets": {
+    "i30-drive": {
+      "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-05eb0b8f-72f2-4e76-8731-dfb038a1b9f3.png",
+      "saved": "public/assets/effects/cesar-drive/i30-drive.png"
+    },
+    "i30-enter": {
+      "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-a7d62297-1c8a-4064-ab1a-585ff6690d25.png",
+      "saved": "public/assets/effects/cesar-drive/i30-enter.png"
+    },
+    "cesar-grab": {
+      "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-a8eaaf38-048c-4dc4-a83e-f70dcac18f8e.png",
+      "saved": "public/assets/effects/cesar-drive/cesar-grab.png"
+    },
+    "cesar-throw": {
+      "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-65a042a5-2bbe-4fa2-ab73-b951fab4ce5a.png",
+      "saved": "public/assets/effects/cesar-drive/cesar-throw.png"
+    },
+    "cesar-monster": {
+      "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-0a723db4-6d6e-4ab3-9d90-00448ad5d348.png",
+      "saved": "public/assets/effects/cesar-drive/cesar-monster.png"
+    }
+  },
+  "carCorrection": {
+    "source": "exec-41ae2302-d5c4-4d89-88d4-8bb9784c516e.png",
+    "prompt": "Edit only the silver driver's door body panel in this existing transparent car image. It currently incorrectly shows the driver's knee, sock and sneaker through the METAL door. Remove that see-through leg entirely and restore a fully opaque realistic silver-painted metal door panel with the same reflections and contours as the surrounding silver i30 body. Keep the driver's face, torso and arms visible through the actual WINDOW ABOVE the door exactly as they are. Keep everything else unchanged: car shape, camera, right-facing direction, wheels, silver paint, driver identity, dimensions and existing transparent background. No new objects, no text, no scenery. The car body must be solid, never X-ray transparent."
+  }
+}
