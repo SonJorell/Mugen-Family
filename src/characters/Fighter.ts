@@ -7,7 +7,7 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { AnimationDefinition } from '../animation/AnimationDefinition';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
-import { CombatState, FighterState } from '../combat/CombatState';
+import { CombatState } from '../combat/CombatState';
 import { Hitbox, Hurtbox, DEFAULT_HURTBOX } from '../combat/Hitbox';
 import { AttackDefinition, ATTACK_DEFINITIONS, DRIVE_GRAB_ATTACK } from '../combat/AttackDefinition';
 import { SonicWave } from '../combat/SonicWave';
@@ -313,7 +313,7 @@ export class Fighter {
     this.hitbox.active = false;
   }
 
-  protected updateAttackFrames(delta: number): void {
+  protected updateAttackFrames(_delta: number): void {
     if (!this.currentAttackDef) return;
     const { startup, active, recovery } = this.currentAttackDef;
     const elapsedFrames = this.combatState.stateTimer * 60 / 1000;

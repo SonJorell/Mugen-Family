@@ -10,7 +10,6 @@
 
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { AnimationDefinition } from './AnimationDefinition';
 import { AnimationRegistry } from './AnimationRegistry';
 
 const FRAMES_PER_IMAGE = 3;

@@ -15,11 +15,12 @@ Plantel actual: Tilin (canto sónico) y César (pisotón sísmico). Escenarios e
 npm ci            # instalar
 npm run dev       # http://localhost:3000
 npm run check     # tsc --noEmit (tipado)
+npm run lint      # ESLint + typescript-eslint
 npm test          # Playwright sobre el juego real
 npm run build     # tsc + vite build
 ```
 
-Antes de dar un cambio por terminado: `npm run check` y las pruebas del área tocada
+Antes de dar un cambio por terminado: `npm run check`, `npm run lint` y las pruebas del área tocada
 (`npx playwright test tests/<archivo>.spec.ts`). La suite completa, una vez antes de integrar.
 
 ## Mapa del código (`src/`)

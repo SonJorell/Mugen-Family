@@ -106,9 +106,11 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Terminado cuando:** el build pesa menos y todas las pruebas pasan.
 
 
-### [ ] CAL-01 · Linter y formato
+### [x] CAL-01 · Linter y formato
 - Agregar ESLint (typescript-eslint) y un script `npm run lint`; corregir lo que marque.
 - **Terminado cuando:** `npm run lint` pasa sin errores.
+- **Hecho:** `eslint.config.js` (flat config, reglas recomendadas de ESLint y typescript-eslint;
+  `any` permitido solo en pruebas). Se corrigieron 8 importaciones y parámetros sin uso.
 
 ### [ ] CAL-02 · Revisión de balance Tilin vs César
 - Tabla con daño por golpe × `damage`, frames × `attackSpeed`, vida y alcance de cada uno;

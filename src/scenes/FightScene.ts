@@ -196,7 +196,7 @@ export class FightScene extends Phaser.Scene {
     console.log(`[FightScene] Switched stage to: ${currentStage.name}`);
   }
 
-  private drawCityBackground(W: number, H: number): void {
+  private drawCityBackground(W: number, _H: number): void {
     const g = this.add.graphics().setDepth(0);
 
     // Buildings

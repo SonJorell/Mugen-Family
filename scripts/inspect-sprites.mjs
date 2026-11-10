@@ -63,7 +63,7 @@ const report = await page.evaluate(() => {
 });
 for (let i = 0; i < report.contacts.length; i++) await writeFile(`artifacts/tilin-v2/contact-${i + 1}.png`, Buffer.from(report.contacts[i].split(',')[1], 'base64'));
 await writeFile('artifacts/tilin-v2/validation.json', JSON.stringify(report.stats, null, 2));
-console.log(JSON.stringify(report.stats.map(({ bounds, ...summary }) => summary), null, 2));
+console.log(JSON.stringify(report.stats.map(({ bounds: _bounds, ...summary }) => summary), null, 2));
 await browser.close();
 if (errors.length) throw new Error(errors.join('\n'));
 assert.equal(report.stats.length, 23, 'Expected all twenty-three animations');

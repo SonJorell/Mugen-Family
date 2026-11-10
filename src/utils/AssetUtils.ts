@@ -16,8 +16,8 @@ export interface AnimationFileManifest {
  * This uses the character manifest JSON file served from public/assets/
  */
 export function buildAnimationManifest(
-  basePath: string,
-  characterId: string,
+  _basePath: string,
+  _characterId: string,
 ): AnimationFileManifest[] {
   const manifests: AnimationFileManifest[] = [];
 

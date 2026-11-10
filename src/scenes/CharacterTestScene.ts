@@ -9,7 +9,6 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { Fighter } from '../characters/Fighter';
-import { TEST_SCENE_BININGS } from '../input/InputMapping';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
 
