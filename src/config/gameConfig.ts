@@ -85,6 +85,23 @@ export const GAME_CONFIG = {
   /** Pause after the deciding round before returning to the menu (ms). */
   MATCH_END_MS: 4500,
 
+  /** Hit feel: freeze on contact, camera shake and sparks. Times in ms. */
+  HIT_FEEL: {
+    /** Both fighters freeze this long when a hit connects; the round clock keeps running. */
+    HITSTOP_MS: { light: 55, heavy: 90, knockdown: 120, block: 50 },
+    /** Camera shake on strong hits (skipped with prefers-reduced-motion). */
+    SHAKE: {
+      heavy: { duration: 110, intensity: 0.004 },
+      knockdown: { duration: 170, intensity: 0.007 },
+    },
+    /** Spark bursts at the contact point. */
+    SPARKS: {
+      light: { size: 46, color: 0xffb347, duration: 170 },
+      heavy: { size: 74, color: 0xff6a3d, duration: 230 },
+      block: { size: 58, color: 0x7fd6ff, duration: 190 },
+    },
+  },
+
   // Camera
   CAMERA_ZOOM: 1.0,
 

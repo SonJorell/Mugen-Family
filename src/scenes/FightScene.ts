@@ -13,7 +13,8 @@ import { Fighter } from '../characters/Fighter';
 import { PhysicsSystem } from '../systems/PhysicsSystem';
 import { InputManager } from '../input/InputManager';
 import { FacingSystem } from '../systems/FacingSystem';
-import { FighterController } from '../systems/FighterController';
+import { FighterController, ImpactEvent } from '../systems/FighterController';
+import { ImpactEffects } from '../ui/ImpactEffects';
 import { RoundSystem, RoundWinner, RoundEndReason } from '../systems/RoundSystem';
 import { HUD } from '../ui/HUD';
 import { FightMessages } from '../ui/FightMessages';
@@ -47,6 +48,9 @@ export class FightScene extends Phaser.Scene {
   private facingSystem = new FacingSystem();
   private fighterController = new FighterController();
   private superMove!: SuperMove;
+  private impacts!: ImpactEffects;
+  /** Remaining freeze after a hit connects (ms). Fighters stand still; the clock runs. */
+  private hitstopMs = 0;
   private roundSystem!: RoundSystem;
   private hud!: HUD;
   private messages!: FightMessages;
@@ -284,7 +288,10 @@ export class FightScene extends Phaser.Scene {
     this.superMove = new SuperMove(this, fighter =>
       rosterEntry(fighter === this.player ? this.playerChoice.characterId : this.opponentChoice.characterId),
       () => GAME_CONFIG.STAGES[this.stageIndex].textureKey);
-    this.fighterController.onSuperHit = (attacker, defender) => this.superMove.start(attacker, defender);
+    this.fighterController.onSuperHit = (attacker, defender) => { this.hitstopMs = 0; this.superMove.start(attacker, defender); };
+    this.impacts = new ImpactEffects(this);
+    this.fighterController.onImpact = event => this.onImpact(event);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.impacts.destroy());
     this.roundSystem = new RoundSystem(this);
     this.roundSystem.onRoundEnd = (winner, reason) => this.onRoundEnd(winner, reason);
 
@@ -326,10 +333,30 @@ export class FightScene extends Phaser.Scene {
     this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, targetY, 0.12);
   }
 
+  // ── Hit feel ──────────────────────────────────────────────
+
+  private onImpact(event: ImpactEvent): void {
+    const feel = GAME_CONFIG.HIT_FEEL;
+    const strength = event.result === 'blocked' ? 'block'
+      : event.attack.causesKnockdown ? 'knockdown'
+        : event.attack.name.startsWith('HEAVY') ? 'heavy' : 'light';
+    this.hitstopMs = Math.max(this.hitstopMs, feel.HITSTOP_MS[strength]);
+    this.impacts.spawn(event.x, event.y, strength === 'knockdown' ? 'heavy' : strength, event.defender.facingRight);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduced && (strength === 'heavy' || strength === 'knockdown')) {
+      const shake = feel.SHAKE[strength];
+      this.cameras.main.shake(shake.duration, shake.intensity);
+    }
+  }
+
+  /** True while a landed hit holds both fighters still. */
+  get inHitstop(): boolean { return this.hitstopMs > 0; }
+
   // ── Round callbacks ───────────────────────────────────────
 
   private onRoundEnd(winner: RoundWinner, reason: RoundEndReason): void {
     this.superMove.cancel();
+    this.hitstopMs = 0;
     const wins = this.roundSystem.wins;
     this.hud.setRoundWins(wins.player, wins.opponent);
     this.player.finishRound(winner === 'draw' ? 'IDLE' : winner === 'player' ? 'VICTORY' : 'DEFEAT');
@@ -398,6 +425,15 @@ export class FightScene extends Phaser.Scene {
       this.player.updatePresentation(delta);
       this.opponent.updatePresentation(delta);
       this.facingSystem.update(this.player, this.opponent);
+      this.updateCamera();
+      return;
+    }
+
+    if (this.hitstopMs > 0) {
+      // Hitstop: fighters and their timers hold still while the round clock keeps its pace.
+      this.hitstopMs = Math.max(0, this.hitstopMs - delta);
+      this.roundSystem.update(delta, this.healthPct(this.player), this.healthPct(this.opponent));
+      this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
       this.updateCamera();
       return;
     }

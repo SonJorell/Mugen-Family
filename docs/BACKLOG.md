@@ -33,6 +33,15 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
   fuertes −10/−11 al ser bloqueados. Pruebas en `tests/block.spec.ts` con Tilin y César en
   ambos lados.
 
+### [x] PEL-05 · Sensación de impacto (hitstop, sacudida y chispas)
+- **Hacer:** congelar a ambos luchadores 50–120 ms al conectar según la fuerza del golpe;
+  sacudida leve de cámara en golpes fuertes; chispas distintas para golpe y bloqueo. Valores
+  en `GAME_CONFIG.HIT_FEEL`. Con *Reducir movimiento* no hay sacudida y las chispas no se mueven.
+- **Terminado cuando:** pruebas verifican la congelación, que el reloj del round sigue corriendo,
+  que el súper limpia el hitstop y que *Reducir movimiento* no sacude la cámara.
+- **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
+  Pruebas en `tests/hitfeel.spec.ts`.
+
 ### [ ] PEL-04 · Lista de movimientos en la pausa
 - **Hoy:** `PauseScene` no muestra controles.
 - **Hacer:** opción "Movimientos" que lista teclas por luchador (leídas de `InputMapping.ts` y

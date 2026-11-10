@@ -4,9 +4,22 @@
 
 import { Fighter } from '../characters/Fighter';
 import { rectsOverlap } from '../combat/CollisionSystem';
+import { AttackDefinition } from '../combat/AttackDefinition';
+
+/** A normal attack that touched the defender, with the centre of the overlap. */
+export interface ImpactEvent {
+  attacker: Fighter;
+  defender: Fighter;
+  attack: AttackDefinition;
+  result: 'hit' | 'blocked';
+  x: number;
+  y: number;
+}
 
 export class FighterController {
   onSuperHit?: (attacker: Fighter, defender: Fighter) => void;
+  /** Reports landed or blocked normal attacks so the scene can add hitstop and sparks. */
+  onImpact?: (event: ImpactEvent) => void;
   checkCollisions(attacker: Fighter, defender: Fighter): void {
     if (attacker.inSuper || defender.inSuper) return;
     for (const wave of attacker.sonicWaves) {
@@ -56,6 +69,11 @@ export class FighterController {
       );
       if (result === 'hit') attacker.gainEnergy(attackDef.damage * 2 + 6);
       else if (result === 'blocked') attacker.gainEnergy(4);
+      if (result !== 'ignored') {
+        const left = Math.max(hitRect.worldX, hurtRect.worldX), right = Math.min(hitRect.worldX + hitRect.width, hurtRect.worldX + hurtRect.width);
+        const top = Math.max(hitRect.worldY, hurtRect.worldY), bottom = Math.min(hitRect.worldY + hitRect.height, hurtRect.worldY + hurtRect.height);
+        this.onImpact?.({ attacker, defender, attack: attackDef, result, x: (left + right) / 2, y: (top + bottom) / 2 });
+      }
 
       attacker.hasHitThisSwing = true;
       attacker.hitbox.active = false;
