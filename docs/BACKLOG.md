@@ -14,7 +14,7 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Terminado cuando:** una prueba Playwright gana 2 rounds y ve la pantalla de victoria;
   otra comprueba que un empate no da round a nadie.
 
-### [ ] PEL-02 · Búfer de entradas
+### [x] PEL-02 · Búfer de entradas
 - **Hoy:** `InputManager` usa `JustDown`; un golpe pulsado mientras termina el anterior se
   pierde.
 - **Hacer:** guardar la última pulsación de ataque durante `INPUT_BUFFER_MS` (≈100 ms, en
@@ -37,7 +37,46 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Terminado cuando:** se abre desde la pausa con teclado, muestra el poder correcto de Tilin
   y de César y vuelve con Esc.
 
+## Funcionalidades nuevas
+
+### [ ] FUN-01 · Dificultad de la CPU
+- **Hoy:** `ComputerOpponent` rota los 4 golpes en orden fijo, bloquea 1 de cada 3 y no se
+  agacha ni responde a saltos.
+- **Hacer:** niveles Fácil / Normal / Difícil (tiempos de reacción, probabilidad de bloqueo,
+  anti-aéreo) en datos de `gameConfig.ts`; selector en la selección de luchadores; algo de azar.
+- **Terminado cuando:** cada nivel se elige con teclado y una prueba verifica que Difícil
+  bloquea más que Fácil en el mismo escenario.
+
+### [ ] FUN-02 · Dos jugadores locales (teclado compartido y gamepad)
+- **Hacer:** segundo juego de teclas y soporte de mando con el plugin de gamepad de Phaser;
+  modo "Jugador 2" en el selector.
+- **Terminado cuando:** dos jugadores pelean un combate completo; prueba con entradas simuladas.
+
+### [ ] FUN-03 · Reasignar teclas en Configuración
+- **Hacer:** fila "Controles" en `SettingsScene`; guardar en `localStorage`; botón restaurar.
+- **Terminado cuando:** una tecla cambiada funciona en combate y persiste al recargar.
+
+### [ ] FUN-04 · Modo arcade
+- **Hacer:** escalera contra cada rival del plantel con dificultad creciente y pantalla final
+  por luchador.
+- **Terminado cuando:** se puede completar la escalera y ver el final.
+
+### [ ] FUN-05 · Modo entrenamiento mejorado
+- **Hacer:** visor de entradas, datos de frames del último golpe y vida que se recupera.
+- **Terminado cuando:** las tres opciones se activan desde la pausa del modo práctica.
+
+### [ ] FUN-06 · Publicación web
+- **Hacer:** script de despliegue de `dist/` a itch.io o GitHub Pages (ruta base de Vite).
+- **Terminado cuando:** el juego abre desde un link público.
+
 ## Calidad y proceso
+
+### [ ] CAL-04 · Limpiar versiones viejas de sprites
+- **Hoy:** en `public/assets/characters` conviven `tilin`, `tilin-v2`, `tilin-v3`, `cesar` y
+  `cesar-v2`.
+- **Hacer:** verificar qué carga cada `manifest.json` y mover lo no usado fuera de `public/`.
+- **Terminado cuando:** el build pesa menos y todas las pruebas pasan.
+
 
 ### [ ] CAL-01 · Linter y formato
 - Agregar ESLint (typescript-eslint) y un script `npm run lint`; corregir lo que marque.

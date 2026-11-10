@@ -8,6 +8,8 @@ import { GAME_CONFIG } from '../config/gameConfig';
 
 export class PlayerFighter extends Fighter {
   private input: InputManager;
+  /** Last attack pressed while the fighter could not act, and how long ago (ms). */
+  private bufferedAttack: { name: string; age: number } | null = null;
 
   constructor(opts: FighterOptions, input: InputManager) {
     super(opts);
@@ -17,11 +19,12 @@ export class PlayerFighter extends Fighter {
   processInput(delta: number): void {
     if (this.combatState.state === 'DEFEAT' || this.combatState.state === 'VICTORY') {
       this.velocityX = 0;
+      this.bufferedAttack = null;
       return;
     }
     const state = this.input.getState();
     this.handleMovement(state, delta);
-    this.handleCombat(state);
+    this.handleCombat(state, delta);
   }
 
   private handleMovement(state: InputState, _delta: number): void {
@@ -99,14 +102,25 @@ export class PlayerFighter extends Fighter {
 
   }
 
-  private handleCombat(state: InputState): void {
-    if (this.combatState.state === 'BLOCKING') return;
+  private handleCombat(state: InputState, delta: number): void {
+    if (this.combatState.state === 'BLOCKING') { this.bufferedAttack = null; return; }
 
-    if (state.lightPunch)  { this.executeAttack('LIGHT_PUNCH');   return; }
-    if (state.heavyPunch)  { this.executeAttack('HEAVY_PUNCH');   return; }
-    if (state.lightKick)   { this.executeAttack('LIGHT_KICK');    return; }
-    if (state.heavyKick)   { this.executeAttack('HEAVY_KICK');    return; }
-    if (state.special)     { this.executeAttack('SPECIAL_ATTACK'); return; }
+    const pressed = state.lightPunch ? 'LIGHT_PUNCH' : state.heavyPunch ? 'HEAVY_PUNCH'
+      : state.lightKick ? 'LIGHT_KICK' : state.heavyKick ? 'HEAVY_KICK' : state.special ? 'SPECIAL_ATTACK' : null;
+    if (pressed) {
+      this.bufferedAttack = { name: pressed, age: 0 };
+    } else if (this.bufferedAttack) {
+      // Input buffer: a press made just before the fighter can act is kept for a short window.
+      this.bufferedAttack.age += delta;
+      if (this.bufferedAttack.age > GAME_CONFIG.INPUT_BUFFER_MS) this.bufferedAttack = null;
+    }
+    if (this.bufferedAttack && this.combatState.canAct()) {
+      const { name } = this.bufferedAttack;
+      this.bufferedAttack = null;
+      this.executeAttack(name);
+      return;
+    }
+    if (pressed) return;
     if (state.taunt && this.combatState.canAct()) {
       this.combatState.setState('TAUNTING');
       this.playAnimation('TAUNT', true);

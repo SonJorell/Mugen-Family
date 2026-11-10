@@ -74,6 +74,8 @@ export const GAME_CONFIG = {
   // Combat
   MAX_HEALTH: 100,
   ROUND_TIME: 99,
+  /** An attack pressed this long before the fighter can act again still comes out (ms). */
+  INPUT_BUFFER_MS: 120,
   /** Rounds needed to win the match (best of 3). */
   ROUNDS_TO_WIN: 2,
   /** Hard cap so repeated draws cannot extend a match forever. */
