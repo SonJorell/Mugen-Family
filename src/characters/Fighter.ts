@@ -336,15 +336,28 @@ export class Fighter {
     this.playAnimation(this.isGrounded ? 'IDLE' : 'JUMP');
   }
 
-  receiveHit(damage: number, hitstun: number, knockback: number, causesKnockdown: boolean, fromRight: boolean, sonic = false): 'hit' | 'blocked' | 'ignored' {
+  /** True while the fighter guards: holding block or still locked in blockstun. */
+  get isGuarding(): boolean {
+    return this.combatState.state === 'BLOCKING' || this.combatState.state === 'BLOCKSTUN';
+  }
+
+  receiveHit(damage: number, hitstun: number, knockback: number, causesKnockdown: boolean, fromRight: boolean, sonic = false,
+    blockstun = 0, blockPushback = 0): 'hit' | 'blocked' | 'ignored' {
     if (!this.canReceiveHit) return 'ignored';
 
-    if (this.combatState.state === 'BLOCKING' && this.facingRight === fromRight) {
+    if (this.isGuarding && this.facingRight === fromRight) {
       this.playImpactSound('hit-block');
       this.gainEnergy(8);
       // Chip damage
       this.currentHealth = Math.max(0, this.currentHealth - Math.floor(damage * 0.1));
-      if (this.currentHealth === 0) this.finishRound('DEFEAT');
+      if (this.currentHealth === 0) { this.finishRound('DEFEAT'); return 'blocked'; }
+      if (blockstun > 0) {
+        // The guard holds for the blockstun and the defender slides away from the attacker.
+        this.combatState.setState('BLOCKSTUN');
+        this.playAnimation('BLOCK');
+        this.stunDuration = blockstun * (1000 / 60);
+        this.velocityX = (fromRight ? -1 : 1) * blockPushback / this.stats.weight;
+      }
       return 'blocked';
     }
 
@@ -530,7 +543,7 @@ export class Fighter {
     this.sonicWaves.forEach(wave => wave.update(delta));
     this.sonicWaves = this.sonicWaves.filter(wave => wave.active);
     this.combatState.tick(delta);
-    if (['HIT', 'STUNNED'].includes(this.combatState.state) && this.combatState.stateTimer >= this.stunDuration) {
+    if (['HIT', 'STUNNED', 'BLOCKSTUN'].includes(this.combatState.state) && this.combatState.stateTimer >= this.stunDuration) {
       this.combatState.setState(this.isGrounded ? 'IDLE' : 'JUMPING');
       this.playAnimation(this.isGrounded ? 'IDLE' : 'JUMP');
     } else if (this.combatState.state === 'KNOCKED_DOWN' && this.combatState.stateTimer >= this.knockdownDuration) {

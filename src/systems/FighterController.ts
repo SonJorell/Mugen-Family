@@ -13,7 +13,7 @@ export class FighterController {
       if (wave.active && rectsOverlap(wave.bounds, defender.hurtbox.getWorldRect(defender.x, defender.y, defender.facingRight))) {
         wave.destroy();
         if (!defender.canReceiveHit) continue;
-        if (defender.combatState.state === 'BLOCKING' && defender.facingRight === (wave.direction < 0)) {
+        if (defender.isGuarding && defender.facingRight === (wave.direction < 0)) {
           defender.receiveHit(0, 0, 0, false, wave.direction < 0);
         } else if (attacker.currentHealth > 0) {
           this.onSuperHit?.(attacker, defender);
@@ -37,7 +37,7 @@ export class FighterController {
         if (!defender.isGrounded || !defender.canReceiveHit) return;
         attacker.hasHitThisSwing = true;
         attacker.hitbox.active = false;
-        if (defender.combatState.state === 'BLOCKING' && defender.facingRight === fromRight) {
+        if (defender.isGuarding && defender.facingRight === fromRight) {
           defender.receiveHit(0, 0, 0, false, fromRight);
         } else {
           this.onSuperHit?.(attacker, defender);
@@ -50,6 +50,9 @@ export class FighterController {
         attackDef.knockback,
         attackDef.causesKnockdown,
         fromRight,
+        false,
+        attackDef.blockstun,
+        attackDef.blockPushback,
       );
       if (result === 'hit') attacker.gainEnergy(attackDef.damage * 2 + 6);
       else if (result === 'blocked') attacker.gainEnergy(4);

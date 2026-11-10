@@ -11,6 +11,11 @@ export type FighterState =
   | 'JUMPING'
   | 'ATTACKING'
   | 'BLOCKING'
+  /**
+   * Guard held after blocking a hit. Entered from BLOCKING (or BLOCKSTUN) when a frontal hit
+   * with blockstun is blocked; leaves to IDLE when the blockstun runs out. Locked, still guards.
+   */
+  | 'BLOCKSTUN'
   | 'HIT'
   | 'STUNNED'
   | 'LANDING'
@@ -32,6 +37,7 @@ export const STATE_TO_ANIMATION: Record<FighterState, string> = {
   JUMPING:          'JUMP',
   ATTACKING:        'IDLE',     // overridden by specific attack name
   BLOCKING:         'BLOCK',
+  BLOCKSTUN:        'BLOCK',
   HIT:              'HIT_REACTION',
   STUNNED:          'STUN',
   LANDING:          'LANDING',
@@ -47,6 +53,7 @@ export const STATE_TO_ANIMATION: Record<FighterState, string> = {
 /** States during which the fighter cannot move */
 export const LOCKED_STATES: Set<FighterState> = new Set([
   'ATTACKING',
+  'BLOCKSTUN',
   'HIT',
   'STUNNED',
   'KNOCKED_DOWN',

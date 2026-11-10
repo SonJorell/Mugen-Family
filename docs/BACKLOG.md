@@ -22,13 +22,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Terminado cuando:** una prueba pulsa J durante la recuperación de K y el puño suave sale
   al terminar, una sola vez.
 
-### [ ] PEL-03 · Bloqueo con consecuencia (blockstun y empuje)
+### [x] PEL-03 · Bloqueo con consecuencia (blockstun y empuje)
 - **Hoy:** `Fighter.receiveHit` al bloquear solo resta 10 % de daño; no hay empuje ni
   aturdimiento de guardia, y un golpe fuerte bloqueado no deja al atacante expuesto.
 - **Hacer:** agregar `blockstun` y `blockPushback` a `AttackDefinition`; el que bloquea retrocede
   y queda unos frames en guardia; los golpes fuertes quedan en desventaja al ser bloqueados.
 - **Terminado cuando:** pruebas verifican el empuje y que tras bloquear un HEAVY_KICK el
   defensor puede golpear antes de que el atacante se recupere.
+- **Hecho:** estado `BLOCKSTUN` (bloqueado, sigue protegiendo); golpes suaves −1/−2 frames y
+  fuertes −10/−11 al ser bloqueados. Pruebas en `tests/block.spec.ts` con Tilin y César en
+  ambos lados.
 
 ### [ ] PEL-04 · Lista de movimientos en la pausa
 - **Hoy:** `PauseScene` no muestra controles.
