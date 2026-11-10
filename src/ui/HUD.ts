@@ -17,7 +17,12 @@ export class HUD {
   private fpsText: Phaser.GameObjects.Text | null = null;
   private chantLabels: Phaser.GameObjects.Text[] = [];
   private chantBars: Phaser.GameObjects.Rectangle[] = [];
+  private chantGlows: Phaser.GameObjects.Rectangle[] = [];
+  private decor: Phaser.GameObjects.GameObject[] = [];
+  private wasReady = [false, false];
   private debugBg: Phaser.GameObjects.Rectangle | null = null;
+  /** Round-win markers: [player pips, opponent pips], filled as rounds are won. */
+  private roundPips: Phaser.GameObjects.Arc[][] = [[], []];
 
   private readonly BAR_MARGIN = 28;
   private readonly BAR_WIDTH = (GAME_CONFIG.WIDTH / 2) - 80;
@@ -25,8 +30,10 @@ export class HUD {
 
   constructor(scene: Phaser.Scene, playerName: string, opponentName: string, playerMaxHealth = GAME_CONFIG.MAX_HEALTH, opponentMaxHealth = GAME_CONFIG.MAX_HEALTH) {
     this.scene = scene;
-    scene.add.rectangle(GAME_CONFIG.WIDTH / 2, 43, GAME_CONFIG.WIDTH, 86, 0x10121b, 0.88)
-      .setDepth(49).setScrollFactor(0);
+    this.decor.push(
+      scene.add.rectangle(GAME_CONFIG.WIDTH / 2, 43, GAME_CONFIG.WIDTH, 86, 0x0b0d16, 0.9).setDepth(49).setScrollFactor(0),
+      scene.add.rectangle(GAME_CONFIG.WIDTH / 2, 86, GAME_CONFIG.WIDTH, 2, 0xf5bd75, 0.55).setDepth(49).setScrollFactor(0),
+    );
 
     this.playerBar = new HealthBar(
       scene,
@@ -35,6 +42,7 @@ export class HUD {
       playerMaxHealth,
       playerName,
       false,
+      0xef709d,
     );
 
     this.opponentBar = new HealthBar(
@@ -44,14 +52,33 @@ export class HUD {
       opponentMaxHealth,
       opponentName,
       true,
+      0x9fe8e1,
     );
 
     this.timer = new Timer(scene);
+    // Round-win pips on the name line, next to the timer (inner end of each bar).
+    for (let side = 0; side < 2; side++) {
+      for (let r = 0; r < GAME_CONFIG.ROUNDS_TO_WIN; r++) {
+        const x = side === 0
+          ? this.BAR_MARGIN + this.BAR_WIDTH - 8 - r * 22
+          : GAME_CONFIG.WIDTH - this.BAR_MARGIN - this.BAR_WIDTH + 8 + r * 22;
+        this.roundPips[side].push(scene.add.circle(x, this.BAR_Y - 14, 7, 0x1b2b3b)
+          .setStrokeStyle(2, 0xf5bd75, 0.9).setDepth(56).setScrollFactor(0));
+      }
+    }
     for (const x of [28, 700]) {
-      scene.add.rectangle(x, 91, 260, 10, 0x263c51).setOrigin(0, 0).setDepth(55).setScrollFactor(0);
+      this.decor.push(
+        scene.add.rectangle(x - 3, 88, 266, 16, 0x07090f).setOrigin(0, 0).setStrokeStyle(1, 0x9fe8e1, 0.6).setDepth(55).setScrollFactor(0),
+        scene.add.rectangle(x, 91, 260, 10, 0x1b2b3b).setOrigin(0, 0).setDepth(55).setScrollFactor(0),
+      );
       this.chantBars.push(scene.add.rectangle(x, 91, 260, 10, 0x9fe8e1).setOrigin(0, 0).setDepth(56).setScrollFactor(0));
-      this.chantLabels.push(scene.add.text(x, 107, '', { fontFamily: 'Trebuchet MS', fontSize: '15px', color: '#fae8cb',
-        backgroundColor: '#241a35', padding: { x: 5, y: 3 } }).setDepth(56).setScrollFactor(0));
+      this.chantGlows.push(scene.add.rectangle(x, 91, 260, 10, 0xffffff, 0).setOrigin(0, 0).setDepth(57).setScrollFactor(0)
+        .setBlendMode(Phaser.BlendModes.ADD));
+      const quarters = scene.add.graphics().setDepth(57).setScrollFactor(0).lineStyle(2, 0x07090f, 0.6);
+      for (let q = 1; q < 4; q++) quarters.lineBetween(x + 65 * q, 91, x + 65 * q, 101);
+      this.decor.push(quarters);
+      this.chantLabels.push(scene.add.text(x, 108, '', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#fae8cb',
+        backgroundColor: '#0b0d16', padding: { x: 6, y: 3 } }).setDepth(56).setScrollFactor(0));
     }
 
     {
@@ -72,10 +99,22 @@ export class HUD {
   }
 
   update(player: Fighter, opponent: Fighter, timeLeft: number): void {
+    const dt = Math.min(this.scene.game.loop.delta || 16, 50), now = this.scene.time.now;
+    const motion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.playerBar.setHealth(player.currentHealth);
     this.opponentBar.setHealth(opponent.currentHealth);
+    this.playerBar.update(dt); this.opponentBar.update(dt);
     this.timer.setTime(timeLeft);
     [player, opponent].forEach((fighter, i) => {
+      // A full bar glows and its label jumps the moment the super becomes available.
+      this.chantGlows[i].setAlpha(fighter.superReady && motion ? 0.25 + Math.sin(now / 90) * 0.25 : 0);
+      if (fighter.superReady && !this.wasReady[i] && motion) {
+        const label = this.chantLabels[i];
+        this.scene.tweens.killTweensOf(label);
+        label.setScale(1.5);
+        this.scene.tweens.add({ targets: label, scale: 1, duration: 380, ease: 'Back.easeOut' });
+      }
+      this.wasReady[i] = fighter.superReady;
       this.chantBars[i].setDisplaySize(260 * fighter.energy / 100, 10).setFillStyle(fighter.superReady ? 0xf5bd75 : 0x9fe8e1);
       this.chantLabels[i].setText(fighter.inSuper ? 'Súper en curso'
         : fighter.combatState.state === 'STUNNED' ? 'Aturdido'
@@ -103,7 +142,14 @@ export class HUD {
     }
   }
 
+  /** Fills one pip per round won by each side. */
+  setRoundWins(player: number, opponent: number): void {
+    [player, opponent].forEach((wins, side) => this.roundPips[side].forEach((pip, r) =>
+      pip.setFillStyle(r < wins ? 0xffc93c : 0x1b2b3b)));
+  }
+
   destroy(): void {
+    this.roundPips.flat().forEach(pip => pip.destroy());
     this.playerBar.destroy();
     this.opponentBar.destroy();
     this.timer.destroy();
@@ -112,5 +158,7 @@ export class HUD {
     this.debugBg?.destroy();
     this.chantLabels.forEach(label => label.destroy());
     this.chantBars.forEach(bar => bar.destroy());
+    this.chantGlows.forEach(glow => glow.destroy());
+    this.decor.forEach(part => part.destroy());
   }
 }

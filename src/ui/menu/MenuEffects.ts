@@ -60,6 +60,45 @@ export class EmberField {
   }
 }
 
+/** Soft warm radial glow shared by the sun, impact flashes and spotlights. */
+export function ensureGlowTexture(scene: Phaser.Scene): string {
+  if (!scene.textures.exists('menu_sun_glow')) {
+    const size = 512, r = size / 2;
+    const texture = scene.textures.createCanvas('menu_sun_glow', size, size)!;
+    const ctx = texture.context;
+    const gradient = ctx.createRadialGradient(r, r, 0, r, r, r);
+    gradient.addColorStop(0, 'rgba(255,240,200,0.9)');
+    gradient.addColorStop(0.18, 'rgba(255,190,110,0.5)');
+    gradient.addColorStop(1, 'rgba(255,120,60,0)');
+    ctx.fillStyle = gradient; ctx.fillRect(0, 0, size, size);
+    texture.refresh();
+  }
+  return 'menu_sun_glow';
+}
+
+/** Radial light rays shared by the title sun and the result banners. */
+export function ensureRaysTexture(scene: Phaser.Scene): string {
+  if (!scene.textures.exists('menu_god_rays')) {
+    const size = 1100, r = size / 2;
+    const texture = scene.textures.createCanvas('menu_god_rays', size, size)!;
+    const ctx = texture.context;
+    const gradient = ctx.createRadialGradient(r, r, 0, r, r, r);
+    gradient.addColorStop(0, 'rgba(255,226,170,0.95)');
+    gradient.addColorStop(0.35, 'rgba(255,170,96,0.35)');
+    gradient.addColorStop(1, 'rgba(255,140,80,0)');
+    ctx.fillStyle = gradient;
+    const rays = 26;
+    for (let i = 0; i < rays; i++) {
+      const angle = (i / rays) * Math.PI * 2 + Math.sin(i * 12.9898) * 0.08;
+      const spread = 0.025 + Math.abs(Math.sin(i * 78.233)) * 0.05;
+      ctx.beginPath(); ctx.moveTo(r, r);
+      ctx.arc(r, r, r, angle - spread, angle + spread); ctx.closePath(); ctx.fill();
+    }
+    texture.refresh();
+  }
+  return 'menu_god_rays';
+}
+
 /** Slowly turning sun rays plus a breathing sun glow, anchored to the painted sun. */
 export class GodRays {
   readonly rays: Phaser.GameObjects.Image;
@@ -67,35 +106,8 @@ export class GodRays {
   private time = 0;
 
   constructor(scene: Phaser.Scene, depth: number) {
-    if (!scene.textures.exists('menu_god_rays')) {
-      const size = 1100, r = size / 2;
-      const texture = scene.textures.createCanvas('menu_god_rays', size, size)!;
-      const ctx = texture.context;
-      const gradient = ctx.createRadialGradient(r, r, 0, r, r, r);
-      gradient.addColorStop(0, 'rgba(255,226,170,0.95)');
-      gradient.addColorStop(0.35, 'rgba(255,170,96,0.35)');
-      gradient.addColorStop(1, 'rgba(255,140,80,0)');
-      ctx.fillStyle = gradient;
-      const rays = 26;
-      for (let i = 0; i < rays; i++) {
-        const angle = (i / rays) * Math.PI * 2 + Math.sin(i * 12.9898) * 0.08;
-        const spread = 0.025 + Math.abs(Math.sin(i * 78.233)) * 0.05;
-        ctx.beginPath(); ctx.moveTo(r, r);
-        ctx.arc(r, r, r, angle - spread, angle + spread); ctx.closePath(); ctx.fill();
-      }
-      texture.refresh();
-    }
-    if (!scene.textures.exists('menu_sun_glow')) {
-      const size = 512, r = size / 2;
-      const texture = scene.textures.createCanvas('menu_sun_glow', size, size)!;
-      const ctx = texture.context;
-      const gradient = ctx.createRadialGradient(r, r, 0, r, r, r);
-      gradient.addColorStop(0, 'rgba(255,240,200,0.9)');
-      gradient.addColorStop(0.18, 'rgba(255,190,110,0.5)');
-      gradient.addColorStop(1, 'rgba(255,120,60,0)');
-      ctx.fillStyle = gradient; ctx.fillRect(0, 0, size, size);
-      texture.refresh();
-    }
+    ensureRaysTexture(scene);
+    ensureGlowTexture(scene);
     this.rays = scene.add.image(0, 0, 'menu_god_rays').setDepth(depth).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.2).setName('menu-rays');
     this.glow = scene.add.image(0, 0, 'menu_sun_glow').setDepth(depth).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.5);
   }
@@ -147,15 +159,26 @@ export class Title3D {
   private readonly extrusions: { layers: Phaser.GameObjects.Text[]; face: Phaser.GameObjects.Text; w: number; h: number }[] = [];
   private static readonly DEPTH = 10;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, words: string[], depth: number) {
-    const style: Phaser.Types.GameObjects.Text.TextStyle = { fontFamily: 'Impact, Arial Black', fontSize: '98px' };
-    const back = Phaser.Display.Color.ValueToColor(0x24150e), front = Phaser.Display.Color.ValueToColor(0x9a5a33);
+  /**
+   * @param x Left edge of the lines, or their centre when `options.centered` is set.
+   * @param options Font size, extrusion colours (far → near) and face gradient (top, bottom).
+   */
+  constructor(scene: Phaser.Scene, x: number, y: number, words: string[], depth: number, options: {
+    fontSize?: number; centered?: boolean; side?: [number, number]; face?: [number, number]; shine?: boolean;
+    /** Pin to the screen instead of the world (for HUD banners over a scrolling camera). */
+    fixed?: boolean;
+  } = {}) {
+    const fontSize = options.fontSize ?? 98, [far, near] = options.side ?? [0x24150e, 0x9a5a33];
+    const [faceTop, faceBottom] = options.face ?? [0xfff3d8, 0xd99b58];
+    const style: Phaser.Types.GameObjects.Text.TextStyle = { fontFamily: 'Impact, Arial Black', fontSize: fontSize + 'px' };
+    const back = Phaser.Display.Color.ValueToColor(far), front = Phaser.Display.Color.ValueToColor(near);
     let top = y;
     for (const word of words) {
       const probe = scene.add.text(0, 0, word, style);
       const w = probe.width, h = probe.height;
       probe.destroy();
-      const line = scene.add.container(x + w / 2, top + h / 2).setDepth(depth);
+      const line = scene.add.container(options.centered ? x : x + w / 2, top + h / 2).setDepth(depth);
+      if (options.fixed) line.setScrollFactor(0);
       const layers: Phaser.GameObjects.Text[] = [];
       for (let i = Title3D.DEPTH; i >= 1; i--) {
         const c = Phaser.Display.Color.Interpolate.ColorWithColor(back, front, Title3D.DEPTH - 1, Title3D.DEPTH - i);
@@ -166,15 +189,17 @@ export class Title3D {
         layers.unshift(layer);
       }
       const face = scene.add.text(-w / 2, -h / 2, word, { ...style, color: '#ffffff', stroke: '#ffdfad', strokeThickness: 1 })
-        .setTint(0xfff3d8, 0xfff3d8, 0xd99b58, 0xd99b58);
-      face.postFX?.addShine(0.45, 0.22, 4);
+        .setTint(faceTop, faceTop, faceBottom, faceBottom);
+      if (options.shine !== false) face.postFX?.addShine(0.45, 0.22, 4);
       line.add([...[...layers].reverse(), face]);
       this.lines.push(line);
       this.extrusions.push({ layers, face, w, h });
-      top += h - 18;
+      top += h - Math.round(fontSize * 0.18);
     }
     this.update(0, 0);
   }
+
+  destroy(): void { this.lines.forEach(line => line.destroy()); }
 
   update(viewX: number, viewY: number): void {
     const dx = 0.75 - viewX * 0.55, dy = 0.82 - viewY * 0.4;

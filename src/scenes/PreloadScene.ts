@@ -5,7 +5,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { FIGHTER_ROSTER } from '../config/roster';
-import { CharacterManifest, isValidManifest, manifestKey, sortAnimationFiles, superPortraitKey } from '../config/characters';
+import { CharacterManifest, isValidManifest, manifestKey, menuArtKey, sortAnimationFiles, superPortraitKey, UI_SOUNDS } from '../config/characters';
 
 export class PreloadScene extends Phaser.Scene {
   private manifests: CharacterManifest[] = [];
@@ -77,9 +77,11 @@ export class PreloadScene extends Phaser.Scene {
       this.load.image(stage.textureKey, stage.imagePath);
     });
     this.load.image('menu_arica_coast', '/assets/menu/arica-coast.png');
-    this.load.image('menu_tilin_3d', '/assets/menu/tilin-3d.png');
-    for (const fighter of FIGHTER_ROSTER) this.load.image(superPortraitKey(fighter.id), fighter.superPortraitPath);
-    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'music-menu', 'music-fight']) {
+    for (const fighter of FIGHTER_ROSTER) {
+      this.load.image(menuArtKey(fighter.id), fighter.menuArtPath);
+      this.load.image(superPortraitKey(fighter.id), fighter.superPortraitPath);
+    }
+    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'music-menu', 'music-fight', ...UI_SOUNDS]) {
       this.load.audio(key, `/assets/audio/${key}.wav`);
     }
     // The native HTML video owns loading and playback; avoid downloading it twice.
@@ -92,7 +94,7 @@ export class PreloadScene extends Phaser.Scene {
         this.showLoadError();
         return;
       }
-      for (const key of ['menu_arica_coast', 'menu_tilin_3d', ...FIGHTER_ROSTER.map(f => superPortraitKey(f.id)), ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
+      for (const key of ['menu_arica_coast', ...FIGHTER_ROSTER.flatMap(f => [menuArtKey(f.id), superPortraitKey(f.id)]), ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
         this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
       }
       this.scene.start('MenuScene', { manifest: this.manifests[0] });

@@ -3,8 +3,8 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { SpriteSheetOptions } from '../animation/SpriteSheetLoader';
 import { GameAudio, musicControls } from '../systems/GameAudio';
-import { FighterChoice, FIGHTER_ROSTER, fighterPalette, normalizeChoice } from '../config/roster';
-import { manifestKey } from '../config/characters';
+import { FighterChoice, FIGHTER_ROSTER, normalizeChoice, RosterEntry } from '../config/roster';
+import { manifestKey, menuArtKey, playUiSound } from '../config/characters';
 import { EmberField, GodRays, GroundPulse, Title3D } from '../ui/menu/MenuEffects';
 
 interface MenuManifest {
@@ -16,6 +16,8 @@ interface MenuManifest {
 const HERO_X = 970, HERO_FOOT = 650, HERO_W = 400, HERO_H = 600;
 /** Where the painted sun sits relative to the centre of the coast image. */
 const SUN_OFFSET = { x: 128, y: -72 };
+/** How long each fighter stays on the title screen before the next one turns in. */
+const SHOWCASE_INTERVAL = 6500;
 
 /**
  * Animated Arica title scene with a 3D look: a cinematic intro (camera dolly, title slam,
@@ -42,6 +44,11 @@ export class MenuScene extends Phaser.Scene {
   private cursor!: Phaser.GameObjects.Rectangle;
   /** Values the intro tweens toward zero; positionArt adds them on top of the parallax. */
   private intro = { spin: 0, rise: 0 };
+  /** Roster in random order; the title screen cycles through it. */
+  private showcase: RosterEntry[] = [];
+  private showcaseIndex = 0;
+  private heroTexts: Phaser.GameObjects.Text[] = [];
+  private swapping = false;
   private introDone = false;
   private leaving = false;
   private pointerX = 0;
@@ -74,7 +81,11 @@ export class MenuScene extends Phaser.Scene {
     this.rows = []; this.menuItems = []; this.rowBackgrounds = [];
     this.pointerX = 0; this.pointerY = 0; this.viewX = 0; this.viewY = 0; this.elapsed = 0;
     this.intro = { spin: 0, rise: 0 }; this.introDone = false; this.leaving = false;
+    this.showcase = Phaser.Utils.Array.Shuffle([...FIGHTER_ROSTER]);
+    this.showcaseIndex = 0; this.swapping = false;
   }
+  /** Fighter currently shown on the title screen. */
+  get featured(): RosterEntry { return this.showcase[this.showcaseIndex]; }
 
   create(): void {
     isolateSceneKeyboard(this);
@@ -93,7 +104,7 @@ export class MenuScene extends Phaser.Scene {
       this.add.text(64, 682, '↑ ↓  Elegir    Enter  Confirmar', {
         fontFamily: 'Trebuchet MS', fontSize: '15px', color: '#d3dce2',
       }).setDepth(10),
-      this.add.text(1214, 682, 'W / ↑ ×2  Doble salto     O  Canto sónico', {
+      this.add.text(1214, 682, 'W / ↑ ×2  Doble salto     O  Poder especial', {
         fontFamily: 'Trebuchet MS', fontSize: '15px', color: '#d3dce2',
       }).setOrigin(1, 0).setDepth(10),
     ];
@@ -102,6 +113,7 @@ export class MenuScene extends Phaser.Scene {
     this.pulse = new GroundPulse(this, 3);
     this.positionArt();
     if (this.reducedMotion) this.skipIntro(); else this.playIntro(credit, tagline, heroTexts, hints);
+    this.time.addEvent({ delay: SHOWCASE_INTERVAL, loop: true, callback: () => this.nextFighter() });
     GameAudio.for(this).play('music-menu');
     musicControls(this);
 
@@ -150,28 +162,61 @@ export class MenuScene extends Phaser.Scene {
 
   private createHero(): Phaser.GameObjects.Text[] {
     this.shadow = this.add.ellipse(HERO_X, HERO_FOOT - 9, 310, 28, 0x040b12, 0.55).setDepth(3);
-    const tint = fighterPalette(this.playerChoice).tint;
+    const art = menuArtKey(this.featured.id);
     if (this.renderer.type === Phaser.WEBGL) {
-      const plane = this.add.plane(HERO_X, HERO_FOOT - HERO_H / 2, 'menu_tilin_3d');
+      const plane = this.add.plane(HERO_X, HERO_FOOT - HERO_H / 2, art);
       plane.setViewHeight(HERO_H);
-      plane.vertices.forEach(vertex => { vertex.color = tint; });
       this.hero = plane;
     } else {
-      this.hero = this.add.image(HERO_X, HERO_FOOT, 'menu_tilin_3d').setOrigin(0.5, 1)
-        .setDisplaySize(HERO_W, HERO_H).setFlipX(true).setTint(tint);
+      this.hero = this.add.image(HERO_X, HERO_FOOT, art).setOrigin(0.5, 1).setDisplaySize(HERO_W, HERO_H).setFlipX(true);
     }
     this.hero.setName('menu-fighter').setDepth(4);
-    return [
-      this.add.text(650, 123, 'TILIN', {
+    this.heroTexts = [
+      this.add.text(650, 123, '', {
         fontFamily: 'Impact, Arial Black', fontSize: '66px', color: '#fff3d8', stroke: '#143a51', strokeThickness: 2,
       }).setDepth(12),
-      this.add.text(654, 207, 'Haz que\nte escuchen.', {
+      this.add.text(654, 207, '', {
         fontFamily: 'Trebuchet MS', fontSize: '23px', color: '#fff3d8', lineSpacing: 3,
         shadow: { offsetX: 1, offsetY: 2, color: '#08121b', blur: 6, fill: true },
       }).setDepth(12),
-      this.add.text(654, 583, 'Canto sónico', { fontFamily: 'Trebuchet MS', fontSize: '23px', fontStyle: 'bold', color: '#9fe8e1' }).setDepth(13),
-      this.add.text(654, 617, 'Carga energía.\nDesata tu voz.', { fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#fff3d8' }).setDepth(13),
+      this.add.text(654, 583, '', { fontFamily: 'Trebuchet MS', fontSize: '23px', fontStyle: 'bold', color: '#9fe8e1' }).setDepth(13),
+      this.add.text(654, 617, '', { fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#fff3d8', wordWrap: { width: 230 } }).setDepth(13),
     ];
+    this.describeFeatured();
+    return this.heroTexts;
+  }
+
+  private describeFeatured(): void {
+    const fighter = this.featured;
+    const [name, motto, power, blurb] = this.heroTexts;
+    name.setText(fighter.name.toUpperCase());
+    motto.setText(fighter.motto);
+    power.setText(fighter.power);
+    blurb.setText(fighter.description.replace(/\n/g, ' '));
+    if (this.hero.texture.key !== menuArtKey(fighter.id)) this.hero.setTexture(menuArtKey(fighter.id));
+  }
+
+  /** Turns the current fighter away in 3D and brings the next one of the shuffled roster in. */
+  nextFighter(): void {
+    if (this.leaving || this.swapping || this.showcase.length < 2) return;
+    this.showcaseIndex = (this.showcaseIndex + 1) % this.showcase.length;
+    if (this.reducedMotion || !this.introDone) { this.describeFeatured(); return; }
+    this.swapping = true;
+    playUiSound(this, 'menu-whoosh', 0.35);
+    this.tweens.add({ targets: this.heroTexts, alpha: 0, duration: 220 });
+    this.tweens.add({
+      targets: this.intro, spin: Math.PI / 2, duration: 280, ease: 'Cubic.easeIn',
+      onComplete: () => {
+        this.describeFeatured();
+        this.intro.spin = -Math.PI / 2;
+        this.burst(HERO_X, HERO_FOOT - 20);
+        this.tweens.add({ targets: this.intro, spin: 0, duration: 520, ease: 'Back.easeOut', onComplete: () => { this.swapping = false; } });
+        this.tweens.add({ targets: this.heroTexts, alpha: 1, duration: 320 });
+      },
+    });
+    if (!(this.hero instanceof Phaser.GameObjects.Plane)) {
+      this.tweens.add({ targets: this.hero, alpha: 0, duration: 260, yoyo: true, hold: 40 });
+    }
   }
 
   /** Cinematic entrance, about 1.6 s. Input works from the first frame. */
@@ -192,7 +237,11 @@ export class MenuScene extends Phaser.Scene {
       line.setScale(2.6).setAlpha(0);
       this.tweens.add({
         targets: line, scale: 1, alpha: 1, duration: 360, delay: 260 + i * 190, ease: 'Quart.easeIn',
-        onComplete: () => { if (!this.leaving) cam.shake(150, 0.0045 + i * 0.002); this.burst(line.x, line.y); },
+        onComplete: () => {
+          if (this.leaving) return;
+          cam.shake(150, 0.0045 + i * 0.002); this.burst(line.x, line.y);
+          playUiSound(this, 'menu-impact', 0.5 + i * 0.2);
+        },
       });
     });
     const fadeUp = (targets: Phaser.GameObjects.Text[], delay: number) => targets.forEach((t, i) => {
@@ -218,7 +267,7 @@ export class MenuScene extends Phaser.Scene {
   private skipIntro(): void {
     this.tweens.killAll();
     this.cameras.main.resetFX(); this.cameras.main.setZoom(1);
-    this.intro = { spin: 0, rise: 0 };
+    this.intro = { spin: 0, rise: 0 }; this.swapping = false;
     this.children.list.forEach(child => {
       const obj = child as Phaser.GameObjects.Components.Alpha & Phaser.GameObjects.GameObject;
       if (obj.name !== 'menu-shine' && typeof obj.setAlpha === 'function' && !this.isEffect(child)) obj.setAlpha(1);
@@ -274,6 +323,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private navigate(delta: number): void {
+    playUiSound(this, 'menu-move', 0.4);
     this.selectedIndex = (this.selectedIndex + delta + this.options.length) % this.options.length;
     this.updateSelection();
   }
@@ -311,6 +361,7 @@ export class MenuScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const row = this.rows[this.selectedIndex];
     if (row) { this.tweens.killTweensOf(row); this.tweens.add({ targets: row, scale: 1.08, duration: 120, yoyo: true }); }
+    playUiSound(this, 'menu-whoosh', 0.55);
     cam.flash(140, 255, 236, 200);
     this.tweens.add({ targets: cam, zoom: 1.22, duration: 300, ease: 'Cubic.easeIn' });
     cam.fadeOut(300, 6, 17, 27);

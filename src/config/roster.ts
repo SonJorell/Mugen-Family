@@ -37,6 +37,10 @@ export interface RosterEntry {
   manifestPath: string;
   /** Retrato que se muestra durante la secuencia del súper. */
   superPortraitPath: string;
+  /** Ilustración de cuerpo entero (transparente, 2:3) que rota en la portada. */
+  menuArtPath: string;
+  /** Lema corto bajo el nombre en la portada (admite salto de línea). */
+  motto: string;
   /** Título de la secuencia del súper (admite salto de línea). */
   superName: string;
   stats: FighterStats;
@@ -50,6 +54,8 @@ export const FIGHTER_ROSTER: readonly RosterEntry[] = [
     description: 'Conecta la onda con\nla energía al máximo.',
     manifestPath: '/assets/characters/tilin/manifest.json',
     superPortraitPath: '/assets/effects/tilin-super-canto.png',
+    menuArtPath: '/assets/menu/tilin-3d.png',
+    motto: 'Haz que\nte escuchen.',
     superName: 'CANTO\nRESONANTE',
     stats: DEFAULT_STATS,
   },
@@ -60,6 +66,8 @@ export const FIGHTER_ROSTER: readonly RosterEntry[] = [
     description: 'Una onda por el suelo; se esquiva saltando.',
     manifestPath: '/assets/characters/cesar/manifest.json',
     superPortraitPath: '/assets/effects/cesar-super.png',
+    menuArtPath: '/assets/menu/cesar-3d-v2.png',
+    motto: 'Haz temblar\nel Morro.',
     superName: 'TERREMOTO\nDEL MORRO',
     // Big and heavy: more health and damage, slower legs and fists, barely moved by hits.
     stats: { size: 1.14, maxHealth: 125, walkSpeed: 0.72, jumpPower: 0.86, attackSpeed: 0.8, damage: 1.3, weight: 1.7, special: 'quake' },

@@ -1,58 +1,35 @@
 // ============================================================
-// FightMessages — Flash messages (KO, WIN, etc.)
+// FightMessages — End-of-round announcements (K.O., time, victory, defeat, draw)
 // ============================================================
 
 import Phaser from 'phaser';
-import { GAME_CONFIG } from '../config/gameConfig';
+import { BANNER_STYLES, showBanner } from './EpicBanner';
 
 export class FightMessages {
-  private scene: Phaser.Scene;
+  constructor(private readonly scene: Phaser.Scene) {}
 
-  constructor(scene: Phaser.Scene) {
-    this.scene = scene;
-  }
-
-  showKO(): void {
-    this.flash('K.O.!', '#ff2222', '#000000');
-  }
-
-  showWinner(name: string): void {
-    this.flash(`${name.toUpperCase()} WINS!`, '#ffdd00', '#cc0000');
-  }
-
-  showTimeover(): void {
-    this.flash('TIME OVER', '#ffffff', '#0000cc');
-  }
-
+  /** The reason lands first (K.O. or time), then the verdict takes over the screen. */
   showResult(winner: 'player' | 'opponent' | 'draw', reason: 'ko' | 'timeout'): void {
-    const result = winner === 'draw' ? 'EMPATE' : winner === 'player' ? '¡GANASTE!' : 'GANA EL RIVAL';
-    this.flash(`${reason === 'timeout' ? 'TIEMPO' : 'K.O.'}\n${result}`, winner === 'opponent' ? '#ff7777' : '#ffdd00', '#111122');
+    this.showReason(reason);
+    this.scene.time.delayedCall(1250, () => {
+      if (winner === 'draw') showBanner(this.scene, 'EMPATE', { ...BANNER_STYLES.draw, caption: 'Nadie cede terreno', hold: 2300 });
+      else if (winner === 'player') showBanner(this.scene, '¡VICTORIA!', { ...BANNER_STYLES.victory, caption: '¡Ganaste el combate!', hold: 2300 });
+      else showBanner(this.scene, 'DERROTA', { ...BANNER_STYLES.defeat, caption: 'Gana el rival', hold: 2300 });
+    });
   }
 
-  private flash(msg: string, color: string, stroke: string): void {
-    const text = this.scene.add.text(
-      GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2,
-      msg,
-      { fontFamily: 'Arial Black', fontSize: '64px', color, stroke, strokeThickness: 8, align: 'center' }
-    ).setOrigin(0.5).setDepth(300).setAlpha(0).setScrollFactor(0);
-
-    this.scene.tweens.add({
-      targets: text,
-      alpha: 1,
-      scaleX: { from: 0.4, to: 1 },
-      scaleY: { from: 0.4, to: 1 },
-      duration: 300,
-      ease: 'Back.easeOut',
-      hold: 1500,
-      yoyo: false,
-      onComplete: () => {
-        this.scene.tweens.add({
-          targets: text,
-          alpha: 0,
-          duration: 600,
-          onComplete: () => text.destroy(),
-        });
-      }
+  /** A round that does not decide the match: reason, then who takes the round and the score. */
+  showRoundResult(winner: 'player' | 'opponent' | 'draw', reason: 'ko' | 'timeout', wins: { player: number; opponent: number }): void {
+    this.showReason(reason);
+    const caption = `Marcador ${wins.player} – ${wins.opponent}`;
+    this.scene.time.delayedCall(1250, () => {
+      if (winner === 'draw') showBanner(this.scene, 'EMPATE', { ...BANNER_STYLES.draw, fontSize: 110, caption: 'Nadie suma el round', hold: 1500 });
+      else if (winner === 'player') showBanner(this.scene, 'ROUND TUYO', { ...BANNER_STYLES.victory, celebrate: false, fontSize: 110, caption, hold: 1500 });
+      else showBanner(this.scene, 'ROUND RIVAL', { ...BANNER_STYLES.defeat, mourn: false, fontSize: 110, caption, hold: 1500 });
     });
+  }
+
+  private showReason(reason: 'ko' | 'timeout'): void {
+    showBanner(this.scene, reason === 'timeout' ? 'TIEMPO' : 'K.O.', { ...(reason === 'timeout' ? BANNER_STYLES.time : BANNER_STYLES.ko), hold: 700 });
   }
 }

@@ -17,6 +17,20 @@ export interface CharacterManifest {
 
 export const manifestKey = (characterId: string) => `${characterId}_manifest`;
 export const superPortraitKey = (characterId: string) => `${characterId}_super_portrait`;
+/** Textura de la ilustración de portada de un luchador. */
+export const menuArtKey = (characterId: string) => `menu_${characterId}_3d`;
+/** Efectos de interfaz (portada y selección). */
+export const UI_SOUNDS = ['menu-impact', 'menu-whoosh', 'menu-move'] as const;
+export type UiSound = typeof UI_SOUNDS[number];
+
+/**
+ * Reproduce un efecto de interfaz. Se omite mientras el navegador mantiene el audio bloqueado
+ * (antes del primer clic o tecla), para que no suene con retraso al desbloquearse.
+ */
+export function playUiSound(scene: Phaser.Scene, key: UiSound, volume = 0.6): void {
+  if (scene.sound.locked || !scene.cache.audio.exists(key)) return;
+  scene.sound.play(key, { volume });
+}
 
 /** Valida la forma mínima de un manifiesto cargado. */
 export function isValidManifest(manifest: unknown): manifest is CharacterManifest {

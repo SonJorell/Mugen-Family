@@ -75,3 +75,38 @@ test('confirming twice during the exit transition opens the next screen only onc
   expect(await page.evaluate(() => ({ starts: (window as any).__starts, gallery: (window as any).__game.scene.isActive('CharacterTestScene') })))
     .toEqual({ starts: 1, gallery: false });
 });
+
+test('the title screen starts on a roster fighter and rotates through the rest', async ({ page }) => {
+  await menu(page);
+  const featured = () => page.evaluate(() => {
+    const s = (window as any).__game.scene.getScene('MenuScene');
+    return { id: s.featured.id as string, art: s.hero.texture.key as string, name: s.heroTexts[0].text as string, order: s.showcase.map((f: any) => f.id) as string[] };
+  });
+  const first = await featured();
+  expect([...first.order].sort()).toEqual(['cesar', 'tilin']);
+  expect(first.art).toBe(`menu_${first.id}_3d`);
+  await expect.poll(async () => (await state(page)).introDone, { timeout: 15000 }).toBe(true);
+  await page.evaluate(() => (window as any).__game.scene.getScene('MenuScene').nextFighter());
+  const other = first.id === 'tilin' ? 'cesar' : 'tilin';
+  await expect.poll(async () => (await featured()).art, { timeout: 10000 }).toBe(`menu_${other}_3d`);
+  expect((await featured()).name).toBe(other === 'cesar' ? 'CÉSAR' : 'TILIN');
+  // The automatic timer brings the first fighter back without any input.
+  await expect.poll(async () => (await featured()).art, { timeout: 20000 }).toBe(`menu_${first.id}_3d`);
+});
+
+test('interface sounds are loaded and stay silent while the browser keeps audio locked', async ({ page }) => {
+  await menu(page);
+  const result = await page.evaluate(async () => {
+    const game = (window as any).__game, s = game.scene.getScene('MenuScene');
+    const { playUiSound, UI_SOUNDS } = await import('/src/config/characters.ts');
+    const loaded = UI_SOUNDS.every((key: string) => game.cache.audio.exists(key));
+    const count = () => game.sound.sounds.filter((x: any) => x.key.startsWith('menu-')).length;
+    const wasLocked = game.sound.locked; game.sound.locked = true;
+    playUiSound(s, 'menu-impact'); const whileLocked = count();
+    game.sound.locked = false;
+    playUiSound(s, 'menu-impact'); const unlocked = count();
+    game.sound.locked = wasLocked;
+    return { loaded, whileLocked, unlocked };
+  });
+  expect(result).toEqual({ loaded: true, whileLocked: 0, unlocked: 1 });
+});

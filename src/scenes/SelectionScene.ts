@@ -3,7 +3,9 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import { FighterChoice, FIGHTER_PALETTES, FIGHTER_ROSTER, fighterPalette, normalizeChoice, rosterEntry } from '../config/roster';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader, SpriteSheetOptions } from '../animation/SpriteSheetLoader';
-import { animationUrls, getManifest } from '../config/characters';
+import { animationUrls, getManifest, playUiSound } from '../config/characters';
+import { SelectionBackdrop } from '../ui/selection/SelectionBackdrop';
+import { ensureGlowTexture, Title3D } from '../ui/menu/MenuEffects';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
 
@@ -16,6 +18,14 @@ interface SelectionData {
   selectionPhase?: 'fighters' | 'stage';
 }
 
+type Animatable = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Transform & Phaser.GameObjects.Components.AlphaSingle;
+/** Starting offsets for an entrance: x/y are added, every other property is multiplied. */
+type EnterFrom = Partial<Record<'x' | 'y' | 'scaleX' | 'scaleY' | 'alpha', number>>;
+
+/**
+ * Fighter, arena and versus screens. Every change rebuilds `content` at its final layout
+ * (so clicks resolve instantly) and then plays entrances on top; nothing here blocks input.
+ */
 export class SelectionScene extends Phaser.Scene {
   private manifest!: NonNullable<SelectionData['manifest']>;
   private playerChoice = normalizeChoice();
@@ -32,6 +42,18 @@ export class SelectionScene extends Phaser.Scene {
   /** IDLE animation key per character id. */
   private idleKeys = new Map<string, string>();
   private hitTargets: { bounds: Phaser.Geom.Rectangle; action: () => void }[] = [];
+  private backdrop!: SelectionBackdrop;
+  /** Objects outside `content` that belong to the current render (3D titles, flashes). */
+  private extras: { destroy(): void }[] = [];
+  /** Per-frame ambient animation of the current render; receives seconds. */
+  private live: ((t: number) => void)[] = [];
+  private bucket?: Animatable[];
+  private clock = 0;
+  private pointerX = 0;
+  private pointerY = 0;
+  /** What the previous render showed, to animate only what changed. */
+  private shown: { phase?: string; player?: string; opponent?: string; stage?: number } = {};
+  private get motion(): boolean { return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
 
   constructor() { super({ key: 'SelectionScene' }); }
   init(data: SelectionData): void {
@@ -42,15 +64,19 @@ export class SelectionScene extends Phaser.Scene {
     this.mode = data?.mode === 'training' ? 'training' : 'cpu';
     this.phase = data?.selectionPhase === 'stage' ? 'stage' : 'fighters';
     this.activeSide = 'player'; this.transition = undefined;
+    this.extras = []; this.live = []; this.shown = {}; this.clock = 0; this.pointerX = 0; this.pointerY = 0;
   }
   create(): void {
     isolateSceneKeyboard(this);
     const video = document.getElementById('menu-video-bg') as HTMLVideoElement | null;
     if (video) { video.pause(); video.style.display = 'none'; }
     GameAudio.for(this).play('music-menu');
-    this.add.rectangle(640, 360, 1280, 720, 0x241a35);
-    const stripes = this.add.graphics().fillStyle(0x473b72, 0.2);
-    for (let x = -300; x < 1400; x += 140) stripes.fillTriangle(x, 720, x + 400, 0, x + 460, 0);
+    this.backdrop = new SelectionBackdrop(this);
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      this.pointerX = Phaser.Math.Clamp((pointer.x - 640) / 640, -1, 1);
+      this.pointerY = Phaser.Math.Clamp((pointer.y - 360) / 360, -1, 1);
+    });
+    this.input.on('gameout', () => { this.pointerX = 0; this.pointerY = 0; });
     this.add.rectangle(640, 677, 1280, 86, 0x14101e).setDepth(20);
     this.title = this.add.text(48, 30, '', { fontFamily: 'Impact, Arial Black', fontSize: '43px', color: '#fae8cb' }).setDepth(30);
     this.steps = this.add.text(50, 88, '', { fontFamily: 'Trebuchet MS', fontSize: '18px', color: '#a1ece5' }).setDepth(30);
@@ -87,11 +113,11 @@ export class SelectionScene extends Phaser.Scene {
   private text(x: number, y: number, value: string, size = 20, color = '#fae8cb', centered = false, headline = false) {
     const text = this.add.text(x, y, value, { fontFamily: headline ? 'Impact, Arial Black' : 'Trebuchet MS', fontSize: size + 'px', color });
     if (centered) text.setOrigin(0.5, 0);
-    this.content.add(text); return text;
+    this.content.add(text); this.bucket?.push(text); return text;
   }
   private rectangle(x: number, y: number, width: number, height: number, color: number, alpha = 1) {
     const rect = this.add.rectangle(x, y, width, height, color, alpha);
-    this.content.add(rect); return rect;
+    this.content.add(rect); this.bucket?.push(rect); return rect;
   }
   private button(x: number, y: number, width: number, label: string, action: () => void, primary = false) {
     const rect = this.clickable(this.rectangle(x, y, width, 46, primary ? 0xef709d : 0x473b72), action);
@@ -106,29 +132,118 @@ export class SelectionScene extends Phaser.Scene {
   private preview(x: number, y: number, scale: number, choice: FighterChoice, flip = false) {
     const sprite = this.add.sprite(x, y, `${choice.characterId}_IDLE_0`).setOrigin(0.5, 0.975).setScale(scale * 2)
       .setTint(fighterPalette(choice).tint).setFlipX(flip).play(this.idleKeys.get(choice.characterId) ?? '');
-    this.content.add(sprite); return sprite;
+    this.content.add(sprite); this.bucket?.push(sprite); return sprite;
+  }
+  /** Adds any other object to the content (and to the group being collected). */
+  private place<T extends Animatable>(object: T): T { this.content.add(object); this.bucket?.push(object); return object; }
+  /** Runs `build` and returns everything it created, to animate it as one group. */
+  private collect(build: () => void): Animatable[] {
+    const outer = this.bucket, group: Animatable[] = [];
+    this.bucket = group; build(); this.bucket = outer;
+    outer?.push(...group);
+    return group;
+  }
+  /** Plays objects from an offset state into the layout they already have. No-op without motion. */
+  private enter(targets: Animatable[], from: EnterFrom, config: { duration?: number; delay?: number; ease?: string; onComplete?: () => void } = {}): void {
+    if (!this.motion) { config.onComplete?.(); return; }
+    targets.forEach((target, index) => {
+      const to: Record<string, number> = {};
+      for (const [key, value] of Object.entries(from) as [keyof EnterFrom, number][]) {
+        to[key] = target[key];
+        target[key] = key === 'x' || key === 'y' ? target[key] + value : target[key] * value;
+      }
+      this.tweens.add({ targets: target, ...to, duration: config.duration ?? 380, delay: config.delay ?? 0,
+        ease: config.ease ?? 'Cubic.easeOut', onComplete: index === 0 ? config.onComplete : undefined });
+    });
+  }
+  /** Glowing pedestal in perspective with rings that ripple outward and a spotlight above. */
+  private pedestal(x: number, y: number, width: number, accent: number, active: boolean): void {
+    const light = this.place(this.add.image(x, y - width * 0.62, ensureGlowTexture(this)).setDisplaySize(width * 1.25, width * 1.7)
+      .setTint(accent).setBlendMode(Phaser.BlendModes.ADD).setAlpha(active ? 0.3 : 0.14));
+    this.place(this.add.ellipse(x, y, width, width * 0.15, accent, active ? 0.3 : 0.14));
+    const rings = [0, 0.5].map(offset => {
+      const ring = this.place(this.add.ellipse(x, y, width, width * 0.15).setStrokeStyle(2, accent, 1).setBlendMode(Phaser.BlendModes.ADD));
+      ring.isFilled = false;
+      return { ring, offset };
+    });
+    rings.forEach(({ ring }) => ring.setAlpha(active ? 0.5 : 0.2));
+    this.live.push(t => {
+      for (const { ring, offset } of rings) {
+        const f = (t * 0.45 + offset) % 1;
+        ring.setScale(0.7 + f * 0.75).setAlpha((1 - f) * (active ? 0.8 : 0.3));
+      }
+      if (active) light.setAlpha(0.28 + Math.sin(t * 2.2) * 0.05);
+    });
+  }
+  /** Border that breathes, for whatever is currently chosen. */
+  private pulseBorder(rect: Phaser.GameObjects.Rectangle, width: number, color: number): void {
+    this.live.push(t => rect.setStrokeStyle(width, color, 0.62 + Math.sin(t * 4) * 0.38));
+  }
+  /** Extruded 3D lettering that slams onto the screen (or simply appears without motion). */
+  private slamTitle(x: number, y: number, word: string, fontSize: number, colors: { side?: [number, number]; face?: [number, number] },
+    slam: { from: number; delay: number; shake: number; volume: number } | null): void {
+    const title = new Title3D(this, x, y, [word], 26, { fontSize, centered: true, shine: false, ...colors });
+    const line = title.lines[0];
+    this.extras.push(title);
+    this.live.push(() => title.update(this.pointerX, this.pointerY));
+    const pulse = () => { if (this.motion) this.tweens.add({ targets: line, scale: 1.06, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' }); };
+    if (!slam) { pulse(); return; }
+    const land = () => {
+      playUiSound(this, 'menu-impact', slam.volume);
+      if (!this.motion) return;
+      this.cameras.main.shake(180, slam.shake);
+      const flash = this.add.image(line.x, line.y, ensureGlowTexture(this)).setDepth(25).setBlendMode(Phaser.BlendModes.ADD).setScale(0.5, 0.2);
+      this.extras.push(flash);
+      this.tweens.add({ targets: flash, scaleX: 3, scaleY: 0.9, alpha: 0, duration: 450, ease: 'Cubic.easeOut' });
+      pulse();
+    };
+    if (!this.motion) { land(); return; }
+    line.setScale(slam.from).setAlpha(0);
+    this.tweens.add({ targets: line, scale: 1, alpha: 1, duration: 280, delay: slam.delay, ease: 'Quart.easeIn', onComplete: land });
   }
   private render(): void {
     this.hitTargets = [];
+    this.tweens.killAll();
+    this.live = [];
+    this.extras.forEach(extra => extra.destroy()); this.extras = [];
     this.content.removeAll(true);
-    if (this.phase === 'fighters') this.renderFighters();
-    else if (this.phase === 'stage') this.renderStages();
+    this.title.setPosition(48, 30).setAlpha(1); this.steps.setPosition(50, 88).setAlpha(1);
+    const fresh = this.shown.phase !== this.phase;
+    const now = { phase: this.phase, player: this.playerChoice.characterId + this.playerChoice.paletteId,
+      opponent: this.opponentChoice.characterId + this.opponentChoice.paletteId, stage: this.stageIndex };
+    if (this.phase === 'fighters') this.renderFighters(fresh, { player: !fresh && now.player !== this.shown.player, opponent: !fresh && now.opponent !== this.shown.opponent });
+    else if (this.phase === 'stage') this.renderStages(fresh, !fresh && now.stage !== this.shown.stage);
     else this.renderVersus();
+    if (fresh) {
+      if (this.shown.phase) playUiSound(this, 'menu-whoosh', 0.45);
+      this.enter([this.title, this.steps], { x: -36, alpha: 0 }, { duration: 320 });
+    }
+    this.shown = now;
   }
-  private renderFighters(): void {
+  update(_time: number, delta: number): void {
+    const dt = Math.min(delta, 50), motion = this.motion;
+    this.backdrop.update(dt, this.pointerX, this.pointerY, motion);
+    if (!motion) return;
+    this.clock += dt;
+    for (const animate of this.live) animate(this.clock / 1000);
+  }
+  private renderFighters(fresh: boolean, changed: { player: boolean; opponent: boolean }): void {
     this.title.setText('ELIGE TU LUCHADOR');
     this.steps.setText('Luchadores   /   Escenario');
     this.help.setText('Q E  Luchador     ← → / A D  Color     Tab / ↑ ↓  Cambiar lado     Enter  Confirmar     Esc  Volver');
     for (const side of ['player', 'opponent'] as const) {
       const player = side === 'player', x = player ? 275 : 1000;
       const choice = player ? this.playerChoice : this.opponentChoice;
-      const accent = player ? 0xef709d : 0xa1ece5;
-      this.clickable(this.rectangle(x, 322, 420, 360, 0x14101e, 0.65)
-        .setStrokeStyle(this.activeSide === side ? 3 : 1, accent, this.activeSide === side ? 1 : 0.35),
-        () => { this.activeSide = side; this.render(); });
+      const accent = player ? 0xef709d : 0xa1ece5, active = this.activeSide === side;
+      let figure: Animatable[] = [];
+      const card = this.collect(() => {
+      const panel = this.rectangle(x, 322, 420, 360, 0x14101e, 0.65).setStrokeStyle(active ? 3 : 1, accent, active ? 1 : 0.35);
+      this.clickable(panel, () => { this.activeSide = side; this.render(); });
+      if (active) this.pulseBorder(panel, 3, accent);
       this.text(x - 186, 155, player ? '1P · Tu personaje' : this.mode === 'cpu' ? 'CPU · Rival' : 'Práctica · Rival', 19, player ? '#ef9dbb' : '#a1ece5');
-      this.text(x - 186, 185, rosterEntry(choice.characterId).name.toUpperCase(), 45, '#fae8cb', false, true);
-      this.preview(x + 30, 495, 0.43, choice, !player);
+      const name = this.text(x - 186, 185, rosterEntry(choice.characterId).name.toUpperCase(), 45, '#fae8cb', false, true);
+      this.pedestal(x + 30, 492, 250, accent, active);
+      figure = [this.preview(x + 30, 495, 0.43, choice, !player), name];
       this.text(x, 506, 'Color · ' + fighterPalette(choice).name, 18, '#fae8cb', true);
       FIGHTER_PALETTES.forEach((palette, index) => {
         const cx = (player ? 140 : 866) + index * 90;
@@ -137,8 +252,13 @@ export class SelectionScene extends Phaser.Scene {
           () => { this.activeSide = side; choice.paletteId = palette.id; this.render(); });
         this.text(cx, 574, palette.name, 13, choice.paletteId === palette.id ? '#ffffff' : '#b6a6c7', true);
       });
+      });
+      // Cards glide in from their side; a changed fighter or colour pops on its pedestal.
+      if (fresh) this.enter(card, { x: player ? -90 : 90, alpha: 0 }, { duration: 460, delay: 60 });
+      else if (changed[side]) this.enter([figure[0]], { scaleX: 0.8, scaleY: 0.8, alpha: 0.2 }, { duration: 300, ease: 'Back.easeOut' });
     }
-    this.text(640, 148, 'VS', 62, '#ef709d', true, true);
+    this.slamTitle(640, 148, 'VS', 62, { side: [0x3d0f27, 0xb0406c], face: [0xffd9e6, 0xef709d] },
+      fresh ? { from: 2.8, delay: 260, shake: 0.004, volume: 0.35 } : null);
     const activeChoice = this.activeSide === 'player' ? this.playerChoice : this.opponentChoice;
     const activeFighter = rosterEntry(activeChoice.characterId);
     this.text(640, 235, activeFighter.power, 24, '#a1ece5', true);
@@ -147,11 +267,14 @@ export class SelectionScene extends Phaser.Scene {
     FIGHTER_ROSTER.forEach((fighter, index) => {
       const x = 640 + (index - (FIGHTER_ROSTER.length - 1) / 2) * 150;
       const selected = activeChoice.characterId === fighter.id;
-      this.clickable(this.rectangle(x, 399, FIGHTER_ROSTER.length > 1 ? 140 : 174, 164, 0x473b72).setStrokeStyle(selected ? 2 : 1, selected ? 0xfae8cb : 0x726182), () => {
-        activeChoice.characterId = fighter.id; this.render();
+      const tile = this.collect(() => {
+        const frame = this.rectangle(x, 399, FIGHTER_ROSTER.length > 1 ? 140 : 174, 164, 0x473b72).setStrokeStyle(selected ? 2 : 1, selected ? 0xfae8cb : 0x726182);
+        this.clickable(frame, () => { activeChoice.characterId = fighter.id; this.render(); });
+        if (selected) this.pulseBorder(frame, 3, 0xfae8cb);
+        this.preview(x, 466, 0.2, { ...activeChoice, characterId: fighter.id });
+        this.text(x, 486, fighter.name, 18, selected ? '#fae8cb' : '#b6a6c7', true);
       });
-      this.preview(x, 466, 0.2, { ...activeChoice, characterId: fighter.id });
-      this.text(x, 486, fighter.name, 18, selected ? '#fae8cb' : '#b6a6c7', true);
+      if (fresh) this.enter(tile, { y: 34, alpha: 0 }, { duration: 380, delay: 300 + index * 90, ease: 'Back.easeOut' });
     });
     this.button(640, 565, 220, this.mode === 'cpu' ? 'Rival: CPU' : 'Rival: Práctica', () => {
       this.mode = this.mode === 'cpu' ? 'training' : 'cpu'; this.render();
@@ -159,27 +282,50 @@ export class SelectionScene extends Phaser.Scene {
     this.button(164, 630, 216, 'Volver', () => this.back());
     this.button(1072, 630, 288, 'Elegir escenario', () => this.confirm(), true);
   }
-  private renderStages(): void {
+  private renderStages(fresh: boolean, changed: boolean): void {
     this.title.setText('ELIGE EL ESCENARIO');
     this.steps.setText('Luchadores ✓   /   Escenario');
     this.help.setText('Flechas / W A S D  Escenario     Enter  Confirmar combate     Esc  Volver a luchadores');
     const stage = GAME_CONFIG.STAGES[this.stageIndex];
-    const image = this.add.image(890, 218, stage.textureKey).setDisplaySize(650, 174);
-    this.content.add(image);
-    this.rectangle(890, 218, 650, 174, 0x000000, 0).setStrokeStyle(2, 0xa1ece5);
-    this.text(58, 137, stage.name, 35, '#fae8cb', false, true).setWordWrapWidth(450);
+    // Wide window onto the arena: the camera pans slowly inside it instead of squashing the image.
+    const source = this.textures.get(stage.textureKey).getSourceImage(), fit = 650 / source.width, band = 174 / fit;
+    const image = this.place(this.add.image(890, 218, stage.textureKey));
+    const window = this.rectangle(890, 218, 650, 174, 0x000000, 0).setStrokeStyle(2, 0xa1ece5);
+    if (band < source.height) {
+      const pan = (f: number) => {
+        const top = (source.height - band) * f;
+        image.setCrop(0, top, source.width, band);
+        image.setPosition(890 + this.pointerX * 5, 218 - (top + band / 2 - source.height / 2) * fit);
+      };
+      image.setScale(fit); pan(0.5);
+      this.live.push(t => pan(0.5 + Math.sin(t * 0.35) * 0.3));
+    } else image.setDisplaySize(650, 174);
+    const name = this.text(58, 137, stage.name, 35, '#fae8cb', false, true).setWordWrapWidth(450);
+    // A new arena swings open like a door, around its vertical axis.
+    if (fresh || changed) {
+      this.enter([image, window], { scaleX: 0.04 }, { duration: 340, ease: 'Back.easeOut', delay: fresh ? 120 : 0 });
+      this.enter([name], { x: -28, alpha: 0 }, { duration: 300, delay: fresh ? 120 : 0 });
+    }
     this.text(60, 214, rosterEntry(this.playerChoice.characterId).name + ' · ' + fighterPalette(this.playerChoice).name, 20, '#ef9dbb');
     this.text(60, 245, 'vs. ' + rosterEntry(this.opponentChoice.characterId).name + ' · ' + fighterPalette(this.opponentChoice).name, 20, '#a1ece5');
     this.text(60, 280, this.mode === 'cpu' ? 'Combate contra CPU' : 'Muñeco de práctica', 17, '#c9b8da');
     GAME_CONFIG.STAGES.forEach((entry, i) => {
       const x = 230 + (i % 3) * 410, y = 386 + Math.floor(i / 3) * 142, selected = this.stageIndex === i;
-      const thumb = this.add.image(x, y - 13, entry.textureKey).setDisplaySize(360, 102);
-      this.content.add(thumb);
-      this.rectangle(x, y + 45, 360, 32, 0x14101e, 0.96);
-      this.text(x, y + 33, entry.name, 18, selected ? '#a1ece5' : '#fae8cb', true);
-      this.clickable(this.rectangle(x, y, 360, 124, 0x000000, 0).setStrokeStyle(selected ? 4 : 1, selected ? 0xa1ece5 : 0x726182),
-        () => { this.stageIndex = i; this.render(); });
-      if (selected) this.text(x - 172, y - 54, 'Elegido', 14, '#241a35').setBackgroundColor('#a1ece5').setPadding(7, 3);
+      let thumb!: Phaser.GameObjects.Image, border!: Phaser.GameObjects.Rectangle;
+      const tile = this.collect(() => {
+        thumb = this.place(this.add.image(x, y - 13, entry.textureKey).setDisplaySize(360, 102));
+        this.rectangle(x, y + 45, 360, 32, 0x14101e, 0.96);
+        this.text(x, y + 33, entry.name, 18, selected ? '#a1ece5' : '#fae8cb', true);
+        border = this.rectangle(x, y, 360, 124, 0x000000, 0).setStrokeStyle(selected ? 4 : 1, selected ? 0xa1ece5 : 0x726182);
+        this.clickable(border, () => { this.stageIndex = i; this.render(); });
+        if (selected) {
+          this.pulseBorder(border, 4, 0xa1ece5);
+          this.text(x - 172, y - 54, 'Elegido', 14, '#241a35').setBackgroundColor('#a1ece5').setPadding(7, 3);
+        }
+      });
+      // Tiles flip up one after another; the newly chosen one pops forward.
+      if (fresh) this.enter(tile, { scaleY: 0.04, alpha: 0 }, { duration: 400, delay: 160 + i * 55, ease: 'Back.easeOut' });
+      else if (selected && changed) this.enter([thumb, border], { scaleX: 0.9, scaleY: 0.9 }, { duration: 260, ease: 'Back.easeOut' });
     });
     this.button(164, 630, 216, 'Luchadores', () => this.back());
     this.button(1072, 630, 288, '¡A pelear!', () => this.confirm(), true);
@@ -188,19 +334,40 @@ export class SelectionScene extends Phaser.Scene {
     this.title.setText('COMBATE LISTO'); this.steps.setText('Luchadores ✓   /   Escenario ✓');
     this.help.setText('Esc  Volver a la selección');
     const stage = GAME_CONFIG.STAGES[this.stageIndex];
-    this.content.add(this.add.image(640, 370, stage.textureKey).setDisplaySize(1280, 540).setAlpha(0.45));
-    this.preview(330, 570, 0.5, this.playerChoice);
-    this.preview(950, 570, 0.5, this.opponentChoice, true);
-    this.text(640, 270, 'VS', 112, '#fae8cb', true, true);
-    this.text(310, 145, rosterEntry(this.playerChoice.characterId).name.toUpperCase(), 52, '#ef9dbb', true, true);
-    this.text(970, 145, rosterEntry(this.opponentChoice.characterId).name.toUpperCase(), 52, '#a1ece5', true, true);
-    this.text(310, 207, fighterPalette(this.playerChoice).name + ' · 1P', 21, '#fae8cb', true);
-    this.text(970, 207, fighterPalette(this.opponentChoice).name + (this.mode === 'cpu' ? ' · CPU' : ' · Práctica'), 21, '#fae8cb', true);
-    this.rectangle(640, 622, 680, 50, 0x14101e, 0.95);
-    this.text(640, 606, stage.name, 26, '#fae8cb', true);
+    const arena = this.place(this.add.image(640, 370, stage.textureKey).setDisplaySize(1280, 540).setAlpha(0.45));
+    this.enter([arena], { scaleX: 1.2, scaleY: 1.2, alpha: 0 }, { duration: 950 });
+    // Both fighters charge in from their corners and stop face to face.
+    for (const player of [true, false]) {
+      const choice = player ? this.playerChoice : this.opponentChoice, x = player ? 330 : 950;
+      const fighter = this.collect(() => {
+        this.pedestal(x, 568, 300, player ? 0xef709d : 0xa1ece5, true);
+        this.preview(x, 570, 0.5, choice, !player);
+      });
+      this.enter(fighter, { x: player ? -560 : 560 }, { duration: 420, ease: 'Back.easeOut' });
+    }
+    const names = this.collect(() => {
+      this.text(310, 145, rosterEntry(this.playerChoice.characterId).name.toUpperCase(), 52, '#ef9dbb', true, true);
+      this.text(970, 145, rosterEntry(this.opponentChoice.characterId).name.toUpperCase(), 52, '#a1ece5', true, true);
+      this.text(310, 207, fighterPalette(this.playerChoice).name + ' · 1P', 21, '#fae8cb', true);
+      this.text(970, 207, fighterPalette(this.opponentChoice).name + (this.mode === 'cpu' ? ' · CPU' : ' · Práctica'), 21, '#fae8cb', true);
+    });
+    this.enter(names, { y: -46, alpha: 0 }, { duration: 340, delay: 140 });
+    this.slamTitle(640, 270, 'VS', 112, {}, { from: 3.4, delay: 240, shake: 0.011, volume: 0.85 });
+    if (this.motion) {
+      // A blade of light crosses the screen as the VS lands.
+      const slash = this.add.rectangle(-300, 360, 150, 1200, 0xffffff, 0.22).setAngle(24).setDepth(27).setBlendMode(Phaser.BlendModes.ADD);
+      this.extras.push(slash);
+      this.tweens.add({ targets: slash, x: 1600, duration: 460, delay: 300, ease: 'Cubic.easeIn' });
+    }
+    const banner = this.collect(() => {
+      this.rectangle(640, 622, 680, 50, 0x14101e, 0.95);
+      this.text(640, 606, stage.name, 26, '#fae8cb', true);
+    });
+    this.enter(banner, { y: 50, alpha: 0 }, { duration: 320, delay: 320 });
   }
   private navigate(delta: number): void {
     if (this.phase === 'versus') return;
+    playUiSound(this, 'menu-move', 0.4);
     if (this.phase === 'stage') this.stageIndex = (this.stageIndex + delta + GAME_CONFIG.STAGES.length) % GAME_CONFIG.STAGES.length;
     else {
       const choice = this.activeSide === 'player' ? this.playerChoice : this.opponentChoice;
@@ -211,6 +378,7 @@ export class SelectionScene extends Phaser.Scene {
   }
   private cycleFighter(delta: number): void {
     if (this.phase !== 'fighters') return;
+    playUiSound(this, 'menu-move', 0.4);
     const choice = this.activeSide === 'player' ? this.playerChoice : this.opponentChoice;
     const index = FIGHTER_ROSTER.findIndex(f => f.id === choice.characterId);
     choice.characterId = FIGHTER_ROSTER[(index + delta + FIGHTER_ROSTER.length) % FIGHTER_ROSTER.length].id;
