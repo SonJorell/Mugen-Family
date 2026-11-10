@@ -17,8 +17,10 @@ test('César can be picked with E, is bigger and sturdier, and his close grab op
   expect(pc.characterId).toBe('cesar');
   // A passive target makes the opener observable; CPU defense is covered separately.
   await page.mouse.click(640, 565);
-  await page.keyboard.press('Enter'); await page.waitForTimeout(200); await page.keyboard.press('Enter');
-  await page.waitForTimeout(400);
+  // Wait for each screen instead of sleeping: a slow frame used to swallow the second Enter.
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('SelectionScene').phase === 'stage');
+  await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 15000 });
   const r = await page.evaluate(() => { const s = (window as any).__game.scene.getScene('FightScene');
     return { anims: s.registry2.getAvailable().length, hp: s.player.maxHealth, scaleP: s.player.sprite.scaleX, scaleO: s.opponent.sprite.scaleX, key: s.player.sprite.texture.key }; });

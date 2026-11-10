@@ -25,3 +25,15 @@ Formato: fecha · contexto · decisión · motivo.
   el juego, con semilla fija en las pruebas. La dificultad se elige en la selección (X) y viaja
   con los datos de la partida; no se guarda en el navegador.
 - **Motivo:** balance editable sin tocar lógica y pruebas deterministas.
+
+## 2026-11-10 · Las 4 pruebas que fallaban
+- **Contexto:** se reportaron fallos en `cesar.spec.ts` («César can be picked with E…»),
+  `menu-3d.spec.ts` («the title screen starts on a roster fighter…») y las dos «real keyboard
+  double jump…» de `super.spec.ts`.
+- **Hallazgo:** con el súper de César ya integrado (85f31bf) las cuatro pasan: 20/20 al repetirlas
+  5 veces y también en las tandas completas. Ninguna regla del código fallaba; dependen de tiempo
+  real. La causa concreta encontrada está en la prueba de César: un `waitForTimeout(200)` entre
+  los dos Enter de la selección podía perder el segundo bajo carga.
+- **Decisión:** reemplazar esas esperas fijas por esperas al estado de la escena. Las demás no se
+  tocan porque ya esperan condiciones del juego, no tiempos fijos.
+- **Motivo:** cambio mínimo y solo en pruebas; no se desactiva ni se salta ninguna.
