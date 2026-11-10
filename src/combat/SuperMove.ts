@@ -31,6 +31,7 @@ export class SuperMove {
   private victimX = 950;
   private fromRight = false;
   private expanded = false;
+  private controls?: Phaser.GameObjects.Text;
   private readonly motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   private pauseAudio = () => this.sound?.pause();
   private resumeAudio = () => { if (this.sound?.isPaused) this.sound.resume(); };
@@ -39,7 +40,8 @@ export class SuperMove {
     scene.events.on(Phaser.Scenes.Events.PAUSE, this.pauseAudio);
     scene.events.on(Phaser.Scenes.Events.RESUME, this.resumeAudio);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.cancel();
+      // The scene display list may already have destroyed its fighters.
+      this.cancel(false);
       scene.events.off(Phaser.Scenes.Events.PAUSE, this.pauseAudio);
       scene.events.off(Phaser.Scenes.Events.RESUME, this.resumeAudio);
     });
@@ -53,6 +55,8 @@ export class SuperMove {
     this.casterX = this.fromRight ? 950 : 330; this.victimX = this.fromRight ? 330 : 950;
     attacker.enterSuper(true); defender.enterSuper(false);
     attacker.sprite.setVisible(false); defender.sprite.setVisible(false);
+    this.controls = this.scene.children.getByName('fight-controls') as Phaser.GameObjects.Text | undefined;
+    this.controls?.setVisible(false);
     this.createArt();
     if (this.scene.cache.audio.exists('super-canto')) {
       this.sound = this.scene.sound.add('super-canto', { volume: 0.72 }) as SuperSound;
@@ -113,7 +117,7 @@ export class SuperMove {
     this.portrait.setAlpha(intro ? 1 : Math.max(0, 1 - (t - 800) / 180));
     if (!intro && !this.expanded) {
       this.expanded = true;
-      this.title.setText('CANTO RESONANTE').setFontSize(40).setPosition(640, 153);
+      this.title.setText(this.identify(this.attacker!).superName.replace('\n', ' ')).setFontSize(40).setPosition(640, 153);
       this.counter.setPosition(640, 210);
     }
     if (!intro) this.counter.setText(`${this.beat} impactos   ·   ${this.damage} de daño`);
@@ -133,15 +137,15 @@ export class SuperMove {
       }
       return;
     }
-    const mouth = this.casterX + direction * 72;
+    const mouth = this.casterX + direction * 54;
     g.fillStyle(0x9fe8e1, 0.06 + pulse * 0.1)
-      .fillTriangle(mouth, 368, this.victimX + direction * 70, 230, this.victimX + direction * 70, 590);
+      .fillTriangle(mouth, 315, this.victimX + direction * 70, 230, this.victimX + direction * 70, 590);
     for (let i = 0; i < 6; i++) {
       const travel = reduced ? i / 6 : ((t - 800) / 520 + i / 6) % 1;
       const x = mouth + (this.victimX - mouth) * travel;
       const size = 75 + travel * 150;
       g.lineStyle(8 - travel * 4, i % 2 ? 0xf5bd75 : 0x9fe8e1, 0.7 * (1 - travel * 0.5));
-      g.strokeEllipse(x, 390, 30 + travel * 50, size);
+      g.strokeEllipse(x, 315 + travel * 80, 30 + travel * 50, size);
     }
     // Musical notes and concentric pressure rings are driven by the same beat as damage.
     for (let i = 0; i < 8; i++) {
@@ -159,12 +163,14 @@ export class SuperMove {
     }
   }
 
-  cancel(): void {
-    if (this.active) {
+  cancel(restoreFighters = true): void {
+    if (this.active && restoreFighters) {
       this.attacker?.leaveSuper(true, !this.fromRight);
       this.defender?.leaveSuper(false, this.fromRight);
     }
     this.active = false;
+    if (restoreFighters && this.controls?.scene) this.controls.setVisible(true);
+    this.controls = undefined;
     this.layer?.destroy(); this.layer = undefined;
     this.sound?.destroy(); this.sound = undefined;
     this.attacker = undefined; this.defender = undefined;

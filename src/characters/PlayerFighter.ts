@@ -5,7 +5,6 @@
 import { Fighter, FighterOptions } from './Fighter';
 import { InputManager, InputState } from '../input/InputManager';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { DEFAULT_HURTBOX } from '../combat/Hitbox';
 
 export class PlayerFighter extends Fighter {
   private input: InputManager;
@@ -30,7 +29,7 @@ export class PlayerFighter extends Fighter {
 
     if (state.block && this.isGrounded) {
       this.velocityX = 0;
-      this.hurtbox.rect = DEFAULT_HURTBOX;
+      this.hurtbox.rect = this.standingHurtbox;
       if (this.combatState.state !== 'BLOCKING') {
         this.combatState.setState('BLOCKING');
         this.playAnimation('BLOCK');
@@ -43,8 +42,8 @@ export class PlayerFighter extends Fighter {
     }
 
     if (state.jump) {
-      this.hurtbox.rect = DEFAULT_HURTBOX;
-      this.velocityX = (Number(!!state.moveRight) - Number(!!state.moveLeft)) * GAME_CONFIG.WALK_SPEED;
+      this.hurtbox.rect = this.standingHurtbox;
+      this.velocityX = (Number(!!state.moveRight) - Number(!!state.moveLeft)) * this.walkSpeed;
       this.jump();
       return;
     }
@@ -52,7 +51,7 @@ export class PlayerFighter extends Fighter {
     if (state.crouch && this.isGrounded) {
       if (this.combatState.state !== 'CROUCHING') {
         this.combatState.setState('CROUCHING');
-        this.hurtbox.rect = { x: -45, y: -160, width: 90, height: 160 };
+        this.hurtbox.rect = this.crouchHurtbox;
         this.playAnimation('CROUCH');
       }
       this.velocityX = 0;
@@ -61,13 +60,13 @@ export class PlayerFighter extends Fighter {
 
     if (this.combatState.state === 'CROUCHING') {
       this.combatState.setState('IDLE');
-      this.hurtbox.rect = DEFAULT_HURTBOX;
+      this.hurtbox.rect = this.standingHurtbox;
       this.playAnimation('IDLE');
     }
 
-    this.hurtbox.rect = DEFAULT_HURTBOX;
+    this.hurtbox.rect = this.standingHurtbox;
     if (state.moveRight && !state.moveLeft) {
-      this.velocityX = GAME_CONFIG.WALK_SPEED;
+      this.velocityX = this.walkSpeed;
 
       if (this.isGrounded) {
         const newState = this.facingRight ? 'WALKING_FORWARD' : 'WALKING_BACKWARD';
@@ -77,7 +76,7 @@ export class PlayerFighter extends Fighter {
         }
       }
     } else if (state.moveLeft && !state.moveRight) {
-      this.velocityX = -GAME_CONFIG.WALK_SPEED;
+      this.velocityX = -this.walkSpeed;
 
       if (this.isGrounded) {
         const newState = this.facingRight ? 'WALKING_BACKWARD' : 'WALKING_FORWARD';

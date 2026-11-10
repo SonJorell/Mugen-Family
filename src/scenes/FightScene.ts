@@ -102,9 +102,9 @@ export class FightScene extends Phaser.Scene {
       this.add.ellipse(fighter.x, GAME_CONFIG.FLOOR_Y + 2, 150, 16, 0x09121a, 0.26).setDepth(1));
     this.createSystems();
     this.add.text(GAME_CONFIG.WIDTH / 2, 682,
-      'A D / ← →  Mover    W / ↑ ×2  Doble salto    S / ↓  Agacharse    J K  Puños    U I  Patadas    L  Bloquear    O  Canto',
+      'A D / ← →  Mover    W / ↑ ×2  Doble salto    S / ↓  Agacharse    J K  Puños    U I  Patadas    L  Bloquear    O  Poder',
       { fontFamily: 'Arial', fontSize: '16px', color: '#eee8d9', backgroundColor: '#12151c', padding: { x: 16, y: 10 } }
-    ).setOrigin(0.5).setDepth(60).setScrollFactor(0);
+    ).setOrigin(0.5).setDepth(60).setScrollFactor(0).setName('fight-controls');
     this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
       fontFamily: 'Arial', fontSize: '18px', color: '#ffdd77', backgroundColor: '#12151c', padding: { x: 12, y: 8 },
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(60).setInteractive({ useHandCursor: true })
@@ -252,8 +252,9 @@ export class FightScene extends Phaser.Scene {
       characterId: this.playerManifest.characterId,
       x: GAME_CONFIG.STAGE_WIDTH * 0.35,
       y: GAME_CONFIG.FLOOR_Y,
-      maxHealth: GAME_CONFIG.MAX_HEALTH,
+      maxHealth: rosterEntry(this.playerChoice.characterId).stats.maxHealth,
       scale: GAME_CONFIG.CHAR_SCALE,
+      stats: rosterEntry(this.playerChoice.characterId).stats,
     }, this.inputManager);
 
     const OpponentClass = this.mode === 'training' ? TrainingOpponent : ComputerOpponent;
@@ -264,8 +265,9 @@ export class FightScene extends Phaser.Scene {
       characterId: 'dummy',
       x: GAME_CONFIG.STAGE_WIDTH * 0.65,
       y: GAME_CONFIG.FLOOR_Y,
-      maxHealth: GAME_CONFIG.MAX_HEALTH,
+      maxHealth: rosterEntry(this.opponentChoice.characterId).stats.maxHealth,
       scale: GAME_CONFIG.CHAR_SCALE,
+      stats: rosterEntry(this.opponentChoice.characterId).stats,
     });
     this.player.sprite.setTint(fighterPalette(this.playerChoice).tint);
     this.opponent.sprite.setTint(fighterPalette(this.opponentChoice).tint);
@@ -283,11 +285,17 @@ export class FightScene extends Phaser.Scene {
 
     const playerName = rosterEntry(this.playerChoice.characterId).name.toUpperCase();
     const opponentName = rosterEntry(this.opponentChoice.characterId).name.toUpperCase();
-    this.hud = new HUD(this, `${playerName} · JUGADOR`, this.mode === 'training' ? 'MUÑECO · PRÁCTICA' : `${opponentName} · CPU`);
+    this.hud = new HUD(this, `${playerName} · JUGADOR`, this.mode === 'training' ? 'MUÑECO · PRÁCTICA' : `${opponentName} · CPU`,
+      this.player.maxHealth, this.opponent.maxHealth);
     this.messages = new FightMessages(this);
     this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
 
     this.roundSystem.startRound();
+  }
+
+  /** Timeouts compare remaining health as a share, so a 125-HP fighter gets no free win. */
+  private healthPct(fighter: Fighter): number {
+    return fighter.currentHealth <= 0 ? 0 : fighter.currentHealth / fighter.maxHealth * GAME_CONFIG.MAX_HEALTH;
   }
 
   // ── Camera follow ─────────────────────────────────────────
@@ -349,7 +357,7 @@ export class FightScene extends Phaser.Scene {
     if (this.superMove.active) {
       this.superMove.update(delta);
       this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
-      if (!this.superMove.active) this.roundSystem.update(0, this.player.currentHealth, this.opponent.currentHealth);
+      if (!this.superMove.active) this.roundSystem.update(0, this.healthPct(this.player), this.healthPct(this.opponent));
       return;
     }
 
@@ -364,7 +372,7 @@ export class FightScene extends Phaser.Scene {
 
     if (this.roundSystem.phase !== 'FIGHT') {
       // Still update round intro
-      this.roundSystem.update(delta, this.player.currentHealth, this.opponent.currentHealth);
+      this.roundSystem.update(delta, this.healthPct(this.player), this.healthPct(this.opponent));
       this.player.updatePresentation(delta);
       this.opponent.updatePresentation(delta);
       this.facingSystem.update(this.player, this.opponent);
@@ -388,7 +396,7 @@ export class FightScene extends Phaser.Scene {
     if (this.superMove.active) { this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft); return; }
 
     // Round logic
-    this.roundSystem.update(delta, this.player.currentHealth, this.opponent.currentHealth);
+    this.roundSystem.update(delta, this.healthPct(this.player), this.healthPct(this.opponent));
 
     // HUD
     this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);

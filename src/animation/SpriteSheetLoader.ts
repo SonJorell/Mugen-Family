@@ -22,6 +22,14 @@ export interface SpriteGridLayout {
   /** A standing pose used to keep physical body scale consistent across moves. */
   referenceFrame?: number;
   alignFeet?: boolean;
+  /**
+   * Fixed-scale mode for rigged sheets: standing body height in source pixels.
+   * Every frame then shares one scale, the cell centre as anchor and `groundY` as floor,
+   * instead of re-normalising each animation to its own reference frame.
+   */
+  sourceBodyHeight?: number;
+  /** Floor line inside each nominal cell (source pixels), used with `sourceBodyHeight`. */
+  groundY?: number;
 }
 
 export interface SpriteSheetOptions extends SpriteGridLayout {
@@ -208,8 +216,9 @@ export class SpriteSheetLoader {
     }
     const reference = frames[layout.referenceFrame ?? 0];
     const referenceHeight = Math.max(1, reference.bottom - reference.top + 1);
-    const scale = 330 / referenceHeight;
-    const anchorX = (reference.left + reference.right) / 2 + reference.offsetX;
+    const fixed = typeof layout.sourceBodyHeight === 'number' && layout.sourceBodyHeight > 0;
+    const scale = 330 / (fixed ? layout.sourceBodyHeight! : referenceHeight);
+    const anchorX = fixed ? src.width / layout.columns / 2 : (reference.left + reference.right) / 2 + reference.offsetX;
     return frames.map((frame, i) => {
       const key = `${this.characterId}_${animName}_${imgIdx * count + i}`;
       if (!this.scene.textures.exists(key)) {
@@ -217,7 +226,8 @@ export class SpriteSheetLoader {
         const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 384;
         const ctx = canvas.getContext('2d')!;
         ctx.imageSmoothingEnabled = false;
-        const baseline = layout.alignFeet === false ? reference.bottom + reference.offsetY - frame.offsetY + 1 : frame.bottom + 1;
+        const baseline = fixed ? (layout.groundY ?? src.height / layout.rows) - frame.offsetY
+          : layout.alignFeet === false ? reference.bottom + reference.offsetY - frame.offsetY + 1 : frame.bottom + 1;
         ctx.drawImage(frame.canvas, 256 + (frame.offsetX - anchorX) * scale, 374.5 - baseline * scale,
           frame.canvas.width * scale, frame.canvas.height * scale);
         this.scene.textures.addCanvas(key, canvas);

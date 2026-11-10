@@ -75,6 +75,8 @@ export class SelectionScene extends Phaser.Scene {
     for (const k of ['LEFT', 'A']) key(k, () => this.navigate(-1));
     for (const k of ['RIGHT', 'D']) key(k, () => this.navigate(1));
     key('TAB', () => this.changeSide());
+    key('Q', () => this.cycleFighter(-1));
+    key('E', () => this.cycleFighter(1));
     for (const k of ['UP', 'W']) key(k, () => this.phase === 'stage' ? this.navigate(-3) : this.changeSide());
     for (const k of ['DOWN', 'S']) key(k, () => this.phase === 'stage' ? this.navigate(3) : this.changeSide());
     for (const k of ['ENTER', 'SPACE']) key(k, () => this.confirm());
@@ -114,9 +116,9 @@ export class SelectionScene extends Phaser.Scene {
     else this.renderVersus();
   }
   private renderFighters(): void {
-    this.title.setText('ELIGE TU LUCHADORA');
+    this.title.setText('ELIGE TU LUCHADOR');
     this.steps.setText('Luchadores   /   Escenario');
-    this.help.setText('← → / A D  Color     Tab / ↑ ↓  Cambiar lado     Enter  Confirmar     Esc  Volver');
+    this.help.setText('Q E  Luchador     ← → / A D  Color     Tab / ↑ ↓  Cambiar lado     Enter  Confirmar     Esc  Volver');
     for (const side of ['player', 'opponent'] as const) {
       const player = side === 'player', x = player ? 275 : 1000;
       const choice = player ? this.playerChoice : this.opponentChoice;
@@ -143,13 +145,13 @@ export class SelectionScene extends Phaser.Scene {
     this.text(640, 270, activeFighter.description, 17, '#c9b8da', true).setAlign('center').setWordWrapWidth(240);
     // One portrait tile per roster entry, centred as a row under the VS.
     FIGHTER_ROSTER.forEach((fighter, index) => {
-      const x = 640 + (index - (FIGHTER_ROSTER.length - 1) / 2) * 184;
+      const x = 640 + (index - (FIGHTER_ROSTER.length - 1) / 2) * 150;
       const selected = activeChoice.characterId === fighter.id;
-      this.clickable(this.rectangle(x, 399, 174, 164, 0x473b72).setStrokeStyle(selected ? 2 : 1, selected ? 0xfae8cb : 0x726182), () => {
+      this.clickable(this.rectangle(x, 399, FIGHTER_ROSTER.length > 1 ? 140 : 174, 164, 0x473b72).setStrokeStyle(selected ? 2 : 1, selected ? 0xfae8cb : 0x726182), () => {
         activeChoice.characterId = fighter.id; this.render();
       });
       this.preview(x, 466, 0.2, { ...activeChoice, characterId: fighter.id });
-      this.text(x, 486, fighter.name + (selected ? ' · Seleccionada' : ''), 18, selected ? '#fae8cb' : '#b6a6c7', true);
+      this.text(x, 486, fighter.name, 18, selected ? '#fae8cb' : '#b6a6c7', true);
     });
     this.button(640, 565, 220, this.mode === 'cpu' ? 'Rival: CPU' : 'Rival: Práctica', () => {
       this.mode = this.mode === 'cpu' ? 'training' : 'cpu'; this.render();
@@ -205,6 +207,13 @@ export class SelectionScene extends Phaser.Scene {
       const index = FIGHTER_PALETTES.findIndex(p => p.id === choice.paletteId);
       choice.paletteId = FIGHTER_PALETTES[(index + delta + FIGHTER_PALETTES.length) % FIGHTER_PALETTES.length].id;
     }
+    this.render();
+  }
+  private cycleFighter(delta: number): void {
+    if (this.phase !== 'fighters') return;
+    const choice = this.activeSide === 'player' ? this.playerChoice : this.opponentChoice;
+    const index = FIGHTER_ROSTER.findIndex(f => f.id === choice.characterId);
+    choice.characterId = FIGHTER_ROSTER[(index + delta + FIGHTER_ROSTER.length) % FIGHTER_ROSTER.length].id;
     this.render();
   }
   private changeSide(): void {

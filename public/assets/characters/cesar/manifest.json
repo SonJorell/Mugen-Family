@@ -1,0 +1,195 @@
+{
+  "characterId": "cesar",
+  "name": "César",
+  "assetPath": "/assets/characters/cesar-v2/",
+  "version": 2,
+  "spriteSheet": {
+    "columns": 4,
+    "rows": 3,
+    "frameCount": 12,
+    "animations": {
+      "IDLE": {
+        "frameRate": 10,
+        "repeat": -1
+      },
+      "WALK_FORWARD": {
+        "frameRate": 13,
+        "repeat": -1
+      },
+      "WALK_BACKWARD": {
+        "frameRate": 12,
+        "repeat": -1
+      },
+      "DASH": {
+        "frameRate": 22,
+        "repeat": 0
+      },
+      "CROUCH": {
+        "frameRate": 30,
+        "repeat": 0
+      },
+      "JUMP": {
+        "frameRate": 12,
+        "repeat": 0,
+        "alignFeet": false
+      },
+      "LIGHT_PUNCH": {
+        "frameRate": 24,
+        "repeat": 0,
+        "impactStart": 4,
+        "impactEnd": 6
+      },
+      "HEAVY_PUNCH": {
+        "frameRate": 20,
+        "repeat": 0,
+        "impactStart": 6,
+        "impactEnd": 8
+      },
+      "LIGHT_KICK": {
+        "frameRate": 24,
+        "repeat": 0,
+        "impactStart": 5,
+        "impactEnd": 7
+      },
+      "HEAVY_KICK": {
+        "frameRate": 19,
+        "repeat": 0,
+        "impactStart": 6,
+        "impactEnd": 8
+      },
+      "BLOCK": {
+        "frameRate": 40,
+        "repeat": 0
+      },
+      "HIT_REACTION": {
+        "frameRate": 26,
+        "repeat": 0
+      },
+      "KNOCKDOWN": {
+        "frameRate": 20,
+        "repeat": 0
+      },
+      "GET_UP": {
+        "frameRate": 18,
+        "repeat": 0,
+        "referenceFrame": 11
+      },
+      "TAUNT": {
+        "frameRate": 12,
+        "repeat": 0
+      },
+      "VICTORY": {
+        "frameRate": 10,
+        "repeat": -1
+      },
+      "DEFEAT": {
+        "frameRate": 16,
+        "repeat": 0
+      },
+      "SPECIAL_ATTACK": {
+        "frameRate": 20,
+        "repeat": 0,
+        "impactStart": 7,
+        "impactEnd": 9
+      },
+      "STUN": {
+        "frameRate": 12,
+        "repeat": -1
+      },
+      "AIR_PUNCH": {
+        "frameRate": 24,
+        "repeat": 0,
+        "impactStart": 5,
+        "impactEnd": 8,
+        "alignFeet": false
+      },
+      "AIR_KICK": {
+        "frameRate": 24,
+        "repeat": 0,
+        "impactStart": 5,
+        "impactEnd": 8,
+        "alignFeet": false
+      },
+      "DOUBLE_JUMP": {
+        "frameRate": 16,
+        "repeat": 0,
+        "alignFeet": false
+      },
+      "LANDING": {
+        "frameRate": 36,
+        "repeat": 0
+      }
+    }
+  },
+  "animations": {
+    "IDLE": [
+      "/assets/characters/cesar-v2/IDLE.png"
+    ],
+    "WALK_FORWARD": [
+      "/assets/characters/cesar-v2/WALK_FORWARD.png"
+    ],
+    "WALK_BACKWARD": [
+      "/assets/characters/cesar-v2/WALK_BACKWARD.png"
+    ],
+    "DASH": [
+      "/assets/characters/cesar-v2/DASH.png"
+    ],
+    "CROUCH": [
+      "/assets/characters/cesar-v2/CROUCH.png"
+    ],
+    "JUMP": [
+      "/assets/characters/cesar-v2/JUMP.png"
+    ],
+    "LIGHT_PUNCH": [
+      "/assets/characters/cesar-v2/LIGHT_PUNCH.png"
+    ],
+    "HEAVY_PUNCH": [
+      "/assets/characters/cesar-v2/HEAVY_PUNCH.png"
+    ],
+    "LIGHT_KICK": [
+      "/assets/characters/cesar-v2/LIGHT_KICK.png"
+    ],
+    "HEAVY_KICK": [
+      "/assets/characters/cesar-v2/HEAVY_KICK.png"
+    ],
+    "BLOCK": [
+      "/assets/characters/cesar-v2/BLOCK.png"
+    ],
+    "HIT_REACTION": [
+      "/assets/characters/cesar-v2/HIT_REACTION.png"
+    ],
+    "KNOCKDOWN": [
+      "/assets/characters/cesar-v2/KNOCKDOWN.png"
+    ],
+    "GET_UP": [
+      "/assets/characters/cesar-v2/GET_UP.png"
+    ],
+    "TAUNT": [
+      "/assets/characters/cesar-v2/TAUNT.png"
+    ],
+    "VICTORY": [
+      "/assets/characters/cesar-v2/VICTORY.png"
+    ],
+    "DEFEAT": [
+      "/assets/characters/cesar-v2/DEFEAT.png"
+    ],
+    "SPECIAL_ATTACK": [
+      "/assets/characters/cesar-v2/SPECIAL_ATTACK.png"
+    ],
+    "STUN": [
+      "/assets/characters/cesar-v2/STUN.png"
+    ],
+    "AIR_PUNCH": [
+      "/assets/characters/cesar-v2/AIR_PUNCH.png"
+    ],
+    "AIR_KICK": [
+      "/assets/characters/cesar-v2/AIR_KICK.png"
+    ],
+    "DOUBLE_JUMP": [
+      "/assets/characters/cesar-v2/DOUBLE_JUMP.png"
+    ],
+    "LANDING": [
+      "/assets/characters/cesar-v2/LANDING.png"
+    ]
+  }
+}

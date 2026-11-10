@@ -1,0 +1,104 @@
+{
+  "generator": "Built-in ImageGen",
+  "reference": "../assets/Characters/Cesar/WATON MAIN.jpg",
+  "animations": {
+    "IDLE": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-f5e8ece0-f3a8-4a11-81b5-bf7312a043f5.png",
+      "saved": "public/assets/characters/cesar-v2/IDLE.png"
+    },
+    "WALK_FORWARD": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-4ec51025-f90a-48cd-b871-4ae355f977ff.png",
+      "saved": "public/assets/characters/cesar-v2/WALK_FORWARD.png"
+    },
+    "LIGHT_PUNCH": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-09d90394-1cce-4334-8b75-94f1741d05ab.png",
+      "saved": "public/assets/characters/cesar-v2/LIGHT_PUNCH.png"
+    },
+    "HEAVY_PUNCH": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-40a0c0d7-3595-4d46-ba6f-3540361e3567.png",
+      "saved": "public/assets/characters/cesar-v2/HEAVY_PUNCH.png"
+    },
+    "LIGHT_KICK": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-c92b904e-08d7-46e1-bfed-2889974a58bf.png",
+      "saved": "public/assets/characters/cesar-v2/LIGHT_KICK.png"
+    },
+    "HEAVY_KICK": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-f7c97d76-55d4-46d4-b650-25a1a054bf6a.png",
+      "saved": "public/assets/characters/cesar-v2/HEAVY_KICK.png"
+    },
+    "WALK_BACKWARD": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-0063ea5c-52c9-48a8-9a5f-c4d8abb9df97.png",
+      "saved": "public/assets/characters/cesar-v2/WALK_BACKWARD.png"
+    },
+    "DASH": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-637232e0-ef22-4a24-af0c-0d728d7739cb.png",
+      "saved": "public/assets/characters/cesar-v2/DASH.png"
+    },
+    "CROUCH": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-3ced0ec4-9aae-43ca-bacd-7d257cf120ce.png",
+      "saved": "public/assets/characters/cesar-v2/CROUCH.png"
+    },
+    "JUMP": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-75176420-9789-432a-b1c3-0d71b3731249.png",
+      "saved": "public/assets/characters/cesar-v2/JUMP.png"
+    },
+    "DOUBLE_JUMP": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-c833e2f9-6b5f-4285-b3bf-75a19c79d6e8.png",
+      "saved": "public/assets/characters/cesar-v2/DOUBLE_JUMP.png"
+    },
+    "LANDING": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-9e4fee6b-d788-42c4-8049-821d93469db8.png",
+      "saved": "public/assets/characters/cesar-v2/LANDING.png"
+    },
+    "BLOCK": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-93df3162-6f94-4a88-b8b5-1c741144ff31.png",
+      "saved": "public/assets/characters/cesar-v2/BLOCK.png"
+    },
+    "HIT_REACTION": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-fa566a9a-b9af-4b85-9a3a-68f7eb1cb45f.png",
+      "saved": "public/assets/characters/cesar-v2/HIT_REACTION.png"
+    },
+    "STUN": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-dc65bc20-e5f1-40b1-abd9-114a832e52a8.png",
+      "saved": "public/assets/characters/cesar-v2/STUN.png"
+    },
+    "KNOCKDOWN": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-dfd9d247-632d-42bb-b4ab-3e35ca667c16.png",
+      "saved": "public/assets/characters/cesar-v2/KNOCKDOWN.png"
+    },
+    "DEFEAT": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-d211a6a9-cb80-46aa-b6e0-9c9453dfd43d.png",
+      "saved": "public/assets/characters/cesar-v2/DEFEAT.png"
+    },
+    "SPECIAL_ATTACK": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-cb100a0d-8909-4b7b-aadb-eedbf5b1a599.png",
+      "saved": "public/assets/characters/cesar-v2/SPECIAL_ATTACK.png"
+    },
+    "AIR_PUNCH": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-cd625508-7c66-424f-b9c0-7ab4ad952b31.png",
+      "saved": "public/assets/characters/cesar-v2/AIR_PUNCH.png"
+    },
+    "AIR_KICK": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-2980a12b-3836-4e3c-8c2f-3bf0f55d95c2.png",
+      "saved": "public/assets/characters/cesar-v2/AIR_KICK.png"
+    },
+    "TAUNT": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-0d72b01f-6dbe-4c4f-9249-52446035aa44.png",
+      "saved": "public/assets/characters/cesar-v2/TAUNT.png"
+    },
+    "VICTORY": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-4bd7fc15-d447-4ffc-a6ae-466ef5b38b82.png",
+      "saved": "public/assets/characters/cesar-v2/VICTORY.png"
+    },
+    "GET_UP": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-26e7c092-fb8e-40c8-9206-7dfba812ea27.png",
+      "saved": "public/assets/characters/cesar-v2/GET_UP.png"
+    }
+  },
+  "edits": {
+    "GET_UP": {
+      "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-0c2158f9-ab9e-412b-987e-868e90936697.png",
+      "prompt": "Use case: background-extraction. Edit target: the attached 12-frame sprite atlas. REMOVE ONLY the entire mottled brown/grey background and every glow or shadow outside each character silhouette. Output genuinely transparent RGBA, clean alpha, clear transparent gutters. Preserve exactly all twelve drawings, their original 4-column by 3-row placement, pixel art, facial expressions, clothing, outlines, proportions and poses. Do not redraw or change the character. No replacement background or checkerboard. Preserve the full hands, shoes and blond hair."
+    }
+  }
+}

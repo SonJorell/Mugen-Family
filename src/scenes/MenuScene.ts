@@ -141,7 +141,7 @@ export class MenuScene extends Phaser.Scene {
       shadow: { offsetX: 1, offsetY: 2, color: '#08121b', blur: 6, fill: true },
     }).setDepth(12);
     this.add.text(654, 583, 'Canto sónico', { fontFamily: 'Trebuchet MS', fontSize: '23px', fontStyle: 'bold', color: '#9fe8e1' }).setDepth(13);
-    this.add.text(654, 617, 'Tu voz daña\ny aturde.', { fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#fff3d8' }).setDepth(13);
+    this.add.text(654, 617, 'Carga energía.\nDesata tu voz.', { fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#fff3d8' }).setDepth(13);
   }
 
   private buildMenu(): void {

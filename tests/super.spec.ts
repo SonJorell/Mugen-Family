@@ -15,16 +15,18 @@ async function fight(page: Page, stop = true) {
   if (stop) await page.evaluate(() => { (window as any).__game.loop.stop(); });
 }
 
-test('an empty energy bar rejects the super and time alone never charges it', async ({ page }) => {
+test('empty and incomplete energy bars reject the super and time alone never charges it', async ({ page }) => {
   await fight(page);
   const result = await page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('FightScene'), p = s.player;
     p.executeAttack('SPECIAL_ATTACK');
     const attack = p.getActiveAttackDef()?.name ?? null;
     for (let i = 0; i < 360; i++) p.update(1000 / 60);
-    return { attack, energy: p.energy, waves: p.sonicWaves.length };
+    const idleEnergy = p.energy;
+    p.gainEnergy(99); p.executeAttack('SPECIAL_ATTACK');
+    return { attack, idleEnergy, energy: p.energy, partialAttack: p.getActiveAttackDef()?.name ?? null, waves: p.sonicWaves.length };
   });
-  expect(result).toEqual({ attack: null, energy: 0, waves: 0 });
+  expect(result).toEqual({ attack: null, idleEnergy: 0, energy: 99, partialAttack: null, waves: 0 });
 });
 
 test('real normal hits charge both bars once and a full bar pays exactly one super', async ({ page }) => {
@@ -115,6 +117,8 @@ test('super damage cannot recharge energy or end the round before the final note
 });
 
 test('pausing a cinematic freezes its damage and restart clears the scene, sound and energy', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.stack ?? error.message));
   await fight(page, false);
   await page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('FightScene');
@@ -126,14 +130,47 @@ test('pausing a cinematic freezes its damage and restart clears the scene, sound
   await page.waitForFunction(() => (window as any).__game.scene.isActive('PauseScene'));
   const snapshot = () => page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('FightScene');
-    return { time: s.superMove.elapsed, health: s.opponent.currentHealth };
+    return { time: s.superMove.elapsed, health: s.opponent.currentHealth, soundPaused: s.superMove.sound?.isPaused };
   });
-  const paused = await snapshot(); await page.waitForTimeout(450); expect(await snapshot()).toEqual(paused);
+  const paused = await snapshot(); expect(paused.soundPaused).toBe(true);
+  await page.waitForTimeout(450); expect(await snapshot()).toEqual(paused);
+  await page.keyboard.press('Escape');
+  await expect.poll(async () => (await snapshot()).time).toBeGreaterThan(paused.time);
+  expect((await snapshot()).soundPaused).toBe(false);
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => (window as any).__game.scene.isActive('PauseScene'));
   await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
-  await page.waitForFunction(() => (window as any).__game.scene.isActive('FightScene'));
+  await expect.poll(async () => ({ errors, active: await page.evaluate(() => (window as any).__game.scene.isActive('FightScene')) }))
+    .toEqual({ errors: [], active: true });
   expect(await page.evaluate(() => {
     const g = (window as any).__game, s = g.scene.getScene('FightScene');
     return { active: s.superMove.active, energy: s.player.energy, health: s.opponent.currentHealth,
       sounds: g.sound.sounds.filter((a: any) => a.key === 'super-canto' && !a.pendingRemove).length };
   })).toEqual({ active: false, energy: 0, health: 100, sounds: 0 });
 });
+
+for (const defense of ['guard', 'double jump'] as const) for (const fromRight of [true, false]) {
+  test(`real keyboard ${defense} avoids a charged opponent super from the ${fromRight ? 'right' : 'left'}`, async ({ page }) => {
+    await fight(page, false);
+    if (defense === 'guard') await page.keyboard.down('KeyL');
+    await page.evaluate(right => {
+      const s = (window as any).__game.scene.getScene('FightScene');
+      s.player.x = right ? 700 : 1100; s.opponent.x = right ? 1100 : 700;
+      s.opponent.updateFacing(s.player.x); s.player.updateFacing(s.opponent.x);
+      s.opponent.gainEnergy(100); s.opponent.executeAttack('SPECIAL_ATTACK');
+    }, fromRight);
+    if (defense === 'double jump') {
+      // Keep each press across a rendered frame: Phaser clears JustDown on keyup.
+      await page.keyboard.press('KeyW', { delay: 60 });
+      await page.waitForTimeout(370);
+      await page.keyboard.press('KeyW', { delay: 60 });
+      expect(await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').player.jumpsUsed)).toBe(2);
+    }
+    await page.waitForTimeout(1500);
+    const result = await page.evaluate(() => {
+      const s = (window as any).__game.scene.getScene('FightScene');
+      return { health: s.player.currentHealth, energy: s.opponent.energy, active: s.superMove.active };
+    });
+    expect(result).toEqual({ health: 100, energy: 0, active: false });
+  });
+}

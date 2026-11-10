@@ -11,6 +11,7 @@ import { CombatState, FighterState } from '../combat/CombatState';
 import { Hitbox, Hurtbox, DEFAULT_HURTBOX } from '../combat/Hitbox';
 import { AttackDefinition, ATTACK_DEFINITIONS } from '../combat/AttackDefinition';
 import { SonicWave } from '../combat/SonicWave';
+import { DEFAULT_STATS, FighterStats } from '../config/roster';
 
 export interface FighterOptions {
   scene: Phaser.Scene;
@@ -21,6 +22,7 @@ export interface FighterOptions {
   y: number;
   maxHealth?: number;
   scale?: number;
+  stats?: FighterStats;
 }
 
 export class Fighter {
@@ -85,6 +87,32 @@ export class Fighter {
   // Debug
   protected debugGraphics: Phaser.GameObjects.Graphics | null = null;
 
+  readonly stats: FighterStats;
+
+  /** Standing hurtbox grown with the fighter's size. */
+  get standingHurtbox() { return this.sizedBox(DEFAULT_HURTBOX); }
+  /** Crouching hurtbox grown with the fighter's size. */
+  get crouchHurtbox() { return this.sizedBox({ x: -45, y: -160, width: 90, height: 160 }); }
+  get walkSpeed(): number { return GAME_CONFIG.WALK_SPEED * this.stats.walkSpeed; }
+
+  private sizedBox(box: { x: number; y: number; width: number; height: number }) {
+    const k = this.stats?.size ?? 1;
+    return k === 1 ? box : { x: box.x * k, y: box.y * k, width: box.width * k, height: box.height * k };
+  }
+
+  /** Applies the fighter's speed, damage and reach to a shared attack definition. */
+  private scaleAttack(def: AttackDefinition): AttackDefinition {
+    const s = this.stats;
+    if (s.attackSpeed === 1 && s.damage === 1 && s.size === 1) return def;
+    const frames = (n: number) => Math.max(1, Math.round(n / s.attackSpeed));
+    return {
+      ...def,
+      startup: frames(def.startup), active: frames(def.active), recovery: frames(def.recovery),
+      damage: Math.round(def.damage * s.damage),
+      hitbox: this.sizedBox(def.hitbox),
+    };
+  }
+
   constructor(opts: FighterOptions) {
     this.scene = opts.scene;
     this.registry = opts.registry;
@@ -94,9 +122,10 @@ export class Fighter {
     this.y = opts.y;
     this.maxHealth = opts.maxHealth ?? GAME_CONFIG.MAX_HEALTH;
     this.currentHealth = this.maxHealth;
-    this.scale = opts.scale ?? GAME_CONFIG.CHAR_SCALE;
+    this.stats = opts.stats ?? DEFAULT_STATS;
+    this.scale = (opts.scale ?? GAME_CONFIG.CHAR_SCALE) * this.stats.size;
 
-    this.hurtbox = new Hurtbox(this.characterId, DEFAULT_HURTBOX);
+    this.hurtbox = new Hurtbox(this.characterId, this.standingHurtbox);
 
     this.createSprite();
     this.setupDebugGraphics();
@@ -239,11 +268,12 @@ export class Fighter {
     if (!this.combatState.canAct()) return;
     if (attackName === 'SPECIAL_ATTACK' && (!this.superReady || !this.isGrounded)) return;
 
-    const attackDef = ATTACK_DEFINITIONS[attackName];
-    if (!attackDef) return;
+    const baseDef = ATTACK_DEFINITIONS[attackName];
+    if (!baseDef) return;
+    const attackDef = this.scaleAttack(baseDef);
 
     this.currentAttackDef = attackDef;
-    this.hurtbox.rect = DEFAULT_HURTBOX;
+    this.hurtbox.rect = this.standingHurtbox;
     if (this.isGrounded) this.velocityX = 0;
     this.attackStartup = attackDef.startup;
     this.attackActive = attackDef.active;
@@ -276,8 +306,9 @@ export class Fighter {
     if (this.currentAttackDef.name === 'SPECIAL_ATTACK' && !this.sonicReleased && elapsedFrames + 1e-6 >= startup) {
       this.sonicReleased = true;
       const direction = this.facingRight ? 1 : -1;
-      this.sonicWaves.push(new SonicWave(this.scene, this.x + direction * 65, this.y - 215, direction));
-      this.playImpactSound('voice-canto');
+      const quake = this.stats.special === 'quake';
+      this.sonicWaves.push(new SonicWave(this.scene, this.x + direction * (quake ? 90 * this.stats.size : 65), quake ? this.y - 70 : this.y - 215, direction, this.stats.special));
+      this.playImpactSound(quake ? 'hit-heavy' : 'voice-canto');
     }
     if (elapsedFrames + 1e-6 >= startup + active + recovery) {
       this.endAttack();
@@ -300,7 +331,7 @@ export class Fighter {
 
   private endAttack(): void {
     this.cancelAttack();
-    this.hurtbox.rect = DEFAULT_HURTBOX;
+    this.hurtbox.rect = this.standingHurtbox;
     this.combatState.setState(this.isGrounded ? 'IDLE' : 'JUMPING');
     this.playAnimation(this.isGrounded ? 'IDLE' : 'JUMP');
   }
@@ -320,11 +351,12 @@ export class Fighter {
     this.cancelAttack();
     this.clearSonicWaves();
     this.gainEnergy(damage + 2);
-    this.hurtbox.rect = DEFAULT_HURTBOX;
+    this.hurtbox.rect = this.standingHurtbox;
     this.currentHealth = Math.max(0, this.currentHealth - damage);
     this.playImpactSound(damage >= 20 ? 'hit-special' : damage >= 10 ? 'hit-heavy' : 'hit-light');
 
     const kbDir = fromRight ? -1 : 1;
+    knockback /= this.stats.weight;
     this.velocityX = kbDir * knockback;
     if (this.currentHealth <= 0) {
       this.combatState.setState('DEFEAT');
@@ -356,7 +388,7 @@ export class Fighter {
   enterSuper(caster: boolean): void {
     this.cancelAttack(); this.clearSonicWaves(); this.stunArt.clear();
     this.velocityX = 0; this.velocityY = 0;
-    this.hurtbox.rect = DEFAULT_HURTBOX;
+    this.hurtbox.rect = this.standingHurtbox;
     this.combatState.setState(caster ? 'SPECIAL' : 'SUPER_CAUGHT');
     this.playAnimation(caster ? 'SPECIAL_ATTACK' : 'STUN', true);
   }
@@ -409,7 +441,7 @@ export class Fighter {
     this.y = GAME_CONFIG.FLOOR_Y;
     this.isGrounded = true;
     this.jumpsUsed = 0;
-    this.hurtbox.rect = DEFAULT_HURTBOX;
+    this.hurtbox.rect = this.standingHurtbox;
     this.combatState.setState(state);
     this.playAnimation(state, true);
     this.sprite.setPosition(this.x, this.y);
@@ -462,7 +494,7 @@ export class Fighter {
 
   jump(): void {
     if (!this.combatState.canAct() || this.jumpsUsed >= GAME_CONFIG.MAX_JUMPS) return;
-    this.velocityY = this.isGrounded ? GAME_CONFIG.JUMP_VELOCITY : GAME_CONFIG.DOUBLE_JUMP_VELOCITY;
+    this.velocityY = (this.isGrounded ? GAME_CONFIG.JUMP_VELOCITY : GAME_CONFIG.DOUBLE_JUMP_VELOCITY) * this.stats.jumpPower;
     this.jumpsUsed++;
     this.isGrounded = false;
     this.combatState.setState('JUMPING');
@@ -514,7 +546,13 @@ export class Fighter {
   }
 
   updatePresentation(delta: number): void {
-    this.advanceAnimation(delta);
+    // Sustain the open-mouth singing drawings instead of replaying wind-up and recovery.
+    if (this.combatState.state === 'SPECIAL' && this.stats.special === 'sonic' && this.animDef?.impactStart !== undefined && this.animDef.impactEnd !== undefined) {
+      this.animTimer += delta;
+      const start = this.animDef.impactStart, count = this.animDef.impactEnd - start;
+      this.animFrameIdx = start + Math.floor(this.animTimer / 85) % Math.max(1, count);
+      this.animationFrame = this.animFrameIdx; this.updateSpriteFrame();
+    } else this.advanceAnimation(delta);
     if (this.inSuper && this.animationComplete) this.playAnimation(this.combatState.getAnimationName(), true);
     this.drawDebug();
   }

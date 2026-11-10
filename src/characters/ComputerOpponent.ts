@@ -22,7 +22,7 @@ export class ComputerOpponent extends Fighter {
     this.updateFacing(target.x);
     const distance = Math.abs(target.x - this.x);
     if (this.jumpCooldown <= 0 && distance > 60 && distance < 230) {
-      this.velocityX = (this.facingRight ? 1 : -1) * GAME_CONFIG.WALK_SPEED;
+      this.velocityX = (this.facingRight ? 1 : -1) * this.walkSpeed;
       this.jump();
       this.jumpCooldown = 5200;
       return;
@@ -50,7 +50,7 @@ export class ComputerOpponent extends Fighter {
 
   override update(delta: number): void {
     if (this.combatState.state === 'WALKING_FORWARD') {
-      this.velocityX = (this.facingRight ? 1 : -1) * GAME_CONFIG.WALK_SPEED * 0.8;
+      this.velocityX = (this.facingRight ? 1 : -1) * this.walkSpeed * 0.8;
     }
     super.update(delta);
   }

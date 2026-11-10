@@ -1,0 +1,9 @@
+{
+  "generator": "Built-in ImageGen",
+  "prompt": "prompt.txt",
+  "reference": "public/assets/menu/tilin-3d.png",
+  "original": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-7f0bfe97-7299-4a76-8f9b-22693c8de2b1.png",
+  "saved": "public/assets/effects/tilin-super-canto.png",
+  "audio": "public/assets/audio/super-canto.wav",
+  "audioSource": "scripts/generate-super-sound.mjs"
+}

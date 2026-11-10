@@ -485,13 +485,15 @@ test('real impacts play distinct decoded sounds once, while misses and invulnera
     const p = s.player, o = s.opponent;
     const strike = (attack: string, mode: string) => {
       s.sound.stopAll();
+      s.superMove.cancel();
       p.finishRound('IDLE'); o.finishRound('IDLE');
       p.x = 800; o.x = mode === 'miss' ? 1300 : 910;
       p.updateFacing(o.x); o.updateFacing(p.x);
       if (mode === 'block') o.combatState.setState('BLOCKING');
       if (mode === 'immune') o.combatState.setState('GETTING_UP');
+      if (attack === 'SPECIAL_ATTACK') p.gainEnergy(100);
       p.executeAttack(attack);
-      for (let i = 0; i < 12; i++) { p.update(1000 / 60); s.fighterController.checkCollisions(p, o); }
+      for (let i = 0; i < (attack === 'SPECIAL_ATTACK' ? 35 : 12); i++) { p.update(1000 / 60); s.fighterController.checkCollisions(p, o); }
       const sounds = s.sound.sounds.filter((sound: any) => sound.isPlaying && sound.key.startsWith('hit-'));
       return sounds.map((sound: any) => {
         const buffer = s.cache.audio.get(sound.key);

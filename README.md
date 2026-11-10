@@ -15,9 +15,14 @@ Abrir http://localhost:3000. El juego está pensado para teclado. El lienzo se a
 
 ## Modos y escenarios
 
-**Elegir luchadores** abre el selector arcade. El plantel actual contiene a Tilin con cuatro variantes de color: Original, Amatista, Menta y Coral. Puedes elegir un color independiente para ti y para el rival. Las variantes mantienen los mismos movimientos y estadísticas.
+**Elegir luchadores** abre el selector arcade. El plantel tiene dos luchadores, cada uno con cuatro colores (Original, Amatista, Menta y Coral):
 
-1. Selecciona los colores con el ratón o con ← / → (A / D). Tab o ↑ / ↓ cambia entre jugador y rival. El botón central alterna CPU y práctica.
+- **Tilin:** ágil, con canto sónico.
+- **César:** grande y pesado. Tiene 125 de vida y pega un 30 % más fuerte, pero camina, salta y ataca más lento, y casi no retrocede al recibir golpes. Su poder es el *Pisotón sísmico*, una onda que recorre el suelo y se esquiva saltando. Su súper es *Terremoto del Morro*. Sus 23 animaciones usan ahora 276 cuadros redibujados, con apoyos y articulaciones naturales; dirección visual, prompts y procedencia en `art/cesar-v2/`. La versión anterior se conserva en `art/cesar/`.
+
+Q / E cambia de luchador en el lado activo. Los colores no cambian las estadísticas. Para sumar un luchador: crea su carpeta en `public/assets/characters/<id>/` con `manifest.json` y agrega una entrada en `src/config/roster.ts`.
+
+1. Elige luchador con Q / E o con el ratón, y el color con ← / → (A / D). Tab o ↑ / ↓ cambia entre jugador y rival. El botón central alterna CPU y práctica.
 2. Confirma con Enter o **Elegir escenario**. Hay seis arenas en dos filas: las miniaturas y ← / → cambian de escenario; ↑ / ↓ o W / S cambian de fila.
 3. Pulsa **¡A pelear!** o Enter: se muestra el versus y comienza el combate. Esc permite volver atrás, incluso durante el versus.
 
@@ -62,7 +67,13 @@ Los impactos tienen cuatro sonidos originales: suave, fuerte, especial y bloqueo
 
 ## Canto y música
 
-**O** inicia el canto de Tilin. Tras 0,2 segundos libera una onda que viaja hacia delante, inflige 20 puntos de daño y aturde durante 1,75 segundos. Durante el aturdimiento no se puede saltar ni atacar. El canto tiene 2,6 segundos de recarga, indicada debajo de la vida. Un bloqueo frontal reduce el daño a 2 puntos y evita el aturdimiento. Se puede esquivar saltando; la onda desaparece al impactar o al agotar su alcance. Interrumpir la preparación impide que salga la onda. La CPU también usa este poder.
+**O** activa el súper de Tilin únicamente con **100 % de energía** y estando en el suelo. La barra empieza vacía: un golpe normal acertado aporta el doble de su daño más 6 puntos; recibirlo aporta su daño más 2. Un contacto bloqueado aporta 4 al atacante y 8 al defensor. Fallar o esperar no carga energía. La barra se limita a 100 y cada intento consume toda la carga, aunque falle o se bloquee. La CPU sigue las mismas reglas.
+
+Tras 0,35 segundos de anticipación, Tilin libera el **golpe sónico inicial**. Un bloqueo frontal con **L**, un doble salto bien sincronizado o salir del alcance evitan que se confirme el súper. Bloquear esta onda no quita vida. Un golpe recibido durante la preparación o antes de que conecte la onda la cancela. El daño masivo nunca se aplica al fallar.
+
+Si el primer golpe conecta sin bloqueo, comienza **Canto resonante**: retrato de Tilin cantando, ondas musicales, cinco pulsos y remate, durante 3 segundos. Sus siete impactos suman **60 de daño** y dejan al rival aturdido durante 0,9 segundos. Durante la secuencia se detienen el reloj y los movimientos; su daño no recarga energía. El K.O. se resuelve al finalizar la secuencia. **Esc** pausa también la animación y su sonido; reiniciar o salir limpia el efecto. El movimiento reducido del navegador elimina las sacudidas y el desplazamiento de las ondas.
+
+El retrato original está en `public/assets/effects/tilin-super-canto.png`, generado con ImageGen integrado. El prompt y la dirección visual están en `art/super-canto/`. `node scripts/generate-super-sound.mjs` regenera el crescendo vocal y sus impactos originales; `node scripts/inspect-super.mjs` guarda capturas y verifica el daño de la secuencia completa.
 
 La música original tiene dos arreglos en bucle: menú a 96 BPM y combate a 128 BPM. La pausa detiene la música del combate; al cambiar de escena no se superponen pistas. **M** silencia solo la música, manteniendo audibles los golpes y el canto. El volumen y la preferencia se guardan localmente. `node scripts/generate-music.mjs` regenera las dos pistas y el efecto vocal sintetizado, sin grabaciones externas.
 
@@ -102,6 +113,8 @@ Servir `dist/` mediante HTTP desde la raíz del sitio. No abrir `index.html` com
 
 ## Recursos y animaciones
 
+César usa las 23 hojas transparentes nuevas de `public/assets/characters/cesar-v2/`, enlazadas desde su manifiesto estable en `public/assets/characters/cesar/manifest.json`. El levantamiento toma como referencia la pose final de pie; los puños, patadas y pisotón muestran su contacto durante la ventana activa del ataque. `node scripts/inspect-cesar.mjs` genera las hojas de contacto y una galería animada con pausa en `artifacts/cesar-v2/preview.html`, además de revisar los 276 cuadros cargados por el juego.
+
 El manifiesto activo contiene **23 animaciones de 12 cuadros: 276 cuadros**. A las hojas de `public/assets/characters/tilin-v2/` se suman seis hojas en `public/assets/characters/tilin-v3/`: canto (sustituye el antiguo especial), aturdimiento, puño aéreo, patada aérea, segundo salto y aterrizaje. Las animaciones aéreas se activan con los mismos botones de ataque mientras se salta; aterrizar reproduce una recuperación breve que se puede cancelar moviéndose o saltando.
 
 Las hojas se generaron mediante ImageGen integrado usando a Tilin como referencia. Los prompts completos, la procedencia y la dirección visual están en `art/tilin-v2/` y `art/tilin-v3/`. La nueva tanda contiene 72 cuadros, de los cuales 60 amplían la biblioteca y 12 sustituyen el especial anterior.
@@ -110,4 +123,4 @@ El manifiesto activo sigue en `public/assets/characters/tilin/manifest.json`. De
 
 Los JPG originales permanecen intactos. El manifiesto anterior está respaldado en `art/tilin-v2/original-manifest.json`; el cargador mantiene compatibilidad con sus hojas de tres cuadros y fondo verde. Si falta `GET_UP`, la recuperación conserva su alternativa segura. Si falla la descarga de recursos, se muestra una opción para reintentar.
 
-`inspect-sprites.mjs` necesita el servidor de desarrollo en el puerto 3000. Guarda capturas, hojas de contacto y mediciones de los 276 cuadros en `artifacts/tilin-v2/`, y falla si encuentra cuadros vacíos, transparencia ausente, recortes en los bordes o errores de ejecución. `inspect-sonic.mjs` guarda vistas del menú, la onda y el aturdimiento en `artifacts/tilin-v3/`.
+`inspect-sprites.mjs` necesita el servidor de desarrollo en el puerto 3000. Guarda capturas, hojas de contacto y mediciones de los 276 cuadros en `artifacts/tilin-v2/`, y falla si encuentra cuadros vacíos, transparencia ausente, recortes en los bordes o errores de ejecución. `inspect-sonic.mjs` ejecuta la inspección actual del súper y guarda la barra cargada, la onda, el retrato, los impactos y la recuperación en `artifacts/super-canto/`.

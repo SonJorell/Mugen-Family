@@ -23,7 +23,7 @@ export class HUD {
   private readonly BAR_WIDTH = (GAME_CONFIG.WIDTH / 2) - 80;
   private readonly BAR_Y = 48;
 
-  constructor(scene: Phaser.Scene, playerName: string, opponentName: string) {
+  constructor(scene: Phaser.Scene, playerName: string, opponentName: string, playerMaxHealth = GAME_CONFIG.MAX_HEALTH, opponentMaxHealth = GAME_CONFIG.MAX_HEALTH) {
     this.scene = scene;
     scene.add.rectangle(GAME_CONFIG.WIDTH / 2, 43, GAME_CONFIG.WIDTH, 86, 0x10121b, 0.88)
       .setDepth(49).setScrollFactor(0);
@@ -32,7 +32,7 @@ export class HUD {
       scene,
       this.BAR_MARGIN, this.BAR_Y,
       this.BAR_WIDTH,
-      GAME_CONFIG.MAX_HEALTH,
+      playerMaxHealth,
       playerName,
       false,
     );
@@ -41,7 +41,7 @@ export class HUD {
       scene,
       GAME_CONFIG.WIDTH - this.BAR_MARGIN - this.BAR_WIDTH, this.BAR_Y,
       this.BAR_WIDTH,
-      GAME_CONFIG.MAX_HEALTH,
+      opponentMaxHealth,
       opponentName,
       true,
     );
@@ -77,8 +77,8 @@ export class HUD {
     this.timer.setTime(timeLeft);
     [player, opponent].forEach((fighter, i) => {
       this.chantBars[i].setDisplaySize(260 * fighter.energy / 100, 10).setFillStyle(fighter.superReady ? 0xf5bd75 : 0x9fe8e1);
-      this.chantLabels[i].setText(fighter.inSuper ? 'Canto resonante'
-        : fighter.combatState.state === 'STUNNED' ? 'Aturdido por el canto'
+      this.chantLabels[i].setText(fighter.inSuper ? 'Súper en curso'
+        : fighter.combatState.state === 'STUNNED' ? 'Aturdido'
         : fighter.superReady ? (i === 0 ? 'O · ' : '') + 'SÚPER LISTO'
         : 'Energía ' + Math.floor(fighter.energy) + '% · Carga al combatir');
       this.chantLabels[i].setColor(fighter.superReady ? '#f5bd75' : '#fae8cb');
