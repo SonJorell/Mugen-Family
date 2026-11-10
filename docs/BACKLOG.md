@@ -42,12 +42,14 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
-### [ ] PEL-04 · Lista de movimientos en la pausa
+### [x] PEL-04 · Lista de movimientos en la pausa
 - **Hoy:** `PauseScene` no muestra controles.
 - **Hacer:** opción "Movimientos" que lista teclas por luchador (leídas de `InputMapping.ts` y
   `roster.ts`, no escritas a mano).
 - **Terminado cuando:** se abre desde la pausa con teclado, muestra el poder correcto de Tilin
   y de César y vuelve con Esc.
+- **Hecho:** `MOVE_LIST` y `describeKeys` en `InputMapping.ts`; quinta opción de la pausa.
+  Prueba en `tests/movelist.spec.ts`.
 
 ## Funcionalidades nuevas
 

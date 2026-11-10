@@ -49,3 +49,28 @@ export const TEST_SCENE_BININGS: Record<string, string> = {
   MINUS: 'BLOCK',
   PLUS:  'SPECIAL_ATTACK',
 };
+
+/** Rows of the pause move list, in display order. Keys always come from the bindings. */
+export const MOVE_LIST: readonly { binding: keyof KeyBindings; label: string; note?: string }[] = [
+  { binding: 'MOVE_LEFT', label: 'Moverse' },
+  { binding: 'JUMP', label: 'Saltar', note: 'otra vez en el aire: doble salto' },
+  { binding: 'CROUCH', label: 'Agacharse' },
+  { binding: 'LIGHT_PUNCH', label: 'Puño suave' },
+  { binding: 'HEAVY_PUNCH', label: 'Puño fuerte' },
+  { binding: 'LIGHT_KICK', label: 'Patada suave' },
+  { binding: 'HEAVY_KICK', label: 'Patada fuerte', note: 'derriba' },
+  { binding: 'BLOCK', label: 'Bloquear', note: 'solo de frente' },
+  { binding: 'TAUNT', label: 'Provocar' },
+];
+
+const KEY_SYMBOLS: Record<string, string> = { LEFT: '←', RIGHT: '→', UP: '↑', DOWN: '↓', ESC: 'Esc' };
+
+/** Readable keys for one action, e.g. "A / ←" for MOVE_LEFT plus MOVE_RIGHT pairs. */
+export function describeKeys(binding: keyof KeyBindings, bindings: KeyBindings = DEFAULT_BINDINGS): string {
+  const keys = (b: keyof KeyBindings) => bindings[b].map(k => KEY_SYMBOLS[k] ?? k);
+  if (binding === 'MOVE_LEFT') {
+    const left = keys('MOVE_LEFT'), right = keys('MOVE_RIGHT');
+    return left.map((k, i) => `${k} ${right[i] ?? ''}`.trim()).join('  /  ');
+  }
+  return keys(binding).join(' / ');
+}
