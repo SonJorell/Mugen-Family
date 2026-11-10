@@ -33,15 +33,12 @@ export class MenuScene extends Phaser.Scene {
   private playerChoice = normalizeChoice();
   private opponentChoice = normalizeChoice(undefined, 'amethyst');
 
+  // Arena and rival are chosen in the selection screen; audio and fullscreen live in Configuración.
   private get options() {
-    const stage = GAME_CONFIG.STAGES[this.selectedStageIndex].name;
     return [
       { label: 'Elegir luchadores', action: () => this.goTo('SelectionScene') },
-      { label: 'Escenario  ·  ' + stage, action: () => this.goTo('SelectionScene', 'stage') },
-      { label: 'Rival  ·  ' + (this.mode === 'cpu' ? 'CPU' : 'Muñeco de práctica'), action: () => this.toggleMode() },
       { label: 'Galería de movimientos', action: () => this.goTo('CharacterTestScene') },
-      { label: 'Pantalla completa', action: () => this.toggleFullscreen() },
-      { label: 'Ver colisiones  ·  ' + (GAME_CONFIG.DEBUG_MODE ? 'Sí' : 'No'), action: () => this.toggleDebug() },
+      { label: 'Configuración', action: () => this.goTo('SettingsScene') },
     ];
   }
 
@@ -77,7 +74,7 @@ export class MenuScene extends Phaser.Scene {
     }).setDepth(10);
     this.createHero();
     this.buildMenu();
-    this.add.text(64, 682, '↑ ↓  Elegir    Enter  Confirmar    ← →  Escenario', {
+    this.add.text(64, 682, '↑ ↓  Elegir    Enter  Confirmar', {
       fontFamily: 'Trebuchet MS', fontSize: '15px', color: '#d3dce2',
     }).setDepth(10);
     this.add.text(1214, 682, 'W / ↑ ×2  Doble salto     O  Canto sónico', {
@@ -91,8 +88,6 @@ export class MenuScene extends Phaser.Scene {
     for (const key of ['ENTER', 'SPACE']) this.input.keyboard!.on('keydown-' + key, (event: KeyboardEvent) => {
       if (!event.repeat) this.options[this.selectedIndex]?.action();
     });
-    this.input.keyboard!.on('keydown-LEFT', () => { if (this.selectedIndex === 1) this.cycleStage(-1); });
-    this.input.keyboard!.on('keydown-RIGHT', () => { if (this.selectedIndex === 1) this.cycleStage(1); });
     this.input.keyboard!.on('keydown-F11', () => this.toggleFullscreen());
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const refreshMotion = () => {
@@ -147,15 +142,15 @@ export class MenuScene extends Phaser.Scene {
   private buildMenu(): void {
     this.rows.forEach(row => row.destroy());
     this.rows = []; this.menuItems = []; this.rowBackgrounds = [];
-    const positions = [352, 426, 477, 528, 579, 630];
+    const positions = [380, 462, 520];
     this.options.forEach((option, i) => {
       const row = this.add.container(64, positions[i]).setDepth(15);
       if (i === 0) row.add(this.add.rectangle(5, 6, 516, 64, 0x754a30).setOrigin(0, 0.5));
-      const bg = this.add.rectangle(0, 0, 516, i === 0 ? 64 : 44, 0x143a51, 0.2).setOrigin(0, 0.5)
+      const bg = this.add.rectangle(0, 0, 516, i === 0 ? 64 : 48, 0x143a51, 0.2).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
       const text = this.add.text(20, 0, option.label, {
         fontFamily: i === 0 ? 'Impact, Arial Black' : 'Trebuchet MS',
-        fontSize: i === 0 ? '36px' : i === 1 ? '18px' : '21px', color: '#fae8cb',
+        fontSize: i === 0 ? '36px' : '23px', color: '#fae8cb',
       }).setOrigin(0, 0.5);
       row.add([bg, text]);
       if (i === 0) row.add(this.add.text(484, 0, '▶', { fontSize: '25px', color: '#241a35' }).setOrigin(1, 0.5));
@@ -177,14 +172,6 @@ export class MenuScene extends Phaser.Scene {
       if (selected) bg.setStrokeStyle(2, 0x9fe8e1); else bg.setStrokeStyle();
       this.menuItems[i].setColor(i === 0 ? '#132938' : selected ? '#9fe8e1' : '#fff3d8');
     });
-  }
-  private cycleStage(direction: number): void {
-    this.selectedStageIndex = (this.selectedStageIndex + direction + GAME_CONFIG.STAGES.length) % GAME_CONFIG.STAGES.length;
-    this.buildMenu();
-  }
-  private toggleMode(): void { this.mode = this.mode === 'cpu' ? 'training' : 'cpu'; this.buildMenu(); }
-  private toggleDebug(): void {
-    GAME_CONFIG.DEBUG_MODE = !GAME_CONFIG.DEBUG_MODE; GAME_CONFIG.SHOW_DEBUG_TEXT = GAME_CONFIG.DEBUG_MODE; this.buildMenu();
   }
   private toggleFullscreen(): void {
     if (this.scale.isFullscreen) this.scale.stopFullscreen(); else this.scale.startFullscreen();

@@ -11,8 +11,10 @@ async function menu(page: Page) {
 
 test('six arenas are reachable by grid navigation and the selected Arica image is used in combat', async ({ page }) => {
   await menu(page);
-  await page.mouse.click(450, 426);
+  await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('SelectionScene').phase === 'stage');
   const index = () => page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').stageIndex);
   await page.keyboard.press('ArrowDown');
   await expect.poll(index).toBe(3);

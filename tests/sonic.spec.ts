@@ -104,10 +104,12 @@ test('music switches with scenes, pauses with combat, and mute survives restart'
   await expect.poll(async () => (await currentMusic())[0]?.mute).toBe(false);
 });
 
-test('menu arena shortcut opens stage selection and uses the chosen arena', async ({ page }) => {
+test('stage selection after the fighters uses the chosen arena', async ({ page }) => {
   await boot(page, false);
-  await page.mouse.click(450, 426);
+  await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('SelectionScene').phase === 'stage');
   await page.mouse.click(640, 370);
   const selection = await page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('SelectionScene');

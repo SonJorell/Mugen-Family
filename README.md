@@ -26,7 +26,9 @@ Q / E cambia de luchador en el lado activo. Los colores no cambian las estadíst
 2. Confirma con Enter o **Elegir escenario**. Hay seis arenas en dos filas: las miniaturas y ← / → cambian de escenario; ↑ / ↓ o W / S cambian de fila.
 3. Pulsa **¡A pelear!** o Enter: se muestra el versus y comienza el combate. Esc permite volver atrás, incluso durante el versus.
 
-Las elecciones se conservan al volver al menú y reiniciar. **Cambiar selección**, en el menú de pausa, permite modificar el enfrentamiento. El acceso **Escenario** del menú principal abre directamente la selección de arena.
+Las elecciones se conservan al volver al menú y reiniciar. **Cambiar selección**, en el menú de pausa, permite modificar el enfrentamiento. El menú principal tiene tres opciones: **Elegir luchadores**, **Galería de movimientos** y **Configuración**. El escenario y el rival (CPU o práctica) se eligen en el selector.
+
+**Configuración** permite activar la pantalla completa, encender o apagar la música y ajustar el volumen de la música y el volumen general (música y efectos). Se navega con ↑ / ↓, se ajusta con ← / → y se cambia con Enter. Los ajustes se guardan en el navegador. En pantalla completa el juego ocupa toda la pantalla y mantiene la proporción 16:9.
 
 - **CPU:** rival que se acerca, alterna ataques y bloquea con intervalos de reacción.
 - **Muñeco de práctica:** rival pasivo para practicar movimiento, alcance y ataques.
@@ -55,9 +57,9 @@ Las partidas duran 99 segundos y terminan por K.O. o tiempo. Un empate no asigna
 | Volumen de música | , / . o botones − / + |
 | Provocar | P |
 | Pausa | Esc o botón de pantalla |
-| Ver colisiones | F1 |
+| Ver colisiones (depuración) | F1 en combate |
 | Cambiar escenario | F2 |
-| Pantalla completa | F11 o menú |
+| Pantalla completa | F11 o Configuración |
 
 En el menú: flechas o W/S para elegir, Enter para confirmar. En el selector: A/D o ←/→ para cambiar color o escenario, Tab para cambiar de lado, Enter para avanzar y Esc para retroceder. En la galería: flechas para recorrer animaciones, 1–0 para selección directa, A para girar, F2 para cambiar fondo y Esc para volver.
 

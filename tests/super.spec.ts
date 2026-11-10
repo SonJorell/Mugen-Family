@@ -8,8 +8,9 @@ async function fight(page: Page, stop = true) {
   });
   await page.goto('/');
   await page.waitForFunction(() => (window as any).__game?.scene.isActive('MenuScene'));
-  await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
-  await page.keyboard.press('ArrowUp'); await page.keyboard.press('ArrowUp'); await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
+  await page.mouse.click(640, 565); // Rival: CPU → Práctica
   await confirmSelection(page);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
   if (stop) await page.evaluate(() => { (window as any).__game.loop.stop(); });

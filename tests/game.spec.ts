@@ -227,12 +227,10 @@ test('menu and fight fit a narrow viewport without stretching', async ({ page })
 
 test('practice mode can be selected and stays passive', async ({ page }) => {
   await boot(page);
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
-  await page.keyboard.press('ArrowUp');
-  await page.keyboard.press('ArrowUp');
-  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
+  await page.mouse.click(640, 565); // Rival: CPU → Práctica
+  await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').mode)).toBe('training');
   await confirmSelection(page);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').roundSystem?.phase === 'FIGHT');
   const result = await page.evaluate(() => {
@@ -251,10 +249,8 @@ test('movement gallery can be opened twice and change backgrounds each time', as
   page.on('pageerror', e => errors.push(e.message));
   await boot(page);
   for (let visit = 0; visit < 2; visit++) {
-    for (let i = 0; i < 3; i++) {
-      await page.keyboard.press('ArrowDown');
-      await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('MenuScene').selectedIndex)).toBe(i + 1);
-    }
+    await page.keyboard.press('ArrowDown');
+    await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('MenuScene').selectedIndex)).toBe(1);
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => (window as any).__game.scene.isActive('CharacterTestScene'));
     await page.keyboard.press('F2');

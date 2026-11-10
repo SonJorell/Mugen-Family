@@ -8,6 +8,8 @@ export class GameAudio {
   private music?: MusicSound;
   muted = false;
   volume = 0.35;
+  /** Overall level for music and effects (Phaser's global sound volume), 0–1. */
+  masterVolume = 1;
   static for(scene: Phaser.Scene): GameAudio {
     let audio = instances.get(scene.game);
     if (!audio) { audio = new GameAudio(scene.game); instances.set(scene.game, audio); }
@@ -18,7 +20,9 @@ export class GameAudio {
       const settings = JSON.parse(localStorage.getItem('tilin-audio') ?? '{}');
       this.muted = settings.muted === true;
       if (Number.isFinite(settings.volume)) this.volume = Phaser.Math.Clamp(settings.volume, 0, 0.7);
+      if (Number.isFinite(settings.master)) this.masterVolume = Phaser.Math.Clamp(settings.master, 0, 1);
     } catch { /* Audio still works when browser storage is unavailable. */ }
+    game.sound.volume = this.masterVolume;
     game.events.once(Phaser.Core.Events.DESTROY, () => this.stop());
   }
   play(key: 'music-menu' | 'music-fight'): void {
@@ -39,10 +43,17 @@ export class GameAudio {
     this.volume = Math.round(Phaser.Math.Clamp(this.volume + delta, 0, 0.7) * 100) / 100;
     this.applySettings();
   }
+  changeMasterVolume(delta: number): void {
+    this.masterVolume = Math.round(Phaser.Math.Clamp(this.masterVolume + delta, 0, 1) * 100) / 100;
+    this.applySettings();
+  }
   private applySettings(): void {
     this.music?.setMute(this.muted);
     this.music?.setVolume(this.volume);
-    try { localStorage.setItem('tilin-audio', JSON.stringify({ muted: this.muted, volume: this.volume })); } catch { /* Optional persistence. */ }
+    this.game.sound.volume = this.masterVolume;
+    try {
+      localStorage.setItem('tilin-audio', JSON.stringify({ muted: this.muted, volume: this.volume, master: this.masterVolume }));
+    } catch { /* Optional persistence. */ }
     this.game.events.emit('music-settings');
   }
 }
