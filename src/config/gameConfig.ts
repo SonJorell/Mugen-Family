@@ -74,6 +74,14 @@ export const GAME_CONFIG = {
   // Combat
   MAX_HEALTH: 100,
   ROUND_TIME: 99,
+  /** Rounds needed to win the match (best of 3). */
+  ROUNDS_TO_WIN: 2,
+  /** Hard cap so repeated draws cannot extend a match forever. */
+  MAX_ROUNDS: 5,
+  /** Pause between the end of a round and the next round's intro (ms). */
+  ROUND_TRANSITION_MS: 3400,
+  /** Pause after the deciding round before returning to the menu (ms). */
+  MATCH_END_MS: 4500,
 
   // Camera
   CAMERA_ZOOM: 1.0,

@@ -432,6 +432,17 @@ export class Fighter {
     this.playAnimation(canAnimate ? 'GET_UP' : 'IDLE', true);
   }
 
+  /** Restores health and position for the next round; energy carries over between rounds. */
+  resetForRound(x: number): void {
+    this.currentHealth = this.maxHealth;
+    this.stunDuration = 0;
+    this.knockdownDuration = 0;
+    this.hitCooldown = 0;
+    this.hasHitThisSwing = false;
+    this.x = x;
+    this.finishRound('IDLE');
+  }
+
   finishRound(state: 'VICTORY' | 'DEFEAT' | 'IDLE'): void {
     this.cancelAttack();
     this.clearSonicWaves();

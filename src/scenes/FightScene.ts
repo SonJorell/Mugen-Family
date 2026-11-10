@@ -23,6 +23,10 @@ import { FighterChoice, fighterPalette, normalizeChoice, rosterEntry } from '../
 import { CharacterManifest, createAliasLoader, createCharacterLoader, getManifest } from '../config/characters';
 import { SuperMove } from '../combat/SuperMove';
 
+/** Starting marks, reused at the start of every round. */
+const PLAYER_START_X = GAME_CONFIG.STAGE_WIDTH * 0.35;
+const OPPONENT_START_X = GAME_CONFIG.STAGE_WIDTH * 0.65;
+
 export class FightScene extends Phaser.Scene {
   private manifest!: CharacterManifest;
   private playerManifest!: CharacterManifest;
@@ -250,7 +254,7 @@ export class FightScene extends Phaser.Scene {
       registry: this.registry2,
       loader: this.loader,
       characterId: this.playerManifest.characterId,
-      x: GAME_CONFIG.STAGE_WIDTH * 0.35,
+      x: PLAYER_START_X,
       y: GAME_CONFIG.FLOOR_Y,
       maxHealth: rosterEntry(this.playerChoice.characterId).stats.maxHealth,
       scale: GAME_CONFIG.CHAR_SCALE,
@@ -263,7 +267,7 @@ export class FightScene extends Phaser.Scene {
       registry: this.opponentRegistry,
       loader: this.opponentLoader,
       characterId: 'dummy',
-      x: GAME_CONFIG.STAGE_WIDTH * 0.65,
+      x: OPPONENT_START_X,
       y: GAME_CONFIG.FLOOR_Y,
       maxHealth: rosterEntry(this.opponentChoice.characterId).stats.maxHealth,
       scale: GAME_CONFIG.CHAR_SCALE,
@@ -325,14 +329,31 @@ export class FightScene extends Phaser.Scene {
 
   private onRoundEnd(winner: RoundWinner, reason: RoundEndReason): void {
     this.superMove.cancel();
-    this.messages.showResult(winner, reason);
+    const wins = this.roundSystem.wins;
+    this.hud.setRoundWins(wins.player, wins.opponent);
     this.player.finishRound(winner === 'draw' ? 'IDLE' : winner === 'player' ? 'VICTORY' : 'DEFEAT');
     this.opponent.finishRound(winner === 'draw' ? 'IDLE' : winner === 'opponent' ? 'VICTORY' : 'DEFEAT');
 
-    // Return to menu after delay
-    this.time.delayedCall(4500, () => {
-      this.scene.start('MenuScene', this.getMatchData());
-    });
+    if (this.roundSystem.matchOver) {
+      // Best of 3 decided (or round cap reached): announce the match and return to the menu.
+      this.messages.showResult(this.roundSystem.matchWinner, reason);
+      this.time.delayedCall(GAME_CONFIG.MATCH_END_MS, () => {
+        this.scene.start('MenuScene', this.getMatchData());
+      });
+      return;
+    }
+
+    this.messages.showRoundResult(winner, reason, wins);
+    this.time.delayedCall(GAME_CONFIG.ROUND_TRANSITION_MS, () => this.startNextRound());
+  }
+
+  /** Puts both fighters back on their marks with full health and plays the next round's intro. */
+  private startNextRound(): void {
+    this.player.resetForRound(PLAYER_START_X);
+    this.opponent.resetForRound(OPPONENT_START_X);
+    this.facingSystem.update(this.player, this.opponent);
+    this.hud.update(this.player, this.opponent, GAME_CONFIG.ROUND_TIME);
+    this.roundSystem.nextRound();
   }
 
   // ── Pause ─────────────────────────────────────────────────

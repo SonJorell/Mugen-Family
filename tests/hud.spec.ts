@@ -65,16 +65,31 @@ test('the countdown ring follows the clock and turns urgent in the last ten seco
   expect(result).toEqual({ calm: ['57', '#ffffff'], urgent: ['10', '#ff5a5a'], over: '00' });
 });
 
-for (const [name, health, verdict] of [['a win', [100, 0], '¡VICTORIA!'], ['a loss', [0, 100], 'DERROTA'], ['a double K.O.', [0, 0], 'EMPATE']] as const) {
-  test(`${name} shows K.O. and then ${verdict}`, async ({ page }) => {
+// Best of 3: each case is the deciding round (one round already won each way; the double K.O. at the round cap).
+for (const [name, health, verdict, wins, round] of [
+  ['a win', [100, 0], '¡VICTORIA!', { player: 1, opponent: 0 }, 2],
+  ['a loss', [0, 100], 'DERROTA', { player: 0, opponent: 1 }, 2],
+  ['a double K.O.', [0, 0], 'EMPATE', { player: 1, opponent: 1 }, 5],
+] as const) {
+  test(`${name} in the deciding round shows K.O. and then ${verdict}`, async ({ page }) => {
     await fight(page);
     await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').roundSystem.phase === 'FIGHT');
-    await page.evaluate(([player, opponent]) => {
+    await page.evaluate(([[player, opponent], wins, round]) => {
       const s = (window as any).__game.scene.getScene('FightScene');
+      s.roundSystem._wins = { ...wins }; s.roundSystem._round = round;
       s.player.currentHealth = player; s.opponent.currentHealth = opponent;
-    }, health);
+    }, [health, wins, round] as const);
     await expect.poll(() => banners(page), { timeout: 10000 }).toContain('K.O.');
     await expect.poll(() => banners(page), { timeout: 10000 }).toContain(verdict);
     await page.waitForFunction(() => (window as any).__game.scene.isActive('MenuScene'), null, { timeout: 20000 });
   });
 }
+
+test('a round that does not decide the match shows the round winner and the score, then the next round', async ({ page }) => {
+  await fight(page);
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').roundSystem.phase === 'FIGHT');
+  await page.evaluate(() => { (window as any).__game.scene.getScene('FightScene').opponent.currentHealth = 0; });
+  await expect.poll(() => banners(page), { timeout: 10000 }).toContain('K.O.');
+  await expect.poll(() => banners(page), { timeout: 10000 }).toContain('ROUND TUYO');
+  await expect.poll(() => banners(page), { timeout: 15000 }).toContain('ROUND 2');
+});
