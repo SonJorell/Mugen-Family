@@ -79,6 +79,8 @@ export class Fighter {
   // Hit cooldown (prevent multi-hit per swing)
   protected hitCooldown: number = 0;
   hasHitThisSwing: boolean = false;
+  /** Increases with every attack started, so observers can tell back-to-back attacks apart. */
+  attackSerial = 0;
 
   // Animation
   protected currentAnimKey: string = '';
@@ -274,6 +276,7 @@ export class Fighter {
     const attackDef = this.scaleAttack(baseDef);
 
     this.currentAttackDef = attackDef;
+    this.attackSerial++;
     this.hurtbox.rect = this.standingHurtbox;
     if (this.isGrounded) this.velocityX = 0;
     this.attackStartup = attackDef.startup;

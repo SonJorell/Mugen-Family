@@ -3,7 +3,7 @@
 // ============================================================
 
 import Phaser from 'phaser';
-import { GAME_CONFIG } from '../config/gameConfig';
+import { CpuDifficulty, GAME_CONFIG, normalizeDifficulty } from '../config/gameConfig';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { PlayerFighter } from '../characters/PlayerFighter';
@@ -36,6 +36,9 @@ export class FightScene extends Phaser.Scene {
   private player!: PlayerFighter;
   private opponent!: Fighter;
   private mode: 'cpu' | 'training' = 'cpu';
+  private difficulty: CpuDifficulty = GAME_CONFIG.DEFAULT_CPU_DIFFICULTY;
+  /** Fixed CPU seed for tests; normal play leaves it undefined. */
+  private cpuSeed?: number;
   private playerChoice = normalizeChoice();
   private opponentChoice = normalizeChoice(undefined, 'amethyst');
   private bodyPhysics = new PhysicsSystem();
@@ -68,9 +71,11 @@ export class FightScene extends Phaser.Scene {
     super({ key: 'FightScene' });
   }
 
-  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: 'cpu' | 'training'; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
+  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: 'cpu' | 'training'; difficulty?: string; cpuSeed?: number; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
     this.stageIndex = GAME_CONFIG.STAGES[data?.stageIndex ?? 0] ? data?.stageIndex ?? 0 : 0;
     this.mode = data?.mode === 'training' ? 'training' : 'cpu';
+    this.difficulty = normalizeDifficulty(data?.difficulty);
+    this.cpuSeed = data?.cpuSeed;
     this.playerChoice = normalizeChoice(data?.playerChoice);
     this.opponentChoice = normalizeChoice(data?.opponentChoice, 'amethyst');
     this.playerManifest = getManifest(this, this.playerChoice.characterId);
@@ -265,8 +270,7 @@ export class FightScene extends Phaser.Scene {
       stats: rosterEntry(this.playerChoice.characterId).stats,
     }, this.inputManager);
 
-    const OpponentClass = this.mode === 'training' ? TrainingOpponent : ComputerOpponent;
-    this.opponent = new OpponentClass({
+    const opponentOptions = {
       scene: this,
       registry: this.opponentRegistry,
       loader: this.opponentLoader,
@@ -276,7 +280,9 @@ export class FightScene extends Phaser.Scene {
       maxHealth: rosterEntry(this.opponentChoice.characterId).stats.maxHealth,
       scale: GAME_CONFIG.CHAR_SCALE,
       stats: rosterEntry(this.opponentChoice.characterId).stats,
-    });
+    };
+    this.opponent = this.mode === 'training' ? new TrainingOpponent(opponentOptions)
+      : new ComputerOpponent(opponentOptions, { difficulty: this.difficulty, seed: this.cpuSeed });
     this.player.sprite.setTint(fighterPalette(this.playerChoice).tint);
     this.opponent.sprite.setTint(fighterPalette(this.opponentChoice).tint);
     this.facingSystem.update(this.player, this.opponent);
@@ -297,7 +303,8 @@ export class FightScene extends Phaser.Scene {
 
     const playerName = rosterEntry(this.playerChoice.characterId).name.toUpperCase();
     const opponentName = rosterEntry(this.opponentChoice.characterId).name.toUpperCase();
-    this.hud = new HUD(this, `${playerName} · JUGADOR`, this.mode === 'training' ? 'MUÑECO · PRÁCTICA' : `${opponentName} · CPU`,
+    this.hud = new HUD(this, `${playerName} · JUGADOR`, this.mode === 'training' ? 'MUÑECO · PRÁCTICA'
+      : `${opponentName} · CPU ${GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label.toUpperCase()}`,
       this.player.maxHealth, this.opponent.maxHealth);
     this.messages = new FightMessages(this);
     this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
@@ -394,7 +401,7 @@ export class FightScene extends Phaser.Scene {
   }
 
   getMatchData() {
-    return { manifest: this.manifest, stageIndex: this.stageIndex, mode: this.mode,
+    return { manifest: this.manifest, stageIndex: this.stageIndex, mode: this.mode, difficulty: this.difficulty,
       playerChoice: { ...this.playerChoice }, opponentChoice: { ...this.opponentChoice } };
   }
 

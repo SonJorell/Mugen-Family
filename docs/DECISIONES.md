@@ -16,3 +16,12 @@ Formato: fecha · contexto · decisión · motivo.
   de estado y sus animaciones. El súper anula cualquier hitstop pendiente al empezar.
 - **Motivo:** el reloj marca tiempo real de partida, como en los arcades del género; además, así
   el hitstop no cambia la duración de los rounds ni las pruebas de tiempo existentes.
+
+## 2026-11-10 · Dificultad de la CPU por datos y con semilla
+- **Contexto:** la CPU rotaba 4 golpes en orden fijo y bloqueaba 1 de cada 3 ataques.
+- **Decisión:** tres perfiles en `GAME_CONFIG.CPU_DIFFICULTY`; *Normal* conserva aproximadamente el
+  ritmo anterior. Cada ataque entrante se evalúa una sola vez (por `Fighter.attackSerial`), así
+  pensar más rápido no regala bloqueos extra. El azar sale de `makeRandom(seed)`: sin semilla en
+  el juego, con semilla fija en las pruebas. La dificultad se elige en la selección (X) y viaja
+  con los datos de la partida; no se guarda en el navegador.
+- **Motivo:** balance editable sin tocar lógica y pruebas deterministas.

@@ -1,19 +1,59 @@
-import { Fighter } from './Fighter';
-import { GAME_CONFIG } from '../config/gameConfig';
+import { Fighter, FighterOptions } from './Fighter';
+import { CpuDifficulty, CpuProfile, GAME_CONFIG } from '../config/gameConfig';
+import { makeRandom } from '../utils/Random';
 
-/** A sparring partner with readable decisions and gaps between attacks. */
+const ATTACKS = ['LIGHT_PUNCH', 'LIGHT_KICK', 'HEAVY_PUNCH', 'HEAVY_KICK'] as const;
+
+export interface CpuOptions {
+  difficulty?: CpuDifficulty;
+  /** Fixes the CPU's random choices (tests); omitted in normal play. */
+  seed?: number;
+}
+
+/** A sparring partner whose reactions, guard and aggression follow its difficulty profile. */
 export class ComputerOpponent extends Fighter {
+  readonly difficulty: CpuDifficulty;
+  private readonly profile: CpuProfile;
+  private readonly random: () => number;
   private decisionTimer = 0;
   private attackCooldown = 600;
-  private attackIndex = 0;
   private jumpCooldown = 1800;
+  /** Each incoming attack, jump-in and recovery is judged once, so faster thinking adds no free rolls. */
+  private judgedAttack = -1;
+  private judgedJump = false;
+  private judgedRecovery = false;
+
+  constructor(opts: FighterOptions, cpu: CpuOptions = {}) {
+    super(opts);
+    this.difficulty = cpu.difficulty ?? GAME_CONFIG.DEFAULT_CPU_DIFFICULTY;
+    this.profile = GAME_CONFIG.CPU_DIFFICULTY[this.difficulty];
+    this.random = makeRandom(cpu.seed);
+  }
+
+  private chance(p: number): boolean { return p > 0 && this.random() < p; }
+
+  private pickAttack(): string {
+    const weights = this.profile.attacks, total = weights.reduce((a, b) => a + b, 0);
+    let roll = this.random() * total;
+    for (let i = 0; i < ATTACKS.length; i++) { roll -= weights[i]; if (roll < 0) return ATTACKS[i]; }
+    return ATTACKS[0];
+  }
+
+  private nextCooldown(): number {
+    const [min, max] = this.profile.attackCooldownMs;
+    return min + (max - min) * this.random();
+  }
 
   think(delta: number, target: Fighter): void {
     this.decisionTimer -= delta;
     this.attackCooldown -= delta;
     this.jumpCooldown -= delta;
+    const targetAttack = target.getActiveAttackDef();
+    if (target.isGrounded) this.judgedJump = false;
+    const recovering = !!targetAttack && target.combatState.stateTimer * 60 / 1000 >= targetAttack.startup + targetAttack.active;
+    if (!recovering) this.judgedRecovery = false;
     if (!this.combatState.canAct() || this.decisionTimer > 0) return;
-    this.decisionTimer = 160;
+    this.decisionTimer = this.profile.reactionMs;
     // Keep the original direction in the air so crossing over does not turn into orbiting.
     if (!this.isGrounded) {
       if (this.velocityY >= -80) this.jump();
@@ -21,31 +61,54 @@ export class ComputerOpponent extends Fighter {
     }
     this.updateFacing(target.x);
     const distance = Math.abs(target.x - this.x);
+    const busy = ['KNOCKED_DOWN', 'GETTING_UP'].includes(target.combatState.state);
+
+    // Punish: an attack already in recovery cannot be turned into a block in time.
+    if (recovering && !this.judgedRecovery && distance < 150 && !busy) {
+      this.judgedRecovery = true;
+      if (this.chance(this.profile.punishChance)) { this.strike('LIGHT_PUNCH'); return; }
+    }
+    // Anti-air: a close jump-in meets a rising heavy punch.
+    if (!target.isGrounded && !this.judgedJump && distance < 200) {
+      this.judgedJump = true;
+      if (this.chance(this.profile.antiAirChance)) { this.strike('HEAVY_PUNCH'); return; }
+    }
+    // Guard against an attack that is still coming.
+    if (targetAttack && !recovering && distance < 190) {
+      if (this.judgedAttack !== target.attackSerial) {
+        this.judgedAttack = target.attackSerial;
+        if (this.chance(this.profile.blockChance)) {
+          this.velocityX = 0;
+          this.combatState.setState('BLOCKING');
+          this.playAnimation('BLOCK');
+          return;
+        }
+      } else if (this.combatState.state === 'BLOCKING') return;
+    }
     if (this.jumpCooldown <= 0 && distance > 60 && distance < 230) {
       this.velocityX = (this.facingRight ? 1 : -1) * this.walkSpeed;
       this.jump();
-      this.jumpCooldown = 5200;
-      return;
-    }
-    if (distance < 190 && target.getActiveAttackDef() && this.attackIndex % 3 === 1) {
-      this.velocityX = 0;
-      this.combatState.setState('BLOCKING');
-      this.playAnimation('BLOCK');
+      this.jumpCooldown = this.profile.jumpCooldownMs;
       return;
     }
     if (distance > 125) {
       this.combatState.setState('WALKING_FORWARD');
       this.playAnimation('WALK_FORWARD');
-    } else if (this.attackCooldown <= 0 && !['KNOCKED_DOWN', 'GETTING_UP'].includes(target.combatState.state)) {
-      this.combatState.setState('IDLE');
-      const attacks = ['LIGHT_PUNCH', 'LIGHT_KICK', 'HEAVY_PUNCH', 'HEAVY_KICK'];
-      this.executeAttack(this.superReady ? 'SPECIAL_ATTACK' : attacks[this.attackIndex++ % attacks.length]);
-      this.attackCooldown = 850;
+    } else if (this.attackCooldown <= 0 && !busy) {
+      this.strike(this.superReady ? 'SPECIAL_ATTACK' : this.pickAttack());
+      return;
     } else {
       this.combatState.setState('IDLE');
       this.playAnimation('IDLE');
     }
     this.velocityX = 0;
+  }
+
+  private strike(attack: string): void {
+    this.combatState.setState('IDLE');
+    this.velocityX = 0;
+    this.executeAttack(attack);
+    this.attackCooldown = this.nextCooldown();
   }
 
   override update(delta: number): void {

@@ -2,6 +2,22 @@
 // GAME CONFIG — Central configuration for all game parameters
 // ============================================================
 
+export type CpuDifficulty = 'easy' | 'normal' | 'hard';
+export const CPU_DIFFICULTIES: readonly CpuDifficulty[] = ['easy', 'normal', 'hard'];
+export interface CpuProfile {
+  label: string;
+  reactionMs: number;
+  blockChance: number;
+  attackCooldownMs: [number, number];
+  antiAirChance: number;
+  punishChance: number;
+  jumpCooldownMs: number;
+  attacks: [number, number, number, number];
+}
+export function normalizeDifficulty(value?: string): CpuDifficulty {
+  return CPU_DIFFICULTIES.includes(value as CpuDifficulty) ? value as CpuDifficulty : 'normal';
+}
+
 export const GAME_CONFIG = {
   // Canvas dimensions
   WIDTH: 1280,
@@ -84,6 +100,20 @@ export const GAME_CONFIG = {
   ROUND_TRANSITION_MS: 3400,
   /** Pause after the deciding round before returning to the menu (ms). */
   MATCH_END_MS: 4500,
+
+  /**
+   * CPU behaviour per difficulty. Times in ms, chances 0–1.
+   * reactionMs: pause between decisions · blockChance: guard against an incoming attack ·
+   * attackCooldownMs: [min, max] gap between attacks · antiAirChance: heavy punch at a close jump ·
+   * punishChance: strike a whiffed or blocked attack during its recovery · jumpCooldownMs: gap
+   * between approach jumps · attacks: weights for LIGHT_PUNCH, LIGHT_KICK, HEAVY_PUNCH, HEAVY_KICK.
+   */
+  CPU_DIFFICULTY: {
+    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1] },
+    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2] },
+    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3] },
+  } as Record<CpuDifficulty, CpuProfile>,
+  DEFAULT_CPU_DIFFICULTY: 'normal' as CpuDifficulty,
 
   /** Hit feel: freeze on contact, camera shake and sparks. Times in ms. */
   HIT_FEEL: {

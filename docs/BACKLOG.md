@@ -53,13 +53,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 
 ## Funcionalidades nuevas
 
-### [ ] FUN-01 · Dificultad de la CPU
+### [x] FUN-01 · Dificultad de la CPU
 - **Hoy:** `ComputerOpponent` rota los 4 golpes en orden fijo, bloquea 1 de cada 3 y no se
   agacha ni responde a saltos.
 - **Hacer:** niveles Fácil / Normal / Difícil (tiempos de reacción, probabilidad de bloqueo,
   anti-aéreo) en datos de `gameConfig.ts`; selector en la selección de luchadores; algo de azar.
 - **Terminado cuando:** cada nivel se elige con teclado y una prueba verifica que Difícil
   bloquea más que Fácil en el mismo escenario.
+- **Hecho:** `GAME_CONFIG.CPU_DIFFICULTY` (reacción, bloqueo, pausa entre ataques, anti-aéreo,
+  castigo, saltos y pesos de golpes); tecla X o botón «CPU: …» en la selección; semilla
+  inyectable (`cpuSeed`) para pruebas en `utils/Random.ts`. Pruebas en `tests/difficulty.spec.ts`.
 
 ### [ ] FUN-02 · Dos jugadores locales (teclado compartido y gamepad)
 - **Hacer:** segundo juego de teclas y soporte de mando con el plugin de gamepad de Phaser;

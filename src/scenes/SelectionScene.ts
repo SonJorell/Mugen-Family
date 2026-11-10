@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_CONFIG } from '../config/gameConfig';
+import { CPU_DIFFICULTIES, CpuDifficulty, GAME_CONFIG, normalizeDifficulty } from '../config/gameConfig';
 import { FighterChoice, FIGHTER_PALETTES, FIGHTER_ROSTER, fighterPalette, normalizeChoice, rosterEntry } from '../config/roster';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader, SpriteSheetOptions } from '../animation/SpriteSheetLoader';
@@ -13,6 +13,7 @@ interface SelectionData {
   manifest?: { assetPath: string; animations: Record<string, string[]>; spriteSheet?: SpriteSheetOptions };
   stageIndex?: number;
   mode?: 'cpu' | 'training';
+  difficulty?: string;
   playerChoice?: FighterChoice;
   opponentChoice?: FighterChoice;
   selectionPhase?: 'fighters' | 'stage';
@@ -32,6 +33,7 @@ export class SelectionScene extends Phaser.Scene {
   private opponentChoice = normalizeChoice(undefined, 'amethyst');
   private stageIndex = 0;
   private mode: 'cpu' | 'training' = 'cpu';
+  private difficulty: CpuDifficulty = GAME_CONFIG.DEFAULT_CPU_DIFFICULTY;
   private phase: 'fighters' | 'stage' | 'versus' = 'fighters';
   private activeSide: 'player' | 'opponent' = 'player';
   private content!: Phaser.GameObjects.Container;
@@ -62,6 +64,7 @@ export class SelectionScene extends Phaser.Scene {
     this.opponentChoice = normalizeChoice(data?.opponentChoice, 'amethyst');
     this.stageIndex = GAME_CONFIG.STAGES[data?.stageIndex ?? 0] ? data?.stageIndex ?? 0 : 0;
     this.mode = data?.mode === 'training' ? 'training' : 'cpu';
+    this.difficulty = normalizeDifficulty(data?.difficulty);
     this.phase = data?.selectionPhase === 'stage' ? 'stage' : 'fighters';
     this.activeSide = 'player'; this.transition = undefined;
     this.extras = []; this.live = []; this.shown = {}; this.clock = 0; this.pointerX = 0; this.pointerY = 0;
@@ -103,6 +106,7 @@ export class SelectionScene extends Phaser.Scene {
     key('TAB', () => this.changeSide());
     key('Q', () => this.cycleFighter(-1));
     key('E', () => this.cycleFighter(1));
+    key('X', () => this.cycleDifficulty());
     for (const k of ['UP', 'W']) key(k, () => this.phase === 'stage' ? this.navigate(-3) : this.changeSide());
     for (const k of ['DOWN', 'S']) key(k, () => this.phase === 'stage' ? this.navigate(3) : this.changeSide());
     for (const k of ['ENTER', 'SPACE']) key(k, () => this.confirm());
@@ -230,7 +234,7 @@ export class SelectionScene extends Phaser.Scene {
   private renderFighters(fresh: boolean, changed: { player: boolean; opponent: boolean }): void {
     this.title.setText('ELIGE TU LUCHADOR');
     this.steps.setText('Luchadores   /   Escenario');
-    this.help.setText('Q E  Luchador     ← → / A D  Color     Tab / ↑ ↓  Cambiar lado     Enter  Confirmar     Esc  Volver');
+    this.help.setText('Q E  Luchador     ← → / A D  Color     Tab / ↑ ↓  Lado     X  Dificultad     Enter  Confirmar     Esc  Volver');
     for (const side of ['player', 'opponent'] as const) {
       const player = side === 'player', x = player ? 275 : 1000;
       const choice = player ? this.playerChoice : this.opponentChoice;
@@ -279,6 +283,7 @@ export class SelectionScene extends Phaser.Scene {
     this.button(640, 565, 220, this.mode === 'cpu' ? 'Rival: CPU' : 'Rival: Práctica', () => {
       this.mode = this.mode === 'cpu' ? 'training' : 'cpu'; this.render();
     });
+    if (this.mode === 'cpu') this.button(640, 630, 220, 'CPU: ' + GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label, () => this.cycleDifficulty());
     this.button(164, 630, 216, 'Volver', () => this.back());
     this.button(1072, 630, 288, 'Elegir escenario', () => this.confirm(), true);
   }
@@ -308,7 +313,7 @@ export class SelectionScene extends Phaser.Scene {
     }
     this.text(60, 214, rosterEntry(this.playerChoice.characterId).name + ' · ' + fighterPalette(this.playerChoice).name, 20, '#ef9dbb');
     this.text(60, 245, 'vs. ' + rosterEntry(this.opponentChoice.characterId).name + ' · ' + fighterPalette(this.opponentChoice).name, 20, '#a1ece5');
-    this.text(60, 280, this.mode === 'cpu' ? 'Combate contra CPU' : 'Muñeco de práctica', 17, '#c9b8da');
+    this.text(60, 280, this.mode === 'cpu' ? 'Combate contra CPU · ' + GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label : 'Muñeco de práctica', 17, '#c9b8da');
     GAME_CONFIG.STAGES.forEach((entry, i) => {
       const x = 230 + (i % 3) * 410, y = 386 + Math.floor(i / 3) * 142, selected = this.stageIndex === i;
       let thumb!: Phaser.GameObjects.Image, border!: Phaser.GameObjects.Rectangle;
@@ -397,13 +402,19 @@ export class SelectionScene extends Phaser.Scene {
     }
     this.render();
   }
+  /** Easy → Normal → Hard → Easy. Only on the fighter screen and against the CPU. */
+  private cycleDifficulty(): void {
+    if (this.phase !== 'fighters' || this.mode !== 'cpu') return;
+    this.difficulty = CPU_DIFFICULTIES[(CPU_DIFFICULTIES.indexOf(this.difficulty) + 1) % CPU_DIFFICULTIES.length];
+    this.render();
+  }
   private back(): void {
     if (this.phase === 'fighters') { this.scene.start('MenuScene', this.matchData()); return; }
     this.transition?.remove(); this.transition = undefined;
     this.phase = this.phase === 'versus' ? 'stage' : 'fighters'; this.render();
   }
   private matchData() {
-    return { manifest: this.manifest, stageIndex: this.stageIndex, mode: this.mode,
+    return { manifest: this.manifest, stageIndex: this.stageIndex, mode: this.mode, difficulty: this.difficulty,
       playerChoice: { ...this.playerChoice }, opponentChoice: { ...this.opponentChoice } };
   }
 }
