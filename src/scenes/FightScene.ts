@@ -3,7 +3,9 @@
 // ============================================================
 
 import Phaser from 'phaser';
-import { CpuDifficulty, GAME_CONFIG, normalizeDifficulty } from '../config/gameConfig';
+import { CpuDifficulty, GAME_CONFIG, GameMode, normalizeDifficulty, normalizeMode } from '../config/gameConfig';
+import { activeKeys, loadBindings } from '../input/Bindings';
+import { describeKeys } from '../input/InputMapping';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { PlayerFighter } from '../characters/PlayerFighter';
@@ -38,7 +40,8 @@ export class FightScene extends Phaser.Scene {
 
   private player!: PlayerFighter;
   private opponent!: Fighter;
-  private mode: 'cpu' | 'training' = 'cpu';
+  private mode: GameMode = 'cpu';
+  private inputManager2: InputManager | null = null;
   private difficulty: CpuDifficulty = GAME_CONFIG.DEFAULT_CPU_DIFFICULTY;
   /** Fixed CPU seed for tests; normal play leaves it undefined. */
   private cpuSeed?: number;
@@ -78,9 +81,9 @@ export class FightScene extends Phaser.Scene {
     super({ key: 'FightScene' });
   }
 
-  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: 'cpu' | 'training'; difficulty?: string; cpuSeed?: number; arcade?: ArcadeRun; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
+  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: string; difficulty?: string; cpuSeed?: number; arcade?: ArcadeRun; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
     this.stageIndex = GAME_CONFIG.STAGES[data?.stageIndex ?? 0] ? data?.stageIndex ?? 0 : 0;
-    this.mode = data?.mode === 'training' ? 'training' : 'cpu';
+    this.mode = data?.arcade ? 'cpu' : normalizeMode(data?.mode);
     this.difficulty = normalizeDifficulty(data?.difficulty);
     this.cpuSeed = data?.cpuSeed;
     this.arcade = data?.arcade;
@@ -122,8 +125,7 @@ export class FightScene extends Phaser.Scene {
     this.fighterShadows = [this.player, this.opponent].map(fighter =>
       this.add.ellipse(fighter.x, GAME_CONFIG.FLOOR_Y + 2, 150, 16, 0x09121a, 0.26).setDepth(1));
     this.createSystems();
-    this.add.text(GAME_CONFIG.WIDTH / 2, 682,
-      'A D / ← →  Mover    W / ↑ ×2  Doble salto    S / ↓  Agacharse    J K  Puños    U I  Patadas    L  Bloquear    O  Poder',
+    this.add.text(GAME_CONFIG.WIDTH / 2, 682, this.controlsHint(),
       { fontFamily: 'Arial', fontSize: '16px', color: '#eee8d9', backgroundColor: '#12151c', padding: { x: 16, y: 10 } }
     ).setOrigin(0.5).setDepth(60).setScrollFactor(0).setName('fight-controls');
     this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
@@ -146,6 +148,7 @@ export class FightScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.game.events.off(Phaser.Core.Events.BLUR, this.pauseFight, this);
       this.inputManager.destroy();
+      this.inputManager2?.destroy();
     });
   }
 
@@ -263,8 +266,25 @@ export class FightScene extends Phaser.Scene {
 
   // ── Fighters ──────────────────────────────────────────────
 
+  /** Footer with the keys in use; in a two-player match, a short line for each player. */
+  private controlsHint(): string {
+    const set = loadBindings();
+    const k = (slot: 'p1' | 'p2', action: Parameters<typeof describeKeys>[0]) => describeKeys(action, activeKeys(set, slot, this.mode === 'versus'));
+    if (this.mode !== 'versus') {
+      return `${k('p1', 'MOVE_LEFT')}  Mover    ${k('p1', 'JUMP')} ×2  Doble salto    ${k('p1', 'CROUCH')}  Agacharse    `
+        + `${k('p1', 'LIGHT_PUNCH')} ${k('p1', 'HEAVY_PUNCH')}  Puños    ${k('p1', 'LIGHT_KICK')} ${k('p1', 'HEAVY_KICK')}  Patadas    `
+        + `${k('p1', 'BLOCK')}  Bloquear    ${k('p1', 'SPECIAL')}  Poder`;
+    }
+    const line = (slot: 'p1' | 'p2') => `${slot === 'p1' ? 'J1' : 'J2'}: ${k(slot, 'MOVE_LEFT')} ${k(slot, 'JUMP')} ${k(slot, 'CROUCH')} · `
+      + `Puños ${k(slot, 'LIGHT_PUNCH')} ${k(slot, 'HEAVY_PUNCH')} · Patadas ${k(slot, 'LIGHT_KICK')} ${k(slot, 'HEAVY_KICK')} · `
+      + `Bloq. ${k(slot, 'BLOCK')} · Poder ${k(slot, 'SPECIAL')}`;
+    return `${line('p1')}     ${line('p2')}`;
+  }
+
   private createFighters(): void {
-    this.inputManager = new InputManager(this);
+    const bindings = loadBindings(), versus = this.mode === 'versus';
+    this.inputManager = new InputManager(this, activeKeys(bindings, 'p1', versus), 0);
+    this.inputManager2 = versus ? new InputManager(this, activeKeys(bindings, 'p2', true), 1) : null;
 
     this.player = new PlayerFighter({
       scene: this,
@@ -290,7 +310,8 @@ export class FightScene extends Phaser.Scene {
       stats: rosterEntry(this.opponentChoice.characterId).stats,
     };
     this.opponent = this.mode === 'training' ? new TrainingOpponent(opponentOptions)
-      : new ComputerOpponent(opponentOptions, { difficulty: this.difficulty, seed: this.cpuSeed });
+      : this.inputManager2 ? new PlayerFighter(opponentOptions, this.inputManager2)
+        : new ComputerOpponent(opponentOptions, { difficulty: this.difficulty, seed: this.cpuSeed });
     this.player.sprite.setTint(fighterPalette(this.playerChoice).tint);
     this.opponent.sprite.setTint(fighterPalette(this.opponentChoice).tint);
     this.facingSystem.update(this.player, this.opponent);
@@ -319,10 +340,11 @@ export class FightScene extends Phaser.Scene {
 
     const playerName = rosterEntry(this.playerChoice.characterId).name.toUpperCase();
     const opponentName = rosterEntry(this.opponentChoice.characterId).name.toUpperCase();
-    this.hud = new HUD(this, `${playerName} · JUGADOR`, this.mode === 'training' ? 'MUÑECO · PRÁCTICA'
+    this.hud = new HUD(this, `${playerName} · ${this.mode === 'versus' ? 'JUGADOR 1' : 'JUGADOR'}`,
+      this.mode === 'training' ? 'MUÑECO · PRÁCTICA' : this.mode === 'versus' ? `${opponentName} · JUGADOR 2`
       : `${opponentName} · CPU ${GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label.toUpperCase()}`,
       this.player.maxHealth, this.opponent.maxHealth);
-    this.messages = new FightMessages(this);
+    this.messages = new FightMessages(this, this.mode === 'versus');
     this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
 
     this.roundSystem.startRound();
@@ -484,6 +506,12 @@ export class FightScene extends Phaser.Scene {
     if (!this.superMove.active) this.fighterController.checkCollisions(this.opponent, this.player);
     if (this.superMove.active) { this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft); return; }
     this.combos.update();
+
+    // A gamepad's Start button pauses like Esc.
+    if (this.player.lastInput?.pause || (this.opponent instanceof PlayerFighter && this.opponent.lastInput?.pause)) {
+      this.pauseFight();
+      return;
+    }
 
     // Round logic
     this.roundSystem.update(delta, this.healthPct(this.player), this.healthPct(this.opponent));

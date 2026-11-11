@@ -8,6 +8,7 @@ import { FightScene } from './FightScene';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { musicControls } from '../systems/GameAudio';
 import { MOVE_LIST, describeKeys } from '../input/InputMapping';
+import { activeKeys, loadBindings } from '../input/Bindings';
 import { rosterEntry } from '../config/roster';
 
 export class PauseScene extends Phaser.Scene {
@@ -98,13 +99,20 @@ export class PauseScene extends Phaser.Scene {
       fontFamily: 'Arial Black', fontSize: '36px', color: '#ffdd77', stroke: '#000000', strokeThickness: 6,
     }).setOrigin(0.5));
     const row = { fontFamily: 'Arial', fontSize: '20px', color: '#eee8d9' };
+    const versus = data.mode === 'versus', set = loadBindings();
+    const p1 = activeKeys(set, 'p1', versus), p2 = activeKeys(set, 'p2', true);
+    if (versus) {
+      box.add(this.add.text(360, 252, 'JUGADOR 1', { ...row, fontSize: '15px', color: '#ef9dbb', fontStyle: 'bold' }));
+      box.add(this.add.text(560, 252, 'JUGADOR 2', { ...row, fontSize: '15px', color: '#a1ece5', fontStyle: 'bold' }));
+    }
     MOVE_LIST.forEach((move, i) => {
       const y = 278 + i * 32;
       box.add(this.add.text(160, y, move.label, { ...row, fontStyle: 'bold' }));
-      box.add(this.add.text(380, y, describeKeys(move.binding), { ...row, color: '#ffdd77' }));
-      if (move.note) box.add(this.add.text(560, y, move.note, { ...row, color: '#9aa4b2', fontSize: '17px' }));
+      box.add(this.add.text(versus ? 360 : 380, y, describeKeys(move.binding, p1), { ...row, color: '#ffdd77' }));
+      if (versus) box.add(this.add.text(560, y, describeKeys(move.binding, p2), { ...row, color: '#ffdd77' }));
+      else if (move.note) box.add(this.add.text(560, y, move.note, { ...row, color: '#9aa4b2', fontSize: '17px' }));
     });
-    const superKeys = describeKeys('SPECIAL');
+    const superKeys = versus ? `J1 ${describeKeys('SPECIAL', p1)} · J2 ${describeKeys('SPECIAL', p2)}` : describeKeys('SPECIAL', p1);
     fighters.forEach((f, i) => {
       const x = 820, y = 282 + i * 140;
       box.add(this.add.text(x, y, f.name.toUpperCase(), { fontFamily: 'Arial Black', fontSize: '22px', color: '#ffffff' }));

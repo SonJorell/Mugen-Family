@@ -75,10 +75,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
   castigo, saltos y pesos de golpes); tecla X o botón «CPU: …» en la selección; semilla
   inyectable (`cpuSeed`) para pruebas en `utils/Random.ts`. Pruebas en `tests/difficulty.spec.ts`.
 
-### [ ] FUN-02 · Dos jugadores locales (teclado compartido y gamepad)
+### [x] FUN-02 · Dos jugadores locales (teclado compartido y gamepad)
 - **Hacer:** segundo juego de teclas y soporte de mando con el plugin de gamepad de Phaser;
   modo "Jugador 2" en el selector.
 - **Terminado cuando:** dos jugadores pelean un combate completo; prueba con entradas simuladas.
+- **Hecho:** modo `versus` («Rival: Jugador 2» en la selección: CPU → Práctica → Jugador 2).
+  J1: WASD + J K U I L O P (las flechas solo cuando juega solo). J2: flechas + Insert/Inicio/
+  Supr/Fin/RePág/AvPág o teclado numérico. Mandos con el plugin de Phaser (mando 1 → J1,
+  mando 2 → J2; Start pausa). HUD, carteles, pie de controles y lista de movimientos muestran
+  ambos jugadores. `input/Bindings.ts` concentra las teclas por jugador. Pruebas en
+  `tests/versus.spec.ts` (teclado real y mandos simulados).
 
 ### [ ] FUN-03 · Reasignar teclas en Configuración
 - **Hacer:** fila "Controles" en `SettingsScene`; guardar en `localStorage`; botón restaurar.

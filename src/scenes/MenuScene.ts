@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { CpuDifficulty, GAME_CONFIG, normalizeDifficulty } from '../config/gameConfig';
+import { CpuDifficulty, GAME_CONFIG, GameMode, normalizeDifficulty, normalizeMode } from '../config/gameConfig';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { SpriteSheetOptions } from '../animation/SpriteSheetLoader';
 import { GameAudio, musicControls } from '../systems/GameAudio';
@@ -28,7 +28,7 @@ export class MenuScene extends Phaser.Scene {
   private manifest!: MenuManifest;
   private selectedIndex = 0;
   private selectedStageIndex = 0;
-  private mode: 'cpu' | 'training' = 'cpu';
+  private mode: GameMode = 'cpu';
   private difficulty: CpuDifficulty = GAME_CONFIG.DEFAULT_CPU_DIFFICULTY;
   private rows: Phaser.GameObjects.Container[] = [];
   private menuItems: Phaser.GameObjects.Text[] = [];
@@ -73,10 +73,10 @@ export class MenuScene extends Phaser.Scene {
 
   constructor() { super({ key: 'MenuScene' }); }
 
-  init(data: { manifest?: MenuManifest; stageIndex?: number; mode?: 'cpu' | 'training'; difficulty?: string; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
+  init(data: { manifest?: MenuManifest; stageIndex?: number; mode?: string; difficulty?: string; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
     this.manifest = data?.manifest ?? this.cache.json.get(manifestKey(FIGHTER_ROSTER[0].id));
     this.selectedStageIndex = data?.stageIndex ?? this.selectedStageIndex;
-    this.mode = data?.mode ?? this.mode;
+    this.mode = data?.mode ? normalizeMode(data.mode) : this.mode;
     this.difficulty = normalizeDifficulty(data?.difficulty ?? this.difficulty);
     this.playerChoice = normalizeChoice(data?.playerChoice ?? this.playerChoice);
     this.opponentChoice = normalizeChoice(data?.opponentChoice ?? this.opponentChoice, 'amethyst');

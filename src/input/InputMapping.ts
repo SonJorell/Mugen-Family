@@ -63,11 +63,26 @@ export const MOVE_LIST: readonly { binding: keyof KeyBindings; label: string; no
   { binding: 'TAUNT', label: 'Provocar' },
 ];
 
-const KEY_SYMBOLS: Record<string, string> = { LEFT: '←', RIGHT: '→', UP: '↑', DOWN: '↓', ESC: 'Esc' };
+const KEY_NAMES: Record<string, string> = {
+  LEFT: '←', RIGHT: '→', UP: '↑', DOWN: '↓', ESC: 'Esc', SPACE: 'Espacio', INSERT: 'Insert', HOME: 'Inicio',
+  DELETE: 'Supr', END: 'Fin', PAGE_UP: 'RePág', PAGE_DOWN: 'AvPág', SHIFT: 'Shift', CTRL: 'Ctrl', ALT: 'Alt',
+  BACKSPACE: 'Retroceso', ENTER: 'Enter', TAB: 'Tab', COMMA: ',', PERIOD: '.', SEMICOLON: 'Ñ', MINUS: '-',
+};
+const DIGITS: Record<string, string> = {
+  ZERO: '0', ONE: '1', TWO: '2', THREE: '3', FOUR: '4', FIVE: '5', SIX: '6', SEVEN: '7', EIGHT: '8', NINE: '9',
+};
+
+/** Readable name of a Phaser key code name, e.g. NUMPAD_FOUR → "Num 4", LEFT → "←". */
+export function keyLabel(key: string): string {
+  if (KEY_NAMES[key]) return KEY_NAMES[key];
+  const numpad = key.match(/^NUMPAD_(\w+)$/);
+  if (numpad) return 'Num ' + (DIGITS[numpad[1]] ?? numpad[1]);
+  return DIGITS[key] ?? key;
+}
 
 /** Readable keys for one action, e.g. "A / ←" for MOVE_LEFT plus MOVE_RIGHT pairs. */
 export function describeKeys(binding: keyof KeyBindings, bindings: KeyBindings = DEFAULT_BINDINGS): string {
-  const keys = (b: keyof KeyBindings) => bindings[b].map(k => KEY_SYMBOLS[k] ?? k);
+  const keys = (b: keyof KeyBindings) => bindings[b].map(keyLabel);
   if (binding === 'MOVE_LEFT') {
     const left = keys('MOVE_LEFT'), right = keys('MOVE_RIGHT');
     return left.map((k, i) => `${k} ${right[i] ?? ''}`.trim()).join('  /  ');

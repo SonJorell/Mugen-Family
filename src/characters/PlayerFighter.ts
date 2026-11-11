@@ -8,6 +8,8 @@ import { GAME_CONFIG } from '../config/gameConfig';
 
 export class PlayerFighter extends Fighter {
   private input: InputManager;
+  /** Input read on the last frame (the scene checks the gamepad's Start button here). */
+  lastInput: InputState | null = null;
   /** Last attack pressed while the fighter could not act, and how long ago (ms). */
   private bufferedAttack: { name: string; age: number } | null = null;
 
@@ -23,6 +25,7 @@ export class PlayerFighter extends Fighter {
       return;
     }
     const state = this.input.getState();
+    this.lastInput = state;
     this.handleMovement(state, delta);
     this.handleCombat(state, delta);
   }

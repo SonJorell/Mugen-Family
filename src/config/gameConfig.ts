@@ -2,6 +2,13 @@
 // GAME CONFIG — Central configuration for all game parameters
 // ============================================================
 
+/** Who controls the rival: the CPU, a passive practice dummy, or a second local player. */
+export type GameMode = 'cpu' | 'training' | 'versus';
+export const GAME_MODES: readonly GameMode[] = ['cpu', 'training', 'versus'];
+export function normalizeMode(value?: string): GameMode {
+  return GAME_MODES.includes(value as GameMode) ? value as GameMode : 'cpu';
+}
+
 export type CpuDifficulty = 'easy' | 'normal' | 'hard';
 export const CPU_DIFFICULTIES: readonly CpuDifficulty[] = ['easy', 'normal', 'hard'];
 export interface CpuProfile {

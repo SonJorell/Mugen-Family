@@ -1,9 +1,9 @@
 // ============================================================
-// InputManager — Wraps Phaser keyboard and exposes clean API
+// InputManager — One player's keyboard keys and gamepad, as a clean input state
 // ============================================================
 
 import Phaser from 'phaser';
-import { DEFAULT_BINDINGS } from './InputMapping';
+import { DEFAULT_BINDINGS, KeyBindings } from './InputMapping';
 
 export interface InputState {
   moveLeft: boolean;
@@ -20,52 +20,102 @@ export interface InputState {
   pause: boolean;
 }
 
+/**
+ * Standard-layout gamepad buttons per action (Xbox names): X/Y punches, A/B kicks, RB or LT
+ * block, RT super, LB taunt, Start pause. Movement uses the d-pad or the left stick.
+ */
+export const PAD_BUTTONS = {
+  lightPunch: [2], heavyPunch: [3], lightKick: [0], heavyKick: [1],
+  block: [5, 6], special: [7], taunt: [4], pause: [9],
+} as const;
+const STICK_DEADZONE = 0.55;
+
+type PressAction = 'jump' | 'lightPunch' | 'heavyPunch' | 'lightKick' | 'heavyKick' | 'special' | 'taunt' | 'pause';
+
 export class InputManager {
   private keys: Map<string, Phaser.Input.Keyboard.Key> = new Map();
   private scene: Phaser.Scene;
+  private readonly bindings: KeyBindings;
+  /** Gamepad slot (0 = first pad) or null for keyboard only. */
+  private readonly padIndex: number | null;
+  /** Pad buttons held on the previous poll, so presses fire once like JustDown. */
+  private padHeld = new Set<PressAction>();
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, bindings: KeyBindings = DEFAULT_BINDINGS, padIndex: number | null = 0) {
     this.scene = scene;
+    this.bindings = bindings;
+    this.padIndex = padIndex;
     this.registerKeys();
   }
 
   private registerKeys(): void {
     if (!this.scene.input.keyboard) return;
-
     const allKeys = new Set<string>();
-    for (const arr of Object.values(DEFAULT_BINDINGS)) {
-      for (const k of arr) allKeys.add(k);
-    }
-
+    for (const arr of Object.values(this.bindings)) for (const k of arr) allKeys.add(k);
     allKeys.forEach(k => {
-      const key = this.scene.input.keyboard!.addKey(k, false);
-      this.keys.set(k, key);
+      try { this.keys.set(k, this.scene.input.keyboard!.addKey(k, false)); }
+      catch { /* An unknown key name in saved settings is ignored instead of breaking the fight. */ }
     });
   }
 
-  private isDown(...keys: string[]): boolean {
+  private isDown(keys: string[]): boolean {
     return keys.some(k => this.keys.get(k)?.isDown ?? false);
   }
 
-  private justDown(...keys: string[]): boolean {
-    return keys.some(k => Phaser.Input.Keyboard.JustDown(this.keys.get(k)!));
+  private justDown(keys: string[]): boolean {
+    let any = false;
+    for (const k of keys) { const key = this.keys.get(k); if (key && Phaser.Input.Keyboard.JustDown(key)) any = true; }
+    return any;
+  }
+
+  /** The connected pad for this player, if any. */
+  private get pad(): Phaser.Input.Gamepad.Gamepad | null {
+    if (this.padIndex === null) return null;
+    const plugin = this.scene.input.gamepad;
+    if (!plugin || !plugin.enabled) return null;
+    return plugin.getPad(this.padIndex) ?? null;
+  }
+
+  private padState(): Partial<InputState> {
+    const pad = this.pad;
+    if (!pad || !pad.connected) { this.padHeld.clear(); return {}; }
+    const button = (ids: readonly number[]) => ids.some(i => pad.buttons[i]?.pressed ?? false);
+    const stick = pad.leftStick;
+    const held: Record<PressAction, boolean> = {
+      jump: pad.up || stick.y < -STICK_DEADZONE,
+      lightPunch: button(PAD_BUTTONS.lightPunch), heavyPunch: button(PAD_BUTTONS.heavyPunch),
+      lightKick: button(PAD_BUTTONS.lightKick), heavyKick: button(PAD_BUTTONS.heavyKick),
+      special: button(PAD_BUTTONS.special), taunt: button(PAD_BUTTONS.taunt), pause: button(PAD_BUTTONS.pause),
+    };
+    const pressed = {} as Record<PressAction, boolean>;
+    for (const action of Object.keys(held) as PressAction[]) {
+      pressed[action] = held[action] && !this.padHeld.has(action);
+      if (held[action]) this.padHeld.add(action); else this.padHeld.delete(action);
+    }
+    return {
+      ...pressed,
+      moveLeft: pad.left || stick.x < -STICK_DEADZONE,
+      moveRight: pad.right || stick.x > STICK_DEADZONE,
+      crouch: pad.down || stick.y > STICK_DEADZONE,
+      block: button(PAD_BUTTONS.block),
+    };
   }
 
   getState(): InputState {
-    const b = DEFAULT_BINDINGS;
+    const b = this.bindings, pad = this.padState();
     return {
-      moveLeft:   this.isDown(...b.MOVE_LEFT),
-      moveRight:  this.isDown(...b.MOVE_RIGHT),
-      jump:       this.justDown(...b.JUMP),
-      crouch:     this.isDown(...b.CROUCH),
-      lightPunch: this.justDown(...b.LIGHT_PUNCH),
-      heavyPunch: this.justDown(...b.HEAVY_PUNCH),
-      lightKick:  this.justDown(...b.LIGHT_KICK),
-      heavyKick:  this.justDown(...b.HEAVY_KICK),
-      block:      this.isDown(...b.BLOCK),
-      special:    this.justDown(...b.SPECIAL),
-      taunt:      this.justDown(...b.TAUNT),
-      pause:      this.justDown(...b.PAUSE),
+      moveLeft:   this.isDown(b.MOVE_LEFT) || !!pad.moveLeft,
+      moveRight:  this.isDown(b.MOVE_RIGHT) || !!pad.moveRight,
+      jump:       this.justDown(b.JUMP) || !!pad.jump,
+      crouch:     this.isDown(b.CROUCH) || !!pad.crouch,
+      lightPunch: this.justDown(b.LIGHT_PUNCH) || !!pad.lightPunch,
+      heavyPunch: this.justDown(b.HEAVY_PUNCH) || !!pad.heavyPunch,
+      lightKick:  this.justDown(b.LIGHT_KICK) || !!pad.lightKick,
+      heavyKick:  this.justDown(b.HEAVY_KICK) || !!pad.heavyKick,
+      block:      this.isDown(b.BLOCK) || !!pad.block,
+      special:    this.justDown(b.SPECIAL) || !!pad.special,
+      taunt:      this.justDown(b.TAUNT) || !!pad.taunt,
+      pause:      !!pad.pause,
     };
   }
 

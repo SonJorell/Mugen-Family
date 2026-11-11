@@ -47,3 +47,13 @@ Formato: fecha · contexto · decisión · motivo.
 - **Motivo:** escala sola al sumar luchadores en `roster.ts`, sin tocar la lógica.
 - **Menú:** «Modo arcade» es la segunda opción; se actualizaron las 4 pruebas que navegaban el menú
   por posición.
+
+## 2026-11-10 · Teclas y mandos para dos jugadores
+- **Contexto:** J1 usaba WASD y las flechas a la vez; las teclas `,` `.` y `M` controlan la música.
+- **Decisión:** J2 usa las flechas y el bloque Insert/Inicio/RePág/Supr/Fin/AvPág (en portátiles sin
+  teclado numérico) o el teclado numérico. En un combate de dos jugadores, J1 pierde cualquier
+  tecla que sea de J2; jugando solo, J1 conserva las flechas. Mandos con distribución estándar:
+  X/Y puños, A/B patadas, RB o LT bloqueo, RT súper, LB provocar, Start pausa.
+- **Motivo:** ninguna tecla hace dos cosas en el mismo combate y el modo de un jugador no cambia.
+- **Nota:** una tecla pulsada y soltada dentro del mismo cuadro se pierde (Phaser borra JustDown al
+  soltar); las pruebas mantienen cada pulsación 60 ms, igual que las existentes.

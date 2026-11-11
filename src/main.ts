@@ -37,6 +37,8 @@ const config: Phaser.Types.Core.GameConfig = {
     ArcadeScene,
     CreditsScene,
   ],
+  // Gamepads: the first pad drives player 1, the second one player 2.
+  input: { gamepad: true },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
