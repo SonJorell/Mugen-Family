@@ -74,7 +74,7 @@ export const FIGHTER_ROSTER: readonly RosterEntry[] = [
     superName: 'FURIA\nDEL i30',
     ending: 'Con el motor todavía caliente y una Monster en la mano,\nCésar estacionó el i30 frente a la Catedral.\n\nNadie volvió a discutirle el último puesto\nen la fila del completo.',
     // Big and heavy: more health and damage, slower legs and fists, barely moved by hits.
-    stats: { size: 1.14, maxHealth: 125, walkSpeed: 0.72, jumpPower: 0.86, attackSpeed: 0.8, damage: 1.3, weight: 1.7, special: 'drive' },
+    stats: { size: 1.14, maxHealth: 125, walkSpeed: 0.72, jumpPower: 0.86, attackSpeed: 0.8, damage: 1.2, weight: 1.7, special: 'drive' },
   },
 ];
 

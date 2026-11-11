@@ -131,11 +131,14 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `eslint.config.js` (flat config, reglas recomendadas de ESLint y typescript-eslint;
   `any` permitido solo en pruebas). Se corrigieron 8 importaciones y parámetros sin uso.
 
-### [ ] CAL-02 · Revisión de balance Tilin vs César
+### [x] CAL-02 · Revisión de balance Tilin vs César
 - Tabla con daño por golpe × `damage`, frames × `attackSpeed`, vida y alcance de cada uno;
   calcular cuántos golpes de cada tipo necesita cada luchador para ganar.
 - **Terminado cuando:** la tabla está en `docs/BALANCE.md` y los ajustes acordados están en
   `roster.ts` / `AttackDefinition.ts`.
+- **Hecho:** `docs/BALANCE.md` (atributos, frames, ventajas, golpes y combos para ganar) y
+  `scripts/simulate-balance.mjs` (CPU contra CPU con semillas). César ganaba el 59 %; su daño
+  bajó de 1.3 a 1.2 y queda 47 % – 53 %. Motivo en `docs/DECISIONES.md`.
 
 ### [ ] CAL-03 · Registro de decisiones
 - Crear `docs/DECISIONES.md` con las decisiones ya tomadas (Phaser 3, sprites con chroma key,

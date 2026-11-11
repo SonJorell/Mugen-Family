@@ -57,3 +57,15 @@ Formato: fecha · contexto · decisión · motivo.
 - **Motivo:** ninguna tecla hace dos cosas en el mismo combate y el modo de un jugador no cambia.
 - **Nota:** una tecla pulsada y soltada dentro del mismo cuadro se pierde (Phaser borra JustDown al
   soltar); las pruebas mantienen cada pulsación 60 ms, igual que las existentes.
+
+## 2026-11-10 · Balance: daño de César de 1.3 a 1.2
+- **Contexto:** la tabla de `docs/BALANCE.md` mostraba a César muy adelante en la carrera de daño
+  (necesita 100 ÷ 1.3 ≈ 77 «unidades» de daño para ganar; Tilin, 125), algo que su 25 % de
+  lentitud no compensa. En 120 rounds CPU contra CPU (`scripts/simulate-balance.mjs`) César ganó el
+  59 % (57 % en Normal y 62 % en Difícil).
+- **Decisión:** `damage` de César pasa de 1.3 a 1.2 (golpes 6/14/7/18 en vez de 7/16/8/20). Con el
+  ajuste, en 240 rounds Tilin gana el 53 % y César el 47 %.
+- **Descartado:** bajar su vida a 115 (cambia la identidad de «tanque»), acelerar sus golpes
+  (cambia las animaciones sincronizadas) o tocar los súpers (60 de daño fijos para ambos).
+- **Motivo:** es el cambio más pequeño que corrige un desequilibrio claro, y la CPU no aprovecha la
+  velocidad de Tilin, así que el ajuste no debe ir más allá. Revisar con partidas de dos jugadores.
