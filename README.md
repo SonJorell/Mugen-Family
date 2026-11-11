@@ -145,7 +145,18 @@ npm run build
 npm run preview
 ```
 
-Servir `dist/` mediante HTTP desde la raíz del sitio. No abrir `index.html` como archivo local. Phaser aporta la mayor parte del bundle; Vite puede mostrar un aviso de tamaño, sin impedir la compilación.
+Servir `dist/` mediante HTTP. No abrir `index.html` como archivo local. Phaser aporta la mayor parte del bundle; Vite puede mostrar un aviso de tamaño, sin impedir la compilación.
+
+Para servirlo desde una subcarpeta (por ejemplo `https://usuario.github.io/Mugen-Family/`), compilar con `BASE_PATH`: todas las rutas `/assets/...` se cargan bajo esa base (`src/config/assetBase.ts`).
+
+```sh
+BASE_PATH=/Mugen-Family/ npm run build
+```
+
+### Integración continua y GitHub Pages
+
+- `.github/workflows/ci.yml` corre lint, tipos, build y las pruebas Playwright en cada push y pull request.
+- `.github/workflows/pages.yml` publica en GitHub Pages **solo a mano**. Para usarlo: en el repositorio, **Settings → Pages → Source: GitHub Actions**, y luego **Actions → Publicar en GitHub Pages → Run workflow**. Compila con `BASE_PATH=/<nombre-del-repositorio>/`. Nada se publica solo.
 
 ## Recursos y animaciones
 

@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
 
+// BASE_PATH sets where the build is served from, e.g. "/Mugen-Family/" for GitHub Pages.
+// Without it the build uses relative paths and works from any site root.
 export default defineConfig({
-  base: './',
+  base: process.env.BASE_PATH || './',
   server: {
     port: 3000,
     open: false,

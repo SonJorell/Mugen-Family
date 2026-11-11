@@ -112,9 +112,12 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
   Se conservan al reiniciar. `ui/TrainingOverlay.ts`, `GAME_CONFIG.TRAINING`. Pruebas en
   `tests/training.spec.ts`.
 
-### [ ] FUN-06 · Publicación web
+### [~] FUN-06 · Publicación web
 - **Hacer:** script de despliegue de `dist/` a itch.io o GitHub Pages (ruta base de Vite).
 - **Terminado cuando:** el juego abre desde un link público.
+- **En curso:** build preparado (`BASE_PATH` en Vite y `loader.baseURL` en Phaser, probado servido
+  bajo `/Mugen-Family/` sin errores 404) y flujo manual `.github/workflows/pages.yml`. Falta que
+  Jorell active Pages y lo ejecute; no se publicó nada.
 
 ## Calidad y proceso
 
