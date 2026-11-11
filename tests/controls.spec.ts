@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { bootGame, startFight } from './fight-helper';
+import { bootGame } from './fight-helper';
 
 const controls = (page: Page) => page.evaluate(() => {
   const s = (window as any).__game.scene.getScene('ControlsScene');
