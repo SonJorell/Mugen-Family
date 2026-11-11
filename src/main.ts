@@ -12,6 +12,8 @@ import { CharacterTestScene } from './scenes/CharacterTestScene';
 import { PauseScene } from './scenes/PauseScene';
 import { SelectionScene } from './scenes/SelectionScene';
 import { SettingsScene } from './scenes/SettingsScene';
+import { ArcadeScene } from './scenes/ArcadeScene';
+import { CreditsScene } from './scenes/CreditsScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -32,6 +34,8 @@ const config: Phaser.Types.Core.GameConfig = {
     CharacterTestScene,
     PauseScene,
     SettingsScene,
+    ArcadeScene,
+    CreditsScene,
   ],
   scale: {
     mode: Phaser.Scale.FIT,

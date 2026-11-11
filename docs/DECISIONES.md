@@ -37,3 +37,13 @@ Formato: fecha · contexto · decisión · motivo.
 - **Decisión:** reemplazar esas esperas fijas por esperas al estado de la escena. Las demás no se
   tocan porque ya esperan condiciones del juego, no tiempos fijos.
 - **Motivo:** cambio mínimo y solo en pruebas; no se desactiva ni se salta ninguna.
+
+## 2026-11-10 · Escalera del modo arcade
+- **Contexto:** el plantel tiene 2 luchadores; una escalera de un solo rival sería muy corta.
+- **Decisión:** cada rival del plantel, luego el combate espejo, y como jefe final una revancha
+  contra el primer rival en Difícil (mínimo 3 combates, `GAME_CONFIG.ARCADE.MIN_FIGHTS`). La
+  dificultad sube de forma pareja de Fácil a Difícil. Los rivales nunca usan el color del jugador.
+  Las continuaciones son ilimitadas pero se cuentan y se muestran en el final.
+- **Motivo:** escala sola al sumar luchadores en `roster.ts`, sin tocar la lógica.
+- **Menú:** «Modo arcade» es la segunda opción; se actualizaron las 4 pruebas que navegaban el menú
+  por posición.

@@ -25,6 +25,7 @@ import { GameAudio, musicControls } from '../systems/GameAudio';
 import { FighterChoice, fighterPalette, normalizeChoice, rosterEntry } from '../config/roster';
 import { CharacterManifest, createAliasLoader, createCharacterLoader, getManifest } from '../config/characters';
 import { SuperMove } from '../combat/SuperMove';
+import type { ArcadeRun } from '../config/arcade';
 
 /** Starting marks, reused at the start of every round. */
 const PLAYER_START_X = GAME_CONFIG.STAGE_WIDTH * 0.35;
@@ -41,6 +42,8 @@ export class FightScene extends Phaser.Scene {
   private difficulty: CpuDifficulty = GAME_CONFIG.DEFAULT_CPU_DIFFICULTY;
   /** Fixed CPU seed for tests; normal play leaves it undefined. */
   private cpuSeed?: number;
+  /** Present when this fight is a step of the arcade ladder. */
+  private arcade?: ArcadeRun;
   private playerChoice = normalizeChoice();
   private opponentChoice = normalizeChoice(undefined, 'amethyst');
   private bodyPhysics = new PhysicsSystem();
@@ -75,11 +78,12 @@ export class FightScene extends Phaser.Scene {
     super({ key: 'FightScene' });
   }
 
-  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: 'cpu' | 'training'; difficulty?: string; cpuSeed?: number; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
+  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: 'cpu' | 'training'; difficulty?: string; cpuSeed?: number; arcade?: ArcadeRun; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
     this.stageIndex = GAME_CONFIG.STAGES[data?.stageIndex ?? 0] ? data?.stageIndex ?? 0 : 0;
     this.mode = data?.mode === 'training' ? 'training' : 'cpu';
     this.difficulty = normalizeDifficulty(data?.difficulty);
     this.cpuSeed = data?.cpuSeed;
+    this.arcade = data?.arcade;
     this.playerChoice = normalizeChoice(data?.playerChoice);
     this.opponentChoice = normalizeChoice(data?.opponentChoice, 'amethyst');
     this.playerManifest = getManifest(this, this.playerChoice.characterId);
@@ -387,14 +391,19 @@ export class FightScene extends Phaser.Scene {
     if (this.roundSystem.matchOver) {
       // Best of 3 decided (or round cap reached): announce the match and return to the menu.
       this.messages.showResult(this.roundSystem.matchWinner, reason);
-      this.time.delayedCall(GAME_CONFIG.MATCH_END_MS, () => {
-        this.scene.start('MenuScene', this.getMatchData());
-      });
+      const winner = this.roundSystem.matchWinner;
+      this.time.delayedCall(GAME_CONFIG.MATCH_END_MS, () => this.leaveMatch(winner));
       return;
     }
 
     this.messages.showRoundResult(winner, reason, wins);
     this.time.delayedCall(GAME_CONFIG.ROUND_TRANSITION_MS, () => this.startNextRound());
+  }
+
+  /** After the deciding round: back to the arcade ladder, or to the menu for a free match. */
+  leaveMatch(winner: RoundWinner): void {
+    if (this.arcade) this.scene.start('ArcadeScene', { run: this.arcade, result: winner });
+    else this.scene.start('MenuScene', this.getMatchData());
   }
 
   /** Puts both fighters back on their marks with full health and plays the next round's intro. */
@@ -416,7 +425,7 @@ export class FightScene extends Phaser.Scene {
   }
 
   getMatchData() {
-    return { manifest: this.manifest, stageIndex: this.stageIndex, mode: this.mode, difficulty: this.difficulty,
+    return { manifest: this.manifest, stageIndex: this.stageIndex, mode: this.mode, difficulty: this.difficulty, arcade: this.arcade,
       playerChoice: { ...this.playerChoice }, opponentChoice: { ...this.opponentChoice } };
   }
 

@@ -65,6 +65,7 @@ export class MenuScene extends Phaser.Scene {
   private get options() {
     return [
       { label: 'Elegir luchadores', action: () => this.goTo('SelectionScene') },
+      { label: 'Modo arcade', action: () => this.goTo('ArcadeScene') },
       { label: 'Galería de movimientos', action: () => this.goTo('CharacterTestScene') },
       { label: 'Configuración', action: () => this.goTo('SettingsScene') },
     ];
@@ -302,7 +303,7 @@ export class MenuScene extends Phaser.Scene {
   private buildMenu(): void {
     this.rows.forEach(row => row.destroy());
     this.rows = []; this.menuItems = []; this.rowBackgrounds = [];
-    const positions = [380, 462, 520];
+    const positions = [380, 462, 520, 578];
     this.cursor?.destroy();
     this.cursor = this.add.rectangle(52, positions[0], 6, 64, 0x9fe8e1, 1).setDepth(16)
       .setBlendMode(Phaser.BlendModes.ADD).setName('menu-cursor');

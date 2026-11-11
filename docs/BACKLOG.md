@@ -84,10 +84,14 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hacer:** fila "Controles" en `SettingsScene`; guardar en `localStorage`; botón restaurar.
 - **Terminado cuando:** una tecla cambiada funciona en combate y persiste al recargar.
 
-### [ ] FUN-04 · Modo arcade
+### [x] FUN-04 · Modo arcade
 - **Hacer:** escalera contra cada rival del plantel con dificultad creciente y pantalla final
   por luchador.
 - **Terminado cuando:** se puede completar la escalera y ver el final.
+- **Hecho:** opción «Modo arcade» en el menú; `config/arcade.ts` arma la escalera (cada rival,
+  espejo y jefe final; Fácil → Normal → Difícil; escenarios en orden); `ArcadeScene` (elegir,
+  escalera, continuar, final por luchador) y `CreditsScene` con la procedencia de `art/` y
+  `scripts/`. Continuaciones ilimitadas y contadas. Pruebas en `tests/arcade.spec.ts`.
 
 ### [ ] FUN-05 · Modo entrenamiento mejorado
 - **Hacer:** visor de entradas, datos de frames del último golpe y vida que se recupera.

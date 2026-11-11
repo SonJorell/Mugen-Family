@@ -249,8 +249,8 @@ test('movement gallery can be opened twice and change backgrounds each time', as
   page.on('pageerror', e => errors.push(e.message));
   await boot(page);
   for (let visit = 0; visit < 2; visit++) {
-    await page.keyboard.press('ArrowDown');
-    await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('MenuScene').selectedIndex)).toBe(1);
+    await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowDown');
+    await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('MenuScene').selectedIndex)).toBe(2);
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => (window as any).__game.scene.isActive('CharacterTestScene'));
     await page.keyboard.press('F2');

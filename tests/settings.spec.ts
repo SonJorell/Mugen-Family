@@ -9,15 +9,16 @@ async function boot(page: Page) {
   await page.waitForFunction(() => (window as any).__game?.scene.isActive('MenuScene'));
 }
 
-test('the menu only offers fighters, gallery and settings', async ({ page }) => {
+test('the menu offers fighters, arcade, gallery and settings', async ({ page }) => {
   await boot(page);
   const labels = await page.evaluate(() => (window as any).__game.scene.getScene('MenuScene').options.map((o: any) => o.label));
-  expect(labels).toEqual(['Elegir luchadores', 'Galería de movimientos', 'Configuración']);
+  expect(labels).toEqual(['Elegir luchadores', 'Modo arcade', 'Galería de movimientos', 'Configuración']);
 });
 
 test('settings adjust music, overall volume and mute, persist them, and return to the menu', async ({ page }) => {
   await boot(page);
-  await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
+  for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SettingsScene'));
   const state = () => page.evaluate(() => {
     const g = (window as any).__game;

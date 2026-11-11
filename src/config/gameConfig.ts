@@ -118,6 +118,9 @@ export const GAME_CONFIG = {
   } as Record<CpuDifficulty, CpuProfile>,
   DEFAULT_CPU_DIFFICULTY: 'normal' as CpuDifficulty,
 
+  /** Arcade ladder: fewest fights, and the arenas used in order. */
+  ARCADE: { MIN_FIGHTS: 3, STAGE_ORDER: [0, 1, 2, 3, 4, 5] },
+
   /** Combo counter: shown from this many hits, and kept on screen this long after it ends. */
   COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900 },
 

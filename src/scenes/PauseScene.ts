@@ -144,6 +144,8 @@ export class PauseScene extends Phaser.Scene {
   private changeSelection(): void {
     const data = (this.scene.get('FightScene') as FightScene).getMatchData();
     this.scene.stop('FightScene');
+    // In the arcade the matchup belongs to the ladder: go back to it instead of the free selection.
+    if (data.arcade) { this.scene.start('ArcadeScene', { run: data.arcade }); return; }
     this.scene.start('SelectionScene', data);
   }
 }
