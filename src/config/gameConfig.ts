@@ -128,6 +128,9 @@ export const GAME_CONFIG = {
   /** Arcade ladder: fewest fights, and the arenas used in order. */
   ARCADE: { MIN_FIGHTS: 3, STAGE_ORDER: [0, 1, 2, 3, 4, 5] },
 
+  /** Practice mode: inputs kept in the viewer, and the calm needed before health refills (ms). */
+  TRAINING: { INPUT_HISTORY: 12, REFILL_DELAY_MS: 1000 },
+
   /** Combo counter: shown from this many hits, and kept on screen this long after it ends. */
   COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900 },
 

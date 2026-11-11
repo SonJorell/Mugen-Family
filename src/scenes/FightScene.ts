@@ -19,6 +19,7 @@ import { FighterController, ImpactEvent } from '../systems/FighterController';
 import { ImpactEffects } from '../ui/ImpactEffects';
 import { ComboTracker } from '../systems/ComboTracker';
 import { ComboDisplay } from '../ui/ComboDisplay';
+import { DEFAULT_TRAINING, TrainingOptions, TrainingOverlay } from '../ui/TrainingOverlay';
 import { RoundSystem, RoundWinner, RoundEndReason } from '../systems/RoundSystem';
 import { HUD } from '../ui/HUD';
 import { FightMessages } from '../ui/FightMessages';
@@ -47,6 +48,11 @@ export class FightScene extends Phaser.Scene {
   private cpuSeed?: number;
   /** Present when this fight is a step of the arcade ladder. */
   private arcade?: ArcadeRun;
+  /** Practice-mode tools chosen in the pause (kept across restarts). */
+  private training: TrainingOptions = { ...DEFAULT_TRAINING };
+  private trainingOverlay: TrainingOverlay | null = null;
+  private refillTimer = 0;
+  private seenAttackSerial = 0;
   private playerChoice = normalizeChoice();
   private opponentChoice = normalizeChoice(undefined, 'amethyst');
   private bodyPhysics = new PhysicsSystem();
@@ -81,12 +87,14 @@ export class FightScene extends Phaser.Scene {
     super({ key: 'FightScene' });
   }
 
-  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: string; difficulty?: string; cpuSeed?: number; arcade?: ArcadeRun; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
+  init(data: { manifest: CharacterManifest; stageIndex?: number; mode?: string; difficulty?: string; cpuSeed?: number; arcade?: ArcadeRun; training?: TrainingOptions; playerChoice?: FighterChoice; opponentChoice?: FighterChoice }): void {
     this.stageIndex = GAME_CONFIG.STAGES[data?.stageIndex ?? 0] ? data?.stageIndex ?? 0 : 0;
     this.mode = data?.arcade ? 'cpu' : normalizeMode(data?.mode);
     this.difficulty = normalizeDifficulty(data?.difficulty);
     this.cpuSeed = data?.cpuSeed;
     this.arcade = data?.arcade;
+    this.training = { ...DEFAULT_TRAINING, ...(data?.training ?? {}) };
+    this.refillTimer = 0;
     this.playerChoice = normalizeChoice(data?.playerChoice);
     this.opponentChoice = normalizeChoice(data?.opponentChoice, 'amethyst');
     this.playerManifest = getManifest(this, this.playerChoice.characterId);
@@ -332,6 +340,9 @@ export class FightScene extends Phaser.Scene {
     this.combos.onChange = (attacker, combo) => this.comboDisplay.show(attacker === this.player ? 0 : 1, combo);
     this.combos.onEnd = attacker => this.comboDisplay.end(attacker === this.player ? 0 : 1);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.comboDisplay.destroy());
+    this.trainingOverlay = this.mode === 'training' ? new TrainingOverlay(this, this.training) : null;
+    this.seenAttackSerial = this.player.attackSerial;
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.trainingOverlay?.destroy(); this.trainingOverlay = null; });
     this.impacts = new ImpactEffects(this);
     this.fighterController.onImpact = event => this.onImpact(event);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.impacts.destroy());
@@ -387,11 +398,44 @@ export class FightScene extends Phaser.Scene {
         : event.attack.name.startsWith('HEAVY') ? 'heavy' : 'light';
     this.hitstopMs = Math.max(this.hitstopMs, feel.HITSTOP_MS[strength]);
     if (event.result === 'hit') this.combos.registerHit(event.attacker, event.defender, event.attack.damage);
+    if (this.trainingOverlay && event.attacker === this.player) {
+      this.trainingOverlay.recordContact(event.attack, Math.floor(event.attacker.combatState.stateTimer * 60 / 1000 + 1e-6));
+    }
     this.impacts.spawn(event.x, event.y, strength === 'knockdown' ? 'heavy' : strength, event.defender.facingRight);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!reduced && (strength === 'heavy' || strength === 'knockdown')) {
       const shake = feel.SHAKE[strength];
       this.cameras.main.shake(shake.duration, shake.intensity);
+    }
+  }
+
+  /** Practice tools toggled from the pause menu. */
+  setTrainingOptions(options: TrainingOptions): void {
+    this.training = { ...options };
+    this.trainingOverlay?.setOptions(this.training);
+  }
+
+  get trainingOptions(): TrainingOptions { return { ...this.training }; }
+
+  /** Feeds the practice overlay and refills health once the dummy is left alone. */
+  private updateTraining(delta: number): void {
+    const overlay = this.trainingOverlay;
+    if (!overlay) return;
+    overlay.recordInput(this.player.lastInput, this.player.facingRight);
+    if (this.player.attackSerial !== this.seenAttackSerial) {
+      this.seenAttackSerial = this.player.attackSerial;
+      const def = this.player.getActiveAttackDef();
+      if (def) overlay.recordAttack(def);
+    }
+    const busy = this.combos.get(this.player) !== null
+      || ['HIT', 'STUNNED', 'KNOCKED_DOWN', 'GETTING_UP', 'BLOCKSTUN'].includes(this.opponent.combatState.state);
+    const hurt = this.player.currentHealth < this.player.maxHealth || this.opponent.currentHealth < this.opponent.maxHealth;
+    if (!this.training.refill || busy || !hurt) { this.refillTimer = 0; return; }
+    this.refillTimer += delta;
+    if (this.refillTimer >= GAME_CONFIG.TRAINING.REFILL_DELAY_MS) {
+      this.refillTimer = 0;
+      this.player.currentHealth = this.player.maxHealth;
+      this.opponent.currentHealth = this.opponent.maxHealth;
     }
   }
 
@@ -448,6 +492,7 @@ export class FightScene extends Phaser.Scene {
 
   getMatchData() {
     return { manifest: this.manifest, stageIndex: this.stageIndex, mode: this.mode, difficulty: this.difficulty, arcade: this.arcade,
+      training: { ...this.training },
       playerChoice: { ...this.playerChoice }, opponentChoice: { ...this.opponentChoice } };
   }
 
@@ -506,6 +551,7 @@ export class FightScene extends Phaser.Scene {
     if (!this.superMove.active) this.fighterController.checkCollisions(this.opponent, this.player);
     if (this.superMove.active) { this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft); return; }
     this.combos.update();
+    this.updateTraining(delta);
 
     // A gamepad's Start button pauses like Esc.
     if (this.player.lastInput?.pause || (this.opponent instanceof PlayerFighter && this.opponent.lastInput?.pause)) {

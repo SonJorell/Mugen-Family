@@ -103,9 +103,14 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
   escalera, continuar, final por luchador) y `CreditsScene` con la procedencia de `art/` y
   `scripts/`. Continuaciones ilimitadas y contadas. Pruebas en `tests/arcade.spec.ts`.
 
-### [ ] FUN-05 · Modo entrenamiento mejorado
+### [x] FUN-05 · Modo entrenamiento mejorado
 - **Hacer:** visor de entradas, datos de frames del último golpe y vida que se recupera.
 - **Terminado cuando:** las tres opciones se activan desde la pausa del modo práctica.
+- **Hecho:** tres filas nuevas en la pausa, solo en modo práctica: visor de entradas (últimas 12,
+  con su duración en frames), datos de frames del último golpe (inicio, activo, recuperación y
+  ventaja al golpear y al bloquear) y vida que se recupera 1 s después de terminar el combo.
+  Se conservan al reiniciar. `ui/TrainingOverlay.ts`, `GAME_CONFIG.TRAINING`. Pruebas en
+  `tests/training.spec.ts`.
 
 ### [ ] FUN-06 · Publicación web
 - **Hacer:** script de despliegue de `dist/` a itch.io o GitHub Pages (ruta base de Vite).

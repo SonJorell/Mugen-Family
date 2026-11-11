@@ -10,6 +10,7 @@ import { musicControls } from '../systems/GameAudio';
 import { MOVE_LIST, describeKeys } from '../input/InputMapping';
 import { activeKeys, loadBindings } from '../input/Bindings';
 import { rosterEntry } from '../config/roster';
+import type { TrainingOptions } from '../ui/TrainingOverlay';
 
 export class PauseScene extends Phaser.Scene {
   private selectedIndex: number = 0;
@@ -22,6 +23,8 @@ export class PauseScene extends Phaser.Scene {
     { label: 'CAMBIAR SELECCIÓN', action: () => this.changeSelection() },
     { label: 'MOVIMIENTOS', action: () => this.showMoveList(true) },
   ];
+  /** Menu rows: the options above, plus the practice tools in the practice mode. */
+  private items: { label: string; action: () => void }[] = [];
   private moveList: Phaser.GameObjects.Container | null = null;
   private title!: Phaser.GameObjects.Text;
   /** True while the move list covers the pause menu. */
@@ -37,6 +40,24 @@ export class PauseScene extends Phaser.Scene {
     this.selectedIndex = 0;
     this.menuItems = [];
     this.moveList = null;
+    const fight = this.scene.get('FightScene') as FightScene;
+    const training = fight.getMatchData().mode === 'training';
+    this.items = [...this.OPTIONS];
+    if (training) {
+      const toggle = (key: keyof TrainingOptions, label: string) => ({
+        label: `${label}: ${fight.trainingOptions[key] ? 'SÍ' : 'NO'}`,
+        action: () => {
+          const options = fight.trainingOptions;
+          options[key] = !options[key];
+          fight.setTrainingOptions(options);
+          this.items[this.selectedIndex].label = `${label}: ${options[key] ? 'SÍ' : 'NO'}`;
+          this.menuItems[this.selectedIndex].setText(this.items[this.selectedIndex].label);
+        },
+      });
+      this.items.push(toggle('inputs', 'VISOR DE ENTRADAS'), toggle('frames', 'DATOS DE FRAMES'), toggle('refill', 'VIDA QUE SE RECUPERA'));
+    }
+    // Practice adds three rows: tighten the list so all eight fit.
+    const top = training ? 190 : GAME_CONFIG.HEIGHT / 2 - 50, step = training ? 52 : 60;
     const W = GAME_CONFIG.WIDTH;
     const H = GAME_CONFIG.HEIGHT;
 
@@ -44,7 +65,7 @@ export class PauseScene extends Phaser.Scene {
     this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.7);
 
     // Pause title
-    this.title = this.add.text(W / 2, H / 2 - 140, 'PAUSA', {
+    this.title = this.add.text(W / 2, training ? 110 : H / 2 - 140, 'PAUSA', {
       fontFamily: 'Arial Black',
       fontSize: '60px',
       color: '#ffffff',
@@ -53,8 +74,8 @@ export class PauseScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Options
-    this.OPTIONS.forEach((opt, i) => {
-      const t = this.add.text(W / 2, H / 2 - 50 + i * 60, opt.label, {
+    this.items.forEach((opt, i) => {
+      const t = this.add.text(W / 2, top + i * step, opt.label, {
         fontFamily: 'Arial Black',
         fontSize: '30px',
         color: '#ffffff',
@@ -69,9 +90,9 @@ export class PauseScene extends Phaser.Scene {
 
     // Key listeners
     this.input.keyboard!.on('keydown-UP',    () => { if (this.moveListOpen) return; this.selectedIndex = Math.max(0, this.selectedIndex - 1); this.updateSelection(); });
-    this.input.keyboard!.on('keydown-DOWN',  () => { if (this.moveListOpen) return; this.selectedIndex = Math.min(this.OPTIONS.length - 1, this.selectedIndex + 1); this.updateSelection(); });
+    this.input.keyboard!.on('keydown-DOWN',  () => { if (this.moveListOpen) return; this.selectedIndex = Math.min(this.items.length - 1, this.selectedIndex + 1); this.updateSelection(); });
     this.input.keyboard!.on('keydown-ENTER', () => {
-      if (this.moveListOpen) this.showMoveList(false); else this.OPTIONS[this.selectedIndex].action();
+      if (this.moveListOpen) this.showMoveList(false); else this.items[this.selectedIndex].action();
     });
     this.input.keyboard!.on('keydown-ESC', (event: KeyboardEvent) => {
       if (event.repeat) return;

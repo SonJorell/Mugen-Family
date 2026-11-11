@@ -104,8 +104,12 @@ test('arcade: a real best-of-3 knockout returns to the ladder, and the pause kee
   expect((await fightData(page)).arcade).toMatchObject({ step: 0 });
   for (let round = 0; round < 2; round++) {
     await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 15000 });
-    await page.evaluate(() => { (window as any).__game.scene.getScene('FightScene').opponent.currentHealth = 0; });
-    await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').roundSystem.phase === 'END');
+    // Keep the rival at zero until the round closes: a CPU super in progress delays the K.O.
+    await page.waitForFunction(() => {
+      const s = (window as any).__game.scene.getScene('FightScene');
+      if (s.roundSystem.phase === 'FIGHT') { s.opponent.currentHealth = 0; s.player.currentHealth = s.player.maxHealth; }
+      return s.roundSystem.phase === 'END';
+    }, null, { timeout: 15000 });
   }
   await page.waitForFunction(() => (window as any).__game.scene.isActive('ArcadeScene'), null, { timeout: 15000 });
   expect(await arcade(page)).toMatchObject({ view: 'ladder', run: { step: 1 } });
