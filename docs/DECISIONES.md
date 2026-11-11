@@ -69,3 +69,26 @@ Formato: fecha · contexto · decisión · motivo.
   (cambia las animaciones sincronizadas) o tocar los súpers (60 de daño fijos para ambos).
 - **Motivo:** es el cambio más pequeño que corrige un desequilibrio claro, y la CPU no aprovecha la
   velocidad de Tilin, así que el ajuste no debe ir más allá. Revisar con partidas de dos jugadores.
+
+## 2026-11-10 · Sprites que el juego no carga (pendiente de decisión de Jorell)
+- **Cómo se midió:** se registraron en el navegador todas las peticiones a `/assets/characters/`
+  al cargar el juego, pelear Tilin vs César en ambos lados y abrir la galería de movimientos
+  (48 archivos pedidos), y se compararon con los 112 archivos de esa carpeta.
+- **Lo que sí se carga:** `tilin/manifest.json` y `cesar/manifest.json` (los manifiestos estables),
+  17 hojas de `tilin-v2/<ANIM>/<ANIM>.png`, las 6 de `tilin-v3/` y las 23 de `cesar-v2/`.
+- **Lo que no se carga (64 archivos, 28,5 MB):**
+
+  | Carpeta | Archivos | Peso | Qué es |
+  | --- | ---: | ---: | --- |
+  | `tilin/` (todo menos `manifest.json`) | 39 | 21,1 MB | JPG originales de Tilin; el README dice que se conservan como respaldo |
+  | `cesar/` (todo menos `manifest.json`) | 23 | 4,8 MB | Primera versión de las hojas de César, reemplazada por `cesar-v2/` |
+  | `tilin-v2/IDLE.png` | 1 | — | Copia suelta de la hoja de reposo; el juego usa `tilin-v2/IDLE/IDLE.png` |
+  | `tilin-v2/SPECIAL_ATTACK/SPECIAL_ATTACK.png` | 1 | — | Especial anterior; el canto de `tilin-v3/` lo sustituyó |
+  | (los dos de `tilin-v2/` juntos) | 2 | 2,6 MB | |
+
+- **Por qué importa:** Vite copia todo `public/` a `dist/`, así que estos 28,5 MB viajan en cada
+  publicación (`dist/assets/characters` pesa 85 MB) sin que el juego los use.
+- **No se movió ni borró nada.** Opciones para Jorell: (a) moverlos a una carpeta fuera de `public/`
+  (por ejemplo `art/originals/`), que es lo que pide `CLAUDE.md` para los originales; (b) dejarlos;
+  (c) borrarlos si ya hay copia en otro lado. Solo `tests/game.spec.ts` toca `tilin/manifest.json`, que
+  se queda donde está en cualquier caso.

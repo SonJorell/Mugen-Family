@@ -118,11 +118,13 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 
 ## Calidad y proceso
 
-### [ ] CAL-04 · Limpiar versiones viejas de sprites
+### [~] CAL-04 · Limpiar versiones viejas de sprites
 - **Hoy:** en `public/assets/characters` conviven `tilin`, `tilin-v2`, `tilin-v3`, `cesar` y
   `cesar-v2`.
 - **Hacer:** verificar qué carga cada `manifest.json` y mover lo no usado fuera de `public/`.
 - **Terminado cuando:** el build pesa menos y todas las pruebas pasan.
+- **En curso:** inventario hecho (64 archivos, 28,5 MB que el juego no carga; detalle en
+  `docs/DECISIONES.md`). Falta que Jorell decida si se mueven fuera de `public/`; no se movió nada.
 
 
 ### [x] CAL-01 · Linter y formato
