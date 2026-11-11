@@ -1,6 +1,6 @@
 # Fighter Family
 
-Juego de pelea 2D para navegador con Phaser 3, TypeScript y Vite. Incluye sprites nuevos de Tilin, canto sónico, música original y un menú con vista del escenario. Los recursos originales se conservan como respaldo.
+Juego de pelea 2D para navegador con Phaser 3, TypeScript y Vite. Dos luchadores de Arica (Tilin y César), modo arcade con escalera de rivales, combates contra la CPU en tres dificultades, dos jugadores en el mismo teclado o con mandos, modo práctica con herramientas de entrenamiento, combos, súpers cinemáticos y música original. Los recursos originales se conservan como respaldo.
 
 ## Ejecutar
 
@@ -11,27 +11,31 @@ npm ci
 npm run dev
 ```
 
-Abrir http://localhost:3000. El juego está pensado para teclado. El lienzo se adapta al tamaño de la ventana; no se han incorporado controles táctiles ni multijugador.
+Abrir http://localhost:3000. Se juega con teclado o mando (hasta dos). El lienzo se adapta al tamaño de la ventana; no hay controles táctiles ni juego en línea.
 
 ## Modos y escenarios
 
 **Elegir luchadores** abre el selector arcade. El plantel tiene dos luchadores, cada uno con cuatro colores (Original, Amatista, Menta y Coral):
 
 - **Tilin:** ágil, con canto sónico.
-- **César:** grande y pesado. Tiene 125 de vida y pega un 30 % más fuerte, pero camina, salta y ataca más lento, y casi no retrocede al recibir golpes. Su súper, *Furia del i30*, comienza con un agarre cercano: lanza al rival al extremo opuesto, sube a su Hyundai i30, lo atropella en una secuencia arcade y vuelve a su posición con una Monster. Sus 23 animaciones usan 276 cuadros redibujados; dirección visual, prompts y procedencia en `art/cesar-v2/`. Los recursos de la cinemática están documentados en `art/cesar-drive/`.
+- **César:** grande y pesado. Tiene 125 de vida y pega un 20 % más fuerte, pero camina, salta y ataca más lento, y casi no retrocede al recibir golpes. Su súper, *Furia del i30*, comienza con un agarre cercano: lanza al rival al extremo opuesto, sube a su Hyundai i30, lo atropella en una secuencia arcade y vuelve a su posición con una Monster. Sus 23 animaciones usan 276 cuadros redibujados; dirección visual, prompts y procedencia en `art/cesar-v2/`. Los recursos de la cinemática están documentados en `art/cesar-drive/`.
 
 Q / E cambia de luchador en el lado activo. Los colores no cambian las estadísticas. Para sumar un luchador: crea su carpeta en `public/assets/characters/<id>/` con `manifest.json` y agrega una entrada en `src/config/roster.ts`, con su ilustración de portada (`menuArtPath`, PNG transparente 2:3) y su lema (`motto`).
 
-1. Elige luchador con Q / E o con el ratón, y el color con ← / → (A / D). Tab o ↑ / ↓ cambia entre jugador y rival. El botón central alterna CPU y práctica.
+1. Elige luchador con Q / E o con el ratón, y el color con ← / → (A / D). Tab o ↑ / ↓ cambia entre jugador y rival. El botón central alterna el rival: **CPU**, **Práctica** o **Jugador 2**. Contra la CPU, **X** o el botón inferior cambian la dificultad: **Fácil**, **Normal** o **Difícil**.
 2. Confirma con Enter o **Elegir escenario**. Hay seis arenas en dos filas: las miniaturas y ← / → cambian de escenario; ↑ / ↓ o W / S cambian de fila.
 3. Pulsa **¡A pelear!** o Enter: se muestra el versus y comienza el combate. Esc permite volver atrás, incluso durante el versus.
 
-Las elecciones se conservan al volver al menú y reiniciar. **Cambiar selección**, en el menú de pausa, permite modificar el enfrentamiento. El menú principal tiene tres opciones: **Elegir luchadores**, **Galería de movimientos** y **Configuración**. El escenario y el rival (CPU o práctica) se eligen en el selector.
+Las elecciones se conservan al volver al menú y reiniciar. **Cambiar selección**, en el menú de pausa, permite modificar el enfrentamiento. El menú principal tiene cuatro opciones: **Elegir luchadores**, **Modo arcade**, **Galería de movimientos** y **Configuración**. El escenario, el rival y la dificultad se eligen en el selector.
 
 **Configuración** permite activar la pantalla completa, encender o apagar la música y ajustar el volumen de la música y el volumen general (música y efectos). Se navega con ↑ / ↓, se ajusta con ← / → y se cambia con Enter. Los ajustes se guardan en el navegador. En pantalla completa el juego ocupa toda la pantalla y mantiene la proporción 16:9.
 
-- **CPU:** rival que se acerca, alterna ataques y bloquea con intervalos de reacción.
-- **Muñeco de práctica:** rival pasivo para practicar movimiento, alcance y ataques.
+En **Configuración → Teclas de J1 y J2** se reasigna cada acción de cada jugador: se elige la acción, Enter y la tecla nueva. El juego rechaza teclas repetidas (de cualquiera de los dos jugadores) y las reservadas (Esc, F1, F2, F11, M, Enter, Tab, coma y punto). Los cambios se guardan en el navegador; **Restaurar valores** vuelve a las teclas de fábrica.
+
+- **CPU:** rival con tres dificultades. Cambian el tiempo de reacción, la probabilidad de bloquear, el ritmo de ataque, los anti-aéreos, el castigo a golpes fallados y la frecuencia de combos. Los valores están en `GAME_CONFIG.CPU_DIFFICULTY`.
+- **Modo arcade:** eliges luchador y color y subes una escalera: cada rival del plantel, el combate espejo y un jefe final, de Fácil a Difícil y en escenarios distintos. Al perder puedes continuar desde ese combate o volver al menú. Al ganar el último combate se muestran el final de tu luchador y los créditos.
+- **Jugador 2:** dos personas en el mismo teclado, o con dos mandos. Los carteles anuncian «¡GANA J1!» o «¡GANA J2!».
+- **Muñeco de práctica:** rival pasivo para practicar movimiento, alcance y ataques. En la pausa del modo práctica se activan tres herramientas: **visor de entradas** (últimas 12 entradas con su duración en frames), **datos de frames** del último golpe (inicio, activo, recuperación y ventaja al golpear y al bloquear) y **vida que se recupera** un segundo después de terminar el combo.
 - **Galería de movimientos:** previsualización de las animaciones; no es el modo de combate.
 - **Escenarios de Arica:** Costanera del Morro al atardecer, Playa Chinchorro y Catedral San Marcos en Plaza Colón al anochecer.
 - **Escenarios originales:** Arena Urbana Nocturna, Templo Antiguo y Azotea de Rascacielos.
@@ -46,30 +50,42 @@ Decisión técnica: el efecto usa solo Phaser (plano con perspectiva `Plane`, fi
 
 Las cinco imágenes originales de esta ampliación se generaron con ImageGen integrado y están en `public/assets/menu/` y `public/assets/stages/arica/`. Prompts, procedencia y referencias de los lugares: `art/arica/`. Los escenarios son interpretaciones artísticas adaptadas al combate; la portada combina ilustraciones en capas, sin introducir un motor de geometría 3D.
 
-Las partidas duran 99 segundos y terminan por K.O. o tiempo. Un empate no asigna un ganador. La pausa detiene también las animaciones y los temporizadores; perder el foco de la ventana pausa automáticamente. Reiniciar conserva el rival y el escenario elegidos.
+Los combates son al mejor de 3 rounds de 99 segundos; cada round termina por K.O. o tiempo y un empate no suma. La pausa detiene también las animaciones y los temporizadores; perder el foco de la ventana pausa automáticamente. Reiniciar conserva el rival, la dificultad y el escenario elegidos. **Movimientos**, en la pausa, muestra las teclas de cada jugador y el poder de cada luchador.
+
+### Combate
+
+- **Bloqueo:** L bloquea solo de frente. Al bloquear, el defensor retrocede y queda unos frames en guardia; un golpe fuerte bloqueado deja al atacante expuesto a un contraataque.
+- **Impacto:** cada golpe congela a ambos luchadores entre 55 y 120 ms según su fuerza (el reloj sigue corriendo), los golpes fuertes sacuden la cámara y saltan chispas en el punto de contacto: naranjas al golpear y un escudo azul al bloquear. Con *Reducir movimiento* no hay sacudidas y las chispas no se mueven.
+- **Combos:** un golpe suave que toca al rival se puede cancelar en uno más fuerte: puño suave → patada suave, puño o patada fuertes; patada suave → fuertes. Por ejemplo, J y luego K, o J, U, I. Mientras el rival sigue aturdido aparece «N HITS» con el daño total.
+- **Balance:** tabla de frames, ventajas y golpes para ganar en `docs/BALANCE.md`.
 
 El HUD de combate está animado. Las barras de vida se llenan al abrir la ronda, bajan al instante con cada golpe y dejan una estela clara que las alcanza después, con destello y chispas en el borde; bajo el 25 % laten en rojo. Muestran la vida en número y tienen muescas cada 10 %. La barra de energía brilla y su etiqueta salta cuando el súper queda listo. El contador es un anillo que se vacía con el tiempo, late cada segundo y se pone rojo en los últimos diez. Los anuncios (ROUND, ¡PELEA!, K.O., TIEMPO, ¡VICTORIA!, DERROTA, EMPATE) son letras 3D que caen sobre una franja con sacudida y golpe sonoro: la victoria suma rayos dorados y lluvia de chispas; la derrota, un velo rojo y brasas que caen. `src/ui/EpicBanner.ts` concentra los anuncios y sus estilos; `tests/hud.spec.ts` los verifica. La duración de la entrada de ronda y del cierre no cambió.
 
 ## Controles
 
-| Acción | Teclas |
+| Acción | Jugador 1 | Jugador 2 | Mando |
+| --- | --- | --- | --- |
+| Moverse | A / D (y ← / → jugando solo) | ← / → | Cruceta o stick |
+| Saltar / doble salto | W (y ↑ jugando solo); otra vez en el aire | ↑ | Arriba |
+| Agacharse | S (y ↓ jugando solo) | ↓ | Abajo |
+| Puño suave / fuerte | J / K | Insert / Inicio, o Num 4 / Num 5 | X / Y |
+| Patada suave / fuerte | U / I | Supr / Fin, o Num 1 / Num 2 | A / B |
+| Bloquear de frente | L | AvPág o Num 3 | RB o LT |
+| Súper del personaje (energía completa) | O | RePág o Num 6 | RT |
+| Provocar | P | Num 0 | LB |
+| Pausa | Esc o botón de pantalla | Esc | Start |
+
+El mando 1 controla al jugador 1 y el mando 2 al jugador 2. Las teclas de J1 y J2 se cambian en **Configuración → Teclas de J1 y J2**.
+
+| Acción general | Teclas |
 | --- | --- |
-| Moverse | A / D o flechas izquierda / derecha |
-| Saltar / doble salto | W o flecha arriba; volver a pulsar en el aire |
-| Agacharse | S o flecha abajo |
-| Puño suave / fuerte | J / K |
-| Patada suave / fuerte | U / I |
-| Bloquear de frente | L |
-| Súper del personaje (energía completa) | O |
 | Activar / silenciar música | M o botón de música |
 | Volumen de música | , / . o botones − / + |
-| Provocar | P |
-| Pausa | Esc o botón de pantalla |
 | Ver colisiones (depuración) | F1 en combate |
 | Cambiar escenario | F2 |
 | Pantalla completa | F11 o Configuración |
 
-En el menú: flechas o W/S para elegir, Enter para confirmar. En el selector: A/D o ←/→ para cambiar color o escenario, Tab para cambiar de lado, Enter para avanzar y Esc para retroceder. En la galería: flechas para recorrer animaciones, 1–0 para selección directa, A para girar, F2 para cambiar fondo y Esc para volver.
+En el menú: flechas o W/S para elegir, Enter para confirmar. En el selector: A/D o ←/→ para cambiar color o escenario, Tab para cambiar de lado, X para la dificultad de la CPU, Enter para avanzar y Esc para retroceder. En el arcade: ←/→ luchador, ↑/↓ color, Enter para pelear y Esc para volver. En la galería: flechas para recorrer animaciones, 1–0 para selección directa, A para girar, F2 para cambiar fondo y Esc para volver.
 
 El segundo salto permite superar la altura del rival y cambiar de lado manteniendo A/D o las flechas. Hay un máximo de dos saltos por vuelo; se recuperan al aterrizar. Mantener la tecla pulsada no activa saltos adicionales. La CPU también puede usar el doble salto; el muñeco de práctica sigue siendo pasivo.
 
@@ -97,13 +113,16 @@ La música original tiene dos arreglos en bucle: menú a 96 BPM y combate a 128 
 
 ```sh
 npx playwright install chromium
-npm test
+npm run lint
 npm run check
+npm test
 npm run build
 npm audit
 ```
 
-Las pruebas ejecutan el juego real en Chromium: controles al cambiar de lado, interrupción de ataques, tiempos de recuperación, caídas sin animación GET_UP, colisiones, bloqueo frontal, daño único por golpe, CPU, práctica, empate, pausa, reinicio, retorno al menú, reapertura de galería, carga fallida y adaptación de pantalla. La instrumentación queda en las pruebas, fuera de la aplicación.
+`npm run lint` revisa el código con ESLint y typescript-eslint; `npm run check` revisa los tipos.
+
+Las pruebas ejecutan el juego real en Chromium: controles al cambiar de lado, interrupción de ataques, tiempos de recuperación, caídas sin animación GET_UP, colisiones, bloqueo frontal, daño único por golpe, CPU, práctica, empate, pausa, reinicio, retorno al menú, reapertura de galería, carga fallida, adaptación de pantalla, bloqueo con aturdimiento y empuje, hitstop, combos, dificultad de la CPU, modo arcade, dos jugadores con teclado y mandos simulados, reasignación de teclas y herramientas de práctica. La instrumentación queda en las pruebas, fuera de la aplicación.
 
 `npm test` inicia Vite automáticamente si no hay servidor en el puerto 3000. `npm run test:ui` abre el explorador de pruebas.
 
@@ -114,6 +133,7 @@ node scripts/inspect.mjs
 node scripts/inspect-sprites.mjs
 node scripts/inspect-sonic.mjs
 node scripts/inspect-arica.mjs
+node scripts/simulate-balance.mjs   # CPU contra CPU: Tilin vs César
 ```
 
 Las capturas se guardan en `artifacts/` y el script falla ante errores de ejecución o de recursos. Puede apuntarse a otro servidor con la variable `GAME_URL`.

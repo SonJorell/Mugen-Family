@@ -1,6 +1,36 @@
-# Registro de decisiones — Mugen Family
+# Registro de decisiones — Fighter Family
 
-Formato: fecha · contexto · decisión · motivo.
+Formato: fecha · contexto · decisión · motivo. Las más recientes van al final.
+
+## Decisiones previas (antes de 2026-11-10)
+
+### Motor: Phaser 3 con TypeScript y Vite
+- **Decisión:** Phaser 3.87, sin motor 3D; el efecto 3D del menú usa planos con perspectiva y
+  `postFX` de Phaser.
+- **Motivo:** juego 2D por sprites, sin instalación, en cualquier navegador. Phaser 4 elimina
+  pipelines, `preFX/postFX`, `setTintFill` y `Geom.Point`, que el código usa: no se actualiza sin
+  una decisión nueva.
+
+### Sprites en hojas 4×3 con transparencia (y chroma key de respaldo)
+- **Decisión:** cada animación es una hoja de 12 cuadros; `SpriteSheetLoader` detecta los huecos
+  transparentes, normaliza la escala y alinea el suelo. Las hojas antiguas de fondo verde siguen
+  cargándose con chroma key (`CHROMA_COLOR`, `CHROMA_TOLERANCE`).
+- **Motivo:** las hojas generadas mantienen proporciones entre animaciones y las viejas no se rompen.
+
+### Plantel por manifiesto
+- **Decisión:** un luchador = una entrada en `src/config/roster.ts` (nombre, poder, `FighterStats`,
+  final del arcade) + `public/assets/characters/<id>/manifest.json`. Las estadísticas escalan los
+  golpes comunes (`Fighter.scaleAttack`).
+- **Motivo:** sumar luchadores sin tocar la lógica de combate.
+
+### Audio sintetizado por código
+- **Decisión:** música, golpes, voces y efectos se generan con `scripts/generate-*.mjs`.
+- **Motivo:** sin licencias de terceros ni grabaciones externas; se regeneran en cualquier momento.
+
+### Arte generado con procedencia
+- **Decisión:** cada imagen generada guarda su prompt, herramienta y origen en `art/<tema>/`; en
+  `public/` solo va lo que el juego carga.
+- **Motivo:** trazabilidad y créditos correctos (la pantalla de créditos del arcade la resume).
 
 ## 2026-11-10 · Aturdimiento de guardia sin escalar por velocidad de ataque
 - **Contexto:** `FighterStats.attackSpeed` divide los frames de cada ataque (César es más lento).

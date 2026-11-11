@@ -142,16 +142,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
   `scripts/simulate-balance.mjs` (CPU contra CPU con semillas). César ganaba el 59 %; su daño
   bajó de 1.3 a 1.2 y queda 47 % – 53 %. Motivo en `docs/DECISIONES.md`.
 
-### [ ] CAL-03 · Registro de decisiones
+### [x] CAL-03 · Registro de decisiones
 - Crear `docs/DECISIONES.md` con las decisiones ya tomadas (Phaser 3, sprites con chroma key,
   plantel por manifiesto, audio sintetizado).
+- **Hecho:** `docs/DECISIONES.md` con las decisiones previas y las de esta etapa; README al día;
+  `CHANGELOG.md`; versión 0.2.0.
 
 ## Trabajo futuro (no MVP)
 
-- Modo entrenamiento con visor de entradas.
-- Medidor de súper visible y reglas de gasto.
-- Escalera arcade contra varios rivales.
-- Segundo jugador en el mismo teclado o con gamepad.
 - Controles táctiles.
-- Combos largos, cancelaciones y juggles.
+- Más luchadores (la escalera arcade y el balance se adaptan solos).
+- Segundo especial por luchador con comandos de movimiento.
+- Combos aéreos y juggles.
 - Multijugador en línea (requiere servidor).
