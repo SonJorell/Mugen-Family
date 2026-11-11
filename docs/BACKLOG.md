@@ -86,9 +86,13 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
   ambos jugadores. `input/Bindings.ts` concentra las teclas por jugador. Pruebas en
   `tests/versus.spec.ts` (teclado real y mandos simulados).
 
-### [ ] FUN-03 · Reasignar teclas en Configuración
+### [x] FUN-03 · Reasignar teclas en Configuración
 - **Hacer:** fila "Controles" en `SettingsScene`; guardar en `localStorage`; botón restaurar.
 - **Terminado cuando:** una tecla cambiada funciona en combate y persiste al recargar.
+- **Hecho:** fila «Teclas de J1 y J2» en Configuración → `ControlsScene` (pestañas J1/J2, Enter
+  y pulsar la tecla nueva). Rechaza teclas reservadas y repetidas en cualquiera de los dos
+  jugadores; guarda en `localStorage` (`fighter-keys`); «Restaurar valores» vuelve a las de
+  fábrica. Pruebas en `tests/controls.spec.ts`.
 
 ### [x] FUN-04 · Modo arcade
 - **Hacer:** escalera contra cada rival del plantel con dificultad creciente y pantalla final

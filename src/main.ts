@@ -14,6 +14,7 @@ import { SelectionScene } from './scenes/SelectionScene';
 import { SettingsScene } from './scenes/SettingsScene';
 import { ArcadeScene } from './scenes/ArcadeScene';
 import { CreditsScene } from './scenes/CreditsScene';
+import { ControlsScene } from './scenes/ControlsScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -36,6 +37,7 @@ const config: Phaser.Types.Core.GameConfig = {
     SettingsScene,
     ArcadeScene,
     CreditsScene,
+    ControlsScene,
   ],
   // Gamepads: the first pad drives player 1, the second one player 2.
   input: { gamepad: true },

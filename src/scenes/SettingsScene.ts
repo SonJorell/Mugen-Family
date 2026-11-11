@@ -61,19 +61,25 @@ export class SettingsScene extends Phaser.Scene {
         level: () => audio.masterVolume,
         adjust: direction => { audio.changeMasterVolume(direction * 0.1); this.sound.play('hit-light', { volume: 0.5 }); },
       },
+      {
+        label: 'Teclas de J1 y J2',
+        value: () => 'Cambiar ›',
+        activate: () => this.scene.start('ControlsScene', this.returnData),
+      },
       { label: 'Volver', value: () => '', activate: () => this.back() },
     ];
 
     this.add.image(640, 360, 'menu_arica_coast').setDisplaySize(1324, 745).setAlpha(0.55);
     this.add.rectangle(640, 360, 1280, 720, 0x06111b, 0.82);
     this.add.text(96, 70, 'CONFIGURACIÓN', { fontFamily: 'Impact, Arial Black', fontSize: '64px', color: '#fff3d8' });
-    this.add.text(100, 148, 'Audio y pantalla. Los cambios se guardan solos.', {
+    this.add.text(100, 148, 'Pantalla, audio y teclas. Los cambios se guardan solos.', {
       fontFamily: 'Trebuchet MS', fontSize: '20px', color: '#9fe8e1',
     });
     this.add.text(100, 236, 'PANTALLA', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
     this.add.text(100, 336, 'AUDIO', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 536, 'CONTROLES', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
 
-    const ys = [282, 382, 440, 498, 590];
+    const ys = [282, 382, 440, 498, 582, 640];
     this.rows.forEach((row, i) => {
       const y = ys[i], back = i === this.rows.length - 1;
       const bg = this.add.rectangle(96, y, back ? 240 : 760, 50, 0x143a51, 0.4).setOrigin(0, 0.5)
@@ -101,7 +107,7 @@ export class SettingsScene extends Phaser.Scene {
       this.rowObjects.push(objects);
     });
 
-    this.add.text(96, 672, '↑ ↓  Elegir     ← →  Ajustar     Enter  Cambiar     Esc  Volver', {
+    this.add.text(96, 690, '↑ ↓  Elegir     ← →  Ajustar     Enter  Cambiar     Esc  Volver', {
       fontFamily: 'Trebuchet MS', fontSize: '16px', color: '#d3dce2',
     });
 
