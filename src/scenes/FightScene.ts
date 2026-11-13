@@ -456,7 +456,10 @@ export class FightScene extends Phaser.Scene {
 
     if (this.roundSystem.matchOver) {
       // Best of 3 decided (or round cap reached): announce the match and return to the menu.
-      this.messages.showResult(this.roundSystem.matchWinner, reason);
+      const matchWinner = this.roundSystem.matchWinner;
+      const winnerChoice = matchWinner === 'player' ? this.playerChoice : matchWinner === 'opponent' ? this.opponentChoice : null;
+      const winnerEntry = winnerChoice ? rosterEntry(winnerChoice.characterId) : null;
+      this.messages.showResult(matchWinner, reason, winnerEntry ? `${winnerEntry.name}: «${winnerEntry.victoryQuote}»` : undefined);
       const winner = this.roundSystem.matchWinner;
       this.time.delayedCall(GAME_CONFIG.MATCH_END_MS, () => this.leaveMatch(winner));
       return;

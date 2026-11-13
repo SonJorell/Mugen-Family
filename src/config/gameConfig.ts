@@ -131,6 +131,9 @@ export const GAME_CONFIG = {
   /** Practice mode: inputs kept in the viewer, and the calm needed before health refills (ms). */
   TRAINING: { INPUT_HISTORY: 12, REFILL_DELAY_MS: 1000 },
 
+  /** Announcer lines play at this level before the announcer volume of Configuración. */
+  ANNOUNCER_GAIN: 0.9,
+
   /** Combo counter: shown from this many hits, and kept on screen this long after it ends. */
   COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900 },
 

@@ -142,3 +142,17 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
   para cuando ese trabajo tenga commit (basta con añadirlos a la lista del script).
 - **Nota:** `dist/` no adelgaza mientras los originales sigan en `public/`, pero el navegador ya no
   los pide. Moverlos fuera de `public/` es la misma decisión pendiente de CAL-04.
+
+## 2026-11-13 · Locutor con un sintetizador de formantes propio (PEL-07)
+- **Contexto:** todo el audio del juego se genera por código; no hay grabaciones ni licencias.
+- **Decisión:** `scripts/generate-announcer.mjs` es un sintetizador de formantes mínimo (pulso glotal,
+  tres resonadores por fonema, ruido para fricativas y explosivas, tono grave con acento en la
+  sílaba tónica, saturación y eco de estadio). Las frases se escriben como fonemas del español.
+  Se descartaron el TTS del sistema operativo (licencia de redistribución dudosa y distinto en cada
+  equipo), la Web Speech API (depende del navegador y no siempre tiene voz en español) y descargar
+  un motor externo.
+- **Consecuencia:** es una voz robótica estilizada, de arcade; los carteles siguen mostrando el
+  texto, así que nada depende de entenderla. Se puede reemplazar regenerando los WAV con el mismo
+  nombre. El nivel de fricativas se ajusta con `HISS`.
+- **Volumen por categoría:** `GameAudio` envuelve una sola vez `play` y `add` del gestor de sonido
+  global y aplica el volumen según la clave (`announcer-*`, efectos), sin tocar cada llamada.

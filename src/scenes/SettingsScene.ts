@@ -62,6 +62,12 @@ export class SettingsScene extends Phaser.Scene {
         adjust: direction => { audio.changeMasterVolume(direction * 0.1); this.sound.play('hit-light', { volume: 0.5 }); },
       },
       {
+        label: 'Volumen del locutor',
+        value: () => `${Math.round(audio.announcerVolume * 100)}%`,
+        level: () => audio.announcerVolume,
+        adjust: direction => { audio.changeAnnouncerVolume(direction * 0.1); this.sound.play('announcer-fight'); },
+      },
+      {
         label: 'Teclas de J1 y J2',
         value: () => 'Cambiar ›',
         activate: () => this.scene.start('ControlsScene', this.returnData),
@@ -71,18 +77,18 @@ export class SettingsScene extends Phaser.Scene {
 
     this.add.image(640, 360, 'menu_arica_coast').setDisplaySize(1324, 745).setAlpha(0.55);
     this.add.rectangle(640, 360, 1280, 720, 0x06111b, 0.82);
-    this.add.text(96, 70, 'CONFIGURACIÓN', { fontFamily: 'Impact, Arial Black', fontSize: '64px', color: '#fff3d8' });
-    this.add.text(100, 148, 'Pantalla, audio y teclas. Los cambios se guardan solos.', {
+    this.add.text(96, 40, 'CONFIGURACIÓN', { fontFamily: 'Impact, Arial Black', fontSize: '60px', color: '#fff3d8' });
+    this.add.text(100, 112, 'Pantalla, audio y teclas. Los cambios se guardan solos.', {
       fontFamily: 'Trebuchet MS', fontSize: '20px', color: '#9fe8e1',
     });
-    this.add.text(100, 236, 'PANTALLA', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
-    this.add.text(100, 336, 'AUDIO', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
-    this.add.text(100, 536, 'CONTROLES', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 160, 'PANTALLA', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 236, 'AUDIO', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 552, 'CONTROLES', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
 
-    const ys = [282, 382, 440, 498, 582, 640];
+    const ys = [200, 276, 326, 376, 426, 590, 646];
     this.rows.forEach((row, i) => {
       const y = ys[i], back = i === this.rows.length - 1;
-      const bg = this.add.rectangle(96, y, back ? 240 : 760, 50, 0x143a51, 0.4).setOrigin(0, 0.5)
+      const bg = this.add.rectangle(96, y, back ? 240 : 760, 44, 0x143a51, 0.4).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
       const label = this.add.text(back ? 216 : 120, y, row.label, {
         fontFamily: back ? 'Impact, Arial Black' : 'Trebuchet MS', fontSize: back ? '24px' : '22px', color: '#fff3d8',

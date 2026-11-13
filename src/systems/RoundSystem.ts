@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { BANNER_STYLES, showBanner } from '../ui/EpicBanner';
+import { announce, roundLine } from './Announcer';
 
 export type RoundPhase = 'INTRO' | 'FIGHT' | 'END';
 export type RoundWinner = 'player' | 'opponent' | 'draw';
@@ -73,6 +74,7 @@ export class RoundSystem {
   }
 
   private showRoundIntro(): void {
+    announce(this.scene, roundLine(this._round));
     this.roundText.setText(`ROUND ${this._round}`).setAlpha(1);
     showBanner(this.scene, `ROUND ${this._round}`, { ...BANNER_STYLES.round, hold: 1250, depth: 200 });
 
@@ -86,6 +88,7 @@ export class RoundSystem {
   }
 
   private showFight(): void {
+    announce(this.scene, 'fight');
     this.fightText.setText('FIGHT!').setAlpha(1);
     showBanner(this.scene, '¡PELEA!', { ...BANNER_STYLES.fight, hold: 520, depth: 200 });
     this.scene.tweens.add({

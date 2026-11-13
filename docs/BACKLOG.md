@@ -42,6 +42,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] PEL-07 · Locutor y frases de victoria
+- **Hacer:** voces sintetizadas por script para «Round N», «¡Pelea!», «K.O.», «¡Tiempo!» y el
+  veredicto, con volumen propio; frase de victoria por luchador al ganar el combate.
+- **Terminado cuando:** pruebas verifican que suena cada línea en su momento, la frase del ganador
+  y el volumen del locutor.
+- **Hecho:** `scripts/generate-announcer.mjs` (sintetizador de formantes, sin grabaciones ni TTS)
+  genera 13 WAV; `systems/Announcer.ts`; `RoundSystem` y `FightMessages` llaman al locutor;
+  `victoryQuote` en `roster.ts`; «Volumen del locutor» en Configuración (`GameAudio` aplica el
+  volumen por categoría en un solo lugar). Pruebas en `tests/announcer.spec.ts`.
+
 ### [x] PEL-06 · Contador de combos y cancelación de golpes suaves
 - **Hoy:** un golpe suave deja al atacante en −2: no existen combos.
 - **Hacer:** `cancelsInto` en `AttackDefinition` (puño suave → patada suave, puño o patada

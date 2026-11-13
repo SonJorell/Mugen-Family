@@ -45,6 +45,8 @@ export interface RosterEntry {
   superName: string;
   /** Final del modo arcade (admite saltos de línea). */
   ending: string;
+  /** Frase de victoria que se muestra al ganar el combate. */
+  victoryQuote: string;
   stats: FighterStats;
 }
 
@@ -59,6 +61,7 @@ export const FIGHTER_ROSTER: readonly RosterEntry[] = [
     menuArtPath: '/assets/menu/tilin-3d.webp',
     motto: 'Haz que\nte escuchen.',
     superName: 'CANTO\nRESONANTE',
+    victoryQuote: '¿Me escuchaste? Porque toda Arica sí.',
     ending: 'La última nota retumbó por toda la costanera.\nDesde el Morro hasta Chinchorro, Arica entera\naprendió la canción de Tilin.\n\nY esta vez, todos la escucharon.',
     stats: DEFAULT_STATS,
   },
@@ -72,6 +75,7 @@ export const FIGHTER_ROSTER: readonly RosterEntry[] = [
     menuArtPath: '/assets/menu/cesar-3d-v2.webp',
     motto: 'A fondo\npor Arica.',
     superName: 'FURIA\nDEL i30',
+    victoryQuote: 'Súbete al i30, que te llevo a casa.',
     ending: 'Con el motor todavía caliente y una Monster en la mano,\nCésar estacionó el i30 frente a la Catedral.\n\nNadie volvió a discutirle el último puesto\nen la fila del completo.',
     // Big and heavy: more health and damage, slower legs and fists, barely moved by hits.
     stats: { size: 1.14, maxHealth: 125, walkSpeed: 0.72, jumpPower: 0.86, attackSpeed: 0.8, damage: 1.2, weight: 1.7, special: 'drive' },

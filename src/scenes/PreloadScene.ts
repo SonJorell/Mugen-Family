@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { LoadingScreen } from '../ui/LoadingScreen';
+import { ANNOUNCER_LINES, announcerKey } from '../systems/Announcer';
 import { FIGHTER_ROSTER } from '../config/roster';
 import { DRIVE_ASSETS } from '../combat/driveAssets';
 import { CharacterManifest, isValidManifest, manifestKey, menuArtKey, sortAnimationFiles, superPortraitKey, UI_SOUNDS } from '../config/characters';
@@ -57,7 +58,7 @@ export class PreloadScene extends Phaser.Scene {
       this.load.image(superPortraitKey(fighter.id), fighter.superPortraitPath);
     }
     for (const [key, path] of Object.entries(DRIVE_ASSETS)) this.load.image(key, path);
-    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'super-drive', 'music-menu', 'music-fight', ...UI_SOUNDS]) {
+    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'super-drive', 'music-menu', 'music-fight', ...UI_SOUNDS, ...ANNOUNCER_LINES.map(announcerKey)]) {
       this.load.audio(key, `/assets/audio/${key}.wav`);
     }
     // The native HTML video owns loading and playback; avoid downloading it twice.

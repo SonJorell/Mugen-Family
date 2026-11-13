@@ -10,6 +10,8 @@ export class GameAudio {
   volume = 0.35;
   /** Overall level for music and effects (Phaser's global sound volume), 0–1. */
   masterVolume = 1;
+  /** Level of the announcer voice, 0–1, applied on top of the overall level. */
+  announcerVolume = 1;
   static for(scene: Phaser.Scene): GameAudio {
     let audio = instances.get(scene.game);
     if (!audio) { audio = new GameAudio(scene.game); instances.set(scene.game, audio); }
@@ -21,8 +23,10 @@ export class GameAudio {
       this.muted = settings.muted === true;
       if (Number.isFinite(settings.volume)) this.volume = Phaser.Math.Clamp(settings.volume, 0, 0.7);
       if (Number.isFinite(settings.master)) this.masterVolume = Phaser.Math.Clamp(settings.master, 0, 1);
+      if (Number.isFinite(settings.announcer)) this.announcerVolume = Phaser.Math.Clamp(settings.announcer, 0, 1);
     } catch { /* Audio still works when browser storage is unavailable. */ }
     game.sound.volume = this.masterVolume;
+    this.scaleByCategory(game.sound);
     game.events.once(Phaser.Core.Events.DESTROY, () => this.stop());
   }
   play(key: 'music-menu' | 'music-fight'): void {
@@ -43,6 +47,29 @@ export class GameAudio {
     this.volume = Math.round(Phaser.Math.Clamp(this.volume + delta, 0, 0.7) * 100) / 100;
     this.applySettings();
   }
+  /** Extra gain for a sound key: the announcer follows its own volume; everything else is 1. */
+  gainFor(key: string): number {
+    return key.startsWith('announcer-') ? this.announcerVolume : 1;
+  }
+
+  /**
+   * Every sound in the game goes through the global manager's play/add, so the per-category volume
+   * is applied once here instead of at each call site.
+   */
+  private scaleByCategory(manager: Phaser.Sound.BaseSoundManager): void {
+    const play = manager.play.bind(manager), add = manager.add.bind(manager);
+    const scaled = (key: string, config?: Phaser.Types.Sound.SoundConfig) =>
+      key.startsWith('music-') ? config : { ...(config ?? {}), volume: (config?.volume ?? 1) * this.gainFor(key) };
+    manager.play = ((key: string, extra?: Phaser.Types.Sound.SoundConfig | Phaser.Types.Sound.SoundMarker) =>
+      play(key, extra && 'name' in extra ? extra : scaled(key, extra as Phaser.Types.Sound.SoundConfig))) as typeof manager.play;
+    manager.add = ((key: string, config?: Phaser.Types.Sound.SoundConfig) => add(key, scaled(key, config))) as typeof manager.add;
+  }
+
+  changeAnnouncerVolume(delta: number): void {
+    this.announcerVolume = Math.round(Phaser.Math.Clamp(this.announcerVolume + delta, 0, 1) * 100) / 100;
+    this.applySettings();
+  }
+
   changeMasterVolume(delta: number): void {
     this.masterVolume = Math.round(Phaser.Math.Clamp(this.masterVolume + delta, 0, 1) * 100) / 100;
     this.applySettings();
@@ -52,7 +79,7 @@ export class GameAudio {
     this.music?.setVolume(this.volume);
     this.game.sound.volume = this.masterVolume;
     try {
-      localStorage.setItem('tilin-audio', JSON.stringify({ muted: this.muted, volume: this.volume, master: this.masterVolume }));
+      localStorage.setItem('tilin-audio', JSON.stringify({ muted: this.muted, volume: this.volume, master: this.masterVolume, announcer: this.announcerVolume }));
     } catch { /* Optional persistence. */ }
     this.game.events.emit('music-settings');
   }

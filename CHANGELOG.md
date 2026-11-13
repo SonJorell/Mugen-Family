@@ -5,6 +5,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 
 ## [Sin publicar]
 
+### Añadido
+- **Locutor**: voz sintetizada que anuncia el round, «¡Pelea!», «K.O.», «¡Tiempo!» y el veredicto
+  («¡Victoria!», «Derrota», «Empate», «Gana jugador uno/dos»), con su propio volumen en
+  Configuración.
+- **Frases de victoria**: el ganador del combate dice su frase en el cartel final.
+
 ### Cambiado
 - Carga más rápida: las imágenes del juego se sirven en WebP (95,4 → 37,1 MB al arrancar; con
   20 Mbit/s, de 45 s a 21 s hasta el menú). Pantalla de carga nueva con progreso real.
