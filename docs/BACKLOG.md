@@ -42,6 +42,15 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] FUN-07 · Controles táctiles
+- **Hacer:** botones en pantalla solo en dispositivos táctiles, sin tapar el HUD.
+- **Terminado cuando:** una prueba con emulación táctil mueve, salta y ataca, incluso con dos dedos.
+- **Hecho:** `ui/TouchControls.ts` (cruceta abajo a la izquierda; PS, PF, SP, KS, KF, BL abajo a la
+  derecha; posiciones en `GAME_CONFIG.TOUCH`). Cada cuadro asigna cada dedo al botón que tiene
+  debajo (se puede deslizar y usar varios a la vez). Una tecla los oculta y el siguiente toque los
+  muestra; con ellos visibles se oculta el pie de teclas. Solo para el jugador 1. Pruebas en
+  `tests/touch.spec.ts` (eventos táctiles reales de Chromium).
+
 ### [x] FUN-08 · Volumen de efectos y estadísticas guardadas
 - **Hacer:** volumen propio para los efectos en Configuración; estadísticas en `localStorage`
   (victorias, derrotas, mejor combo, arcade completado) visibles desde el menú.

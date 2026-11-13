@@ -17,6 +17,7 @@ import { InputManager } from '../input/InputManager';
 import { FacingSystem } from '../systems/FacingSystem';
 import { FighterController, ImpactEvent } from '../systems/FighterController';
 import { ImpactEffects } from '../ui/ImpactEffects';
+import { TouchControls, isTouchDevice } from '../ui/TouchControls';
 import { ComboTracker } from '../systems/ComboTracker';
 import { ComboDisplay } from '../ui/ComboDisplay';
 import { DEFAULT_TRAINING, TrainingOptions, TrainingOverlay } from '../ui/TrainingOverlay';
@@ -44,6 +45,7 @@ export class FightScene extends Phaser.Scene {
   private opponent!: Fighter;
   private mode: GameMode = 'cpu';
   private inputManager2: InputManager | null = null;
+  private touchControls: TouchControls | null = null;
   private difficulty: CpuDifficulty = GAME_CONFIG.DEFAULT_CPU_DIFFICULTY;
   /** Fixed CPU seed for tests; normal play leaves it undefined. */
   private cpuSeed?: number;
@@ -137,6 +139,11 @@ export class FightScene extends Phaser.Scene {
     this.add.text(GAME_CONFIG.WIDTH / 2, 682, this.controlsHint(),
       { fontFamily: 'Arial', fontSize: '16px', color: '#eee8d9', backgroundColor: '#12151c', padding: { x: 16, y: 10 } }
     ).setOrigin(0.5).setDepth(60).setScrollFactor(0).setName('fight-controls');
+    // The keyboard footer would sit under the touch buttons: show one or the other.
+    const footer = this.children.getByName('fight-controls') as Phaser.GameObjects.Text;
+    footer.setVisible(!this.touchControls?.visible);
+    this.events.on('touch-controls-visible', (visible: boolean) => footer.setVisible(!visible));
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('touch-controls-visible'));
     this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
       fontFamily: 'Arial', fontSize: '18px', color: '#ffdd77', backgroundColor: '#12151c', padding: { x: 12, y: 8 },
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(60).setInteractive({ useHandCursor: true })
@@ -158,6 +165,8 @@ export class FightScene extends Phaser.Scene {
       this.game.events.off(Phaser.Core.Events.BLUR, this.pauseFight, this);
       this.inputManager.destroy();
       this.inputManager2?.destroy();
+      this.touchControls?.destroy();
+      this.touchControls = null;
     });
   }
 
@@ -292,7 +301,8 @@ export class FightScene extends Phaser.Scene {
 
   private createFighters(): void {
     const bindings = loadBindings(), versus = this.mode === 'versus';
-    this.inputManager = new InputManager(this, activeKeys(bindings, 'p1', versus), 0);
+    this.touchControls = isTouchDevice(this.game) ? new TouchControls(this) : null;
+    this.inputManager = new InputManager(this, activeKeys(bindings, 'p1', versus), 0, this.touchControls);
     this.inputManager2 = versus ? new InputManager(this, activeKeys(bindings, 'p2', true), 1) : null;
 
     this.player = new PlayerFighter({

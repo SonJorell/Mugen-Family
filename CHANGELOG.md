@@ -10,6 +10,8 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
   («¡Victoria!», «Derrota», «Empate», «Gana jugador uno/dos»), con su propio volumen en
   Configuración.
 - **Frases de victoria**: el ganador del combate dice su frase en el cartel final.
+- **Controles táctiles**: cruceta y seis botones en pantalla en celulares y tabletas, con varios
+  dedos a la vez; se ocultan al usar el teclado.
 - **Volumen de efectos** separado en Configuración.
 - **Estadísticas** desde el menú principal: combates contra la CPU por luchador, mejor combo, modo
   arcade completado y combates de dos jugadores, guardados en el navegador.

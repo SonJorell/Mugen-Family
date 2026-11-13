@@ -156,3 +156,13 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
   nombre. El nivel de fricativas se ajusta con `HISS`.
 - **Volumen por categoría:** `GameAudio` envuelve una sola vez `play` y `add` del gestor de sonido
   global y aplica el volumen según la clave (`announcer-*`, efectos), sin tocar cada llamada.
+
+## 2026-11-13 · Controles táctiles por posición de los dedos (FUN-07)
+- **Decisión:** en vez de eventos por botón, cada cuadro se mira dónde está cada dedo
+  (`input.manager.pointers`) y qué botón tiene debajo, con un 25 % de margen. Los golpes, el salto
+  y el súper se disparan una vez por toque; moverse, agacharse y bloquear actúan mientras se tocan.
+- **Motivo:** permite deslizar el pulgar de ◀ a ▶ sin levantarlo y combinar dirección y golpe con
+  dos dedos, que es como se juega en pantallas táctiles.
+- **Alcance:** solo el jugador 1 (dos jugadores en una misma pantalla táctil no caben con este
+  tamaño de botones). Se muestran si el dispositivo es táctil, se ocultan con una tecla y vuelven
+  con el siguiente toque, así un portátil con pantalla táctil no queda tapado.

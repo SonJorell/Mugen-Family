@@ -131,6 +131,19 @@ export const GAME_CONFIG = {
   /** Practice mode: inputs kept in the viewer, and the calm needed before health refills (ms). */
   TRAINING: { INPUT_HISTORY: 12, REFILL_DELAY_MS: 1000 },
 
+  /**
+   * On-screen controls for touch screens (1280×720 canvas units): a pad bottom-left, six buttons
+   * bottom-right, clear of the HUD at the top. HIT_SLACK enlarges each button's touch area.
+   */
+  TOUCH: {
+    BUTTON_RADIUS: 46,
+    HIT_SLACK: 1.25,
+    ALPHA: 0.42,
+    EXTRA_POINTERS: 3,
+    PAD: { x: 190, y: 575, gap: 88 },
+    ACTIONS: { x: 1000, y: 560, gap: 104 },
+  },
+
   /** Announcer lines play at this level before the announcer volume of Configuración. */
   ANNOUNCER_GAIN: 0.9,
 

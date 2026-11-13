@@ -4,6 +4,7 @@
 
 import Phaser from 'phaser';
 import { DEFAULT_BINDINGS, KeyBindings } from './InputMapping';
+import type { TouchControls } from '../ui/TouchControls';
 
 export interface InputState {
   moveLeft: boolean;
@@ -41,10 +42,14 @@ export class InputManager {
   /** Pad buttons held on the previous poll, so presses fire once like JustDown. */
   private padHeld = new Set<PressAction>();
 
-  constructor(scene: Phaser.Scene, bindings: KeyBindings = DEFAULT_BINDINGS, padIndex: number | null = 0) {
+  /** On-screen buttons on touch screens (player 1 only). */
+  private readonly touch: TouchControls | null;
+
+  constructor(scene: Phaser.Scene, bindings: KeyBindings = DEFAULT_BINDINGS, padIndex: number | null = 0, touch: TouchControls | null = null) {
     this.scene = scene;
     this.bindings = bindings;
     this.padIndex = padIndex;
+    this.touch = touch;
     this.registerKeys();
   }
 
@@ -102,7 +107,11 @@ export class InputManager {
   }
 
   getState(): InputState {
-    const b = this.bindings, pad = this.padState();
+    const b = this.bindings, pad = { ...this.padState() };
+    // Touch buttons merge in like a second gamepad.
+    for (const [action, on] of Object.entries(this.touch?.poll() ?? {})) {
+      if (on) (pad as Record<string, boolean>)[action] = true;
+    }
     return {
       moveLeft:   this.isDown(b.MOVE_LEFT) || !!pad.moveLeft,
       moveRight:  this.isDown(b.MOVE_RIGHT) || !!pad.moveRight,
