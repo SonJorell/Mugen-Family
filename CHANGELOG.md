@@ -3,6 +3,12 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versiones según
 [SemVer](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Cambiado
+- Carga más rápida: las imágenes del juego se sirven en WebP (95,4 → 37,1 MB al arrancar; con
+  20 Mbit/s, de 45 s a 21 s hasta el menú). Pantalla de carga nueva con progreso real.
+
 ## [0.2.0] — 2026-11-10
 
 ### Añadido

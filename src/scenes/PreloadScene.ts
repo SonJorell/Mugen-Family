@@ -4,6 +4,7 @@
 
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { LoadingScreen } from '../ui/LoadingScreen';
 import { FIGHTER_ROSTER } from '../config/roster';
 import { DRIVE_ASSETS } from '../combat/driveAssets';
 import { CharacterManifest, isValidManifest, manifestKey, menuArtKey, sortAnimationFiles, superPortraitKey, UI_SOUNDS } from '../config/characters';
@@ -11,6 +12,7 @@ import { CharacterManifest, isValidManifest, manifestKey, menuArtKey, sortAnimat
 export class PreloadScene extends Phaser.Scene {
   private manifests: CharacterManifest[] = [];
   private failed = false;
+  private loading!: LoadingScreen;
 
   constructor() {
     super({ key: 'PreloadScene' });
@@ -18,7 +20,9 @@ export class PreloadScene extends Phaser.Scene {
 
   preload(): void {
     this.failed = false;
-    this.createLoadingBar();
+    this.loading = new LoadingScreen(this);
+    // The manifests are a handful of tiny files: they fill the first few percent of the bar.
+    this.loading.setPhase(0, 0.04);
     this.load.on('loaderror', () => { this.failed = true; });
 
     // Load every roster manifest
@@ -27,36 +31,6 @@ export class PreloadScene extends Phaser.Scene {
     // We can't dynamically load files without the manifest, so on complete
     // we'll chain a second load phase
     this.load.on('complete', this.onFirstLoadComplete, this);
-  }
-
-  private createLoadingBar(): void {
-    const W = GAME_CONFIG.WIDTH;
-    const H = GAME_CONFIG.HEIGHT;
-
-    const title = this.add.text(W / 2, H / 2 - 80, 'MUGEN WEB FIGHTER', {
-      fontFamily: 'Arial Black',
-      fontSize: '42px',
-      color: '#ffdd00',
-      stroke: '#c00000',
-      strokeThickness: 8,
-    }).setOrigin(0.5);
-
-    const sub = this.add.text(W / 2, H / 2 - 30, 'Cargando escenarios y movimientos…', {
-      fontFamily: 'Arial',
-      fontSize: '18px',
-      color: '#cccccc',
-    }).setOrigin(0.5);
-
-    // Progress bar frame
-    this.add.rectangle(W / 2, H / 2 + 20, 500, 30, 0x333333).setOrigin(0.5);
-    const progressBar = this.add.rectangle(W / 2 - 248, H / 2 + 5, 2, 22, 0x00dd55).setOrigin(0, 0);
-
-    this.load.on('progress', (value: number) => {
-      progressBar.setSize(496 * value, 22);
-    });
-
-    // Suppress TS "unused" warnings
-    void title; void sub;
   }
 
   private onFirstLoadComplete(): void {
@@ -77,7 +51,7 @@ export class PreloadScene extends Phaser.Scene {
     GAME_CONFIG.STAGES.forEach(stage => {
       this.load.image(stage.textureKey, stage.imagePath);
     });
-    this.load.image('menu_arica_coast', '/assets/menu/arica-coast.png');
+    this.load.image('menu_arica_coast', '/assets/menu/arica-coast.webp');
     for (const fighter of FIGHTER_ROSTER) {
       this.load.image(menuArtKey(fighter.id), fighter.menuArtPath);
       this.load.image(superPortraitKey(fighter.id), fighter.superPortraitPath);
@@ -90,6 +64,7 @@ export class PreloadScene extends Phaser.Scene {
 
     // Queue all character images
     this.manifests.forEach(manifest => this.queueCharacterImages(manifest));
+    this.loading.setPhase(0.04, 1);
 
     this.load.on('complete', () => {
       if (this.failed) {

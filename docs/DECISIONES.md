@@ -122,3 +122,23 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
   (por ejemplo `art/originals/`), que es lo que pide `CLAUDE.md` para los originales; (b) dejarlos;
   (c) borrarlos si ya hay copia en otro lado. Solo `tests/game.spec.ts` toca `tilin/manifest.json`, que
   se queda donde está en cualquier caso.
+
+## 2026-11-13 · Imágenes en WebP con alfa sin pérdida (CAL-05)
+- **Medición inicial** (`scripts/measure-load.mjs`, caché vacía): el juego descargaba 95,4 MB al
+  arrancar (90 MB de PNG/JPG, 3 MB de audio); con 20 Mbit/s simulados tardaba 45,5 s en mostrar el
+  menú. Todo se carga en `PreloadScene`; las hojas de luchadores sumaban 57 MB.
+- **Decisión:** `scripts/convert-webp.py` (Pillow) escribe un `.webp` junto a cada imagen que el
+  juego carga y solo cambian las referencias (manifiestos, `roster.ts`, `GAME_CONFIG.STAGES` y la
+  costa del menú). Color con pérdida (calidad 90) y **alfa sin pérdida** (`alpha_quality=100`).
+  Los originales se quedan donde están.
+- **Verificación del recorte:** se compararon los 552 cuadros procesados por `SpriteSheetLoader`
+  antes y después: mismo tamaño y misma máscara alfa en los 552, mismos píxeles visibles; el color
+  medio cambia 4,7/255 de mediana (máx. 8,9). Comparando archivo contra archivo, el color visible
+  difiere 2–3/255. Las capturas de combate lado a lado no muestran diferencias a simple vista.
+- **Resultado:** 57 imágenes pasan de 80 MB a 18,9 MB. Descarga total 95,4 → 37,1 MB; menú a
+  20 Mbit/s 45,5 → 21,0 s. En local, sin red, los tiempos no cambian de forma apreciable.
+- **Fuera de alcance:** los recursos del súper de César (`driveAssets.ts`) y los nuevos de
+  `cesar-drive-fluid/` y `tilin-reaction/` (16,2 MB de PNG) los está editando otra sesión; quedan
+  para cuando ese trabajo tenga commit (basta con añadirlos a la lista del script).
+- **Nota:** `dist/` no adelgaza mientras los originales sigan en `public/`, pero el navegador ya no
+  los pide. Moverlos fuera de `public/` es la misma decisión pendiente de CAL-04.

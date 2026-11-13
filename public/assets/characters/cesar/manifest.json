@@ -123,73 +123,73 @@
   },
   "animations": {
     "IDLE": [
-      "/assets/characters/cesar-v2/IDLE.png"
+      "/assets/characters/cesar-v2/IDLE.webp"
     ],
     "WALK_FORWARD": [
-      "/assets/characters/cesar-v2/WALK_FORWARD.png"
+      "/assets/characters/cesar-v2/WALK_FORWARD.webp"
     ],
     "WALK_BACKWARD": [
-      "/assets/characters/cesar-v2/WALK_BACKWARD.png"
+      "/assets/characters/cesar-v2/WALK_BACKWARD.webp"
     ],
     "DASH": [
-      "/assets/characters/cesar-v2/DASH.png"
+      "/assets/characters/cesar-v2/DASH.webp"
     ],
     "CROUCH": [
-      "/assets/characters/cesar-v2/CROUCH.png"
+      "/assets/characters/cesar-v2/CROUCH.webp"
     ],
     "JUMP": [
-      "/assets/characters/cesar-v2/JUMP.png"
+      "/assets/characters/cesar-v2/JUMP.webp"
     ],
     "LIGHT_PUNCH": [
-      "/assets/characters/cesar-v2/LIGHT_PUNCH.png"
+      "/assets/characters/cesar-v2/LIGHT_PUNCH.webp"
     ],
     "HEAVY_PUNCH": [
-      "/assets/characters/cesar-v2/HEAVY_PUNCH.png"
+      "/assets/characters/cesar-v2/HEAVY_PUNCH.webp"
     ],
     "LIGHT_KICK": [
-      "/assets/characters/cesar-v2/LIGHT_KICK.png"
+      "/assets/characters/cesar-v2/LIGHT_KICK.webp"
     ],
     "HEAVY_KICK": [
-      "/assets/characters/cesar-v2/HEAVY_KICK.png"
+      "/assets/characters/cesar-v2/HEAVY_KICK.webp"
     ],
     "BLOCK": [
-      "/assets/characters/cesar-v2/BLOCK.png"
+      "/assets/characters/cesar-v2/BLOCK.webp"
     ],
     "HIT_REACTION": [
-      "/assets/characters/cesar-v2/HIT_REACTION.png"
+      "/assets/characters/cesar-v2/HIT_REACTION.webp"
     ],
     "KNOCKDOWN": [
-      "/assets/characters/cesar-v2/KNOCKDOWN.png"
+      "/assets/characters/cesar-v2/KNOCKDOWN.webp"
     ],
     "GET_UP": [
-      "/assets/characters/cesar-v2/GET_UP.png"
+      "/assets/characters/cesar-v2/GET_UP.webp"
     ],
     "TAUNT": [
-      "/assets/characters/cesar-v2/TAUNT.png"
+      "/assets/characters/cesar-v2/TAUNT.webp"
     ],
     "VICTORY": [
-      "/assets/characters/cesar-v2/VICTORY.png"
+      "/assets/characters/cesar-v2/VICTORY.webp"
     ],
     "DEFEAT": [
-      "/assets/characters/cesar-v2/DEFEAT.png"
+      "/assets/characters/cesar-v2/DEFEAT.webp"
     ],
     "SPECIAL_ATTACK": [
-      "/assets/characters/cesar-v2/SPECIAL_ATTACK.png"
+      "/assets/characters/cesar-v2/SPECIAL_ATTACK.webp"
     ],
     "STUN": [
-      "/assets/characters/cesar-v2/STUN.png"
+      "/assets/characters/cesar-v2/STUN.webp"
     ],
     "AIR_PUNCH": [
-      "/assets/characters/cesar-v2/AIR_PUNCH.png"
+      "/assets/characters/cesar-v2/AIR_PUNCH.webp"
     ],
     "AIR_KICK": [
-      "/assets/characters/cesar-v2/AIR_KICK.png"
+      "/assets/characters/cesar-v2/AIR_KICK.webp"
     ],
     "DOUBLE_JUMP": [
-      "/assets/characters/cesar-v2/DOUBLE_JUMP.png"
+      "/assets/characters/cesar-v2/DOUBLE_JUMP.webp"
     ],
     "LANDING": [
-      "/assets/characters/cesar-v2/LANDING.png"
+      "/assets/characters/cesar-v2/LANDING.webp"
     ]
   }
 }

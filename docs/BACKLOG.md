@@ -62,6 +62,18 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `MOVE_LIST` y `describeKeys` en `InputMapping.ts`; quinta opción de la pausa.
   Prueba en `tests/movelist.spec.ts`.
 
+### [x] CAL-05 · Carga más rápida
+- **Hoy:** el juego descarga 95,4 MB al arrancar (≈ 45 s a 20 Mbit/s); la barra de carga se
+  reinicia entre fases y dice «MUGEN WEB FIGHTER».
+- **Hacer:** pantalla de carga con progreso real y aligerar las imágenes que el juego carga, sin
+  borrar los originales ni cambiar el recorte.
+- **Terminado cuando:** se midió antes y después, el recorte de los 552 cuadros es idéntico y las
+  pruebas pasan.
+- **Hecho:** `ui/LoadingScreen.ts` (progreso por archivos en dos fases que solo avanza, qué se
+  carga y un consejo); `scripts/convert-webp.py` genera `.webp` junto a 57 imágenes (80 → 18,9 MB);
+  `scripts/measure-load.mjs` mide peso y tiempo. Resultado: 95,4 → 37,1 MB y 45,5 → 21,0 s hasta el
+  menú a 20 Mbit/s. Pruebas en `tests/loading.spec.ts`.
+
 ## Funcionalidades nuevas
 
 ### [x] FUN-01 · Dificultad de la CPU
