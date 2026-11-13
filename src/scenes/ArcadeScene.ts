@@ -8,6 +8,7 @@ import { FIGHTER_PALETTES, FIGHTER_ROSTER, fighterPalette, normalizeChoice, rost
 import { ArcadeRun, ArcadeStep, buildLadder, newRun } from '../config/arcade';
 import { menuArtKey, playUiSound } from '../config/characters';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
+import { recordArcadeClear } from '../systems/Stats';
 import { GameAudio, musicControls } from '../systems/GameAudio';
 
 export type ArcadeView = 'pick' | 'ladder' | 'continue' | 'ending';
@@ -39,6 +40,7 @@ export class ArcadeScene extends Phaser.Scene {
       if (data.result === 'player') {
         this.run.step++;
         this.view = this.run.step >= this.ladder.length ? 'ending' : 'ladder';
+        if (this.view === 'ending') recordArcadeClear(this.run.player.characterId, this.run.continues);
       } else if (data.result) {
         this.view = 'continue';
       } else {

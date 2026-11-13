@@ -12,6 +12,8 @@ export class GameAudio {
   masterVolume = 1;
   /** Level of the announcer voice, 0–1, applied on top of the overall level. */
   announcerVolume = 1;
+  /** Level of hits, interface and super effects, 0–1, applied on top of the overall level. */
+  sfxVolume = 1;
   static for(scene: Phaser.Scene): GameAudio {
     let audio = instances.get(scene.game);
     if (!audio) { audio = new GameAudio(scene.game); instances.set(scene.game, audio); }
@@ -24,6 +26,7 @@ export class GameAudio {
       if (Number.isFinite(settings.volume)) this.volume = Phaser.Math.Clamp(settings.volume, 0, 0.7);
       if (Number.isFinite(settings.master)) this.masterVolume = Phaser.Math.Clamp(settings.master, 0, 1);
       if (Number.isFinite(settings.announcer)) this.announcerVolume = Phaser.Math.Clamp(settings.announcer, 0, 1);
+      if (Number.isFinite(settings.sfx)) this.sfxVolume = Phaser.Math.Clamp(settings.sfx, 0, 1);
     } catch { /* Audio still works when browser storage is unavailable. */ }
     game.sound.volume = this.masterVolume;
     this.scaleByCategory(game.sound);
@@ -47,9 +50,14 @@ export class GameAudio {
     this.volume = Math.round(Phaser.Math.Clamp(this.volume + delta, 0, 0.7) * 100) / 100;
     this.applySettings();
   }
-  /** Extra gain for a sound key: the announcer follows its own volume; everything else is 1. */
+  /** Extra gain for a sound key: the announcer and the effects follow their own volume. */
   gainFor(key: string): number {
-    return key.startsWith('announcer-') ? this.announcerVolume : 1;
+    return key.startsWith('announcer-') ? this.announcerVolume : key.startsWith('music-') ? 1 : this.sfxVolume;
+  }
+
+  changeSfxVolume(delta: number): void {
+    this.sfxVolume = Math.round(Phaser.Math.Clamp(this.sfxVolume + delta, 0, 1) * 100) / 100;
+    this.applySettings();
   }
 
   /**
@@ -79,7 +87,7 @@ export class GameAudio {
     this.music?.setVolume(this.volume);
     this.game.sound.volume = this.masterVolume;
     try {
-      localStorage.setItem('tilin-audio', JSON.stringify({ muted: this.muted, volume: this.volume, master: this.masterVolume, announcer: this.announcerVolume }));
+      localStorage.setItem('tilin-audio', JSON.stringify({ muted: this.muted, volume: this.volume, master: this.masterVolume, announcer: this.announcerVolume, sfx: this.sfxVolume }));
     } catch { /* Optional persistence. */ }
     this.game.events.emit('music-settings');
   }

@@ -15,6 +15,7 @@ import { SettingsScene } from './scenes/SettingsScene';
 import { ArcadeScene } from './scenes/ArcadeScene';
 import { CreditsScene } from './scenes/CreditsScene';
 import { ControlsScene } from './scenes/ControlsScene';
+import { StatsScene } from './scenes/StatsScene';
 import { ASSET_BASE } from './config/assetBase';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -39,6 +40,7 @@ const config: Phaser.Types.Core.GameConfig = {
     ArcadeScene,
     CreditsScene,
     ControlsScene,
+    StatsScene,
   ],
   // Every /assets/... URL is loaded under Vite's base path (GitHub Pages serves from a subfolder).
   loader: { baseURL: ASSET_BASE },

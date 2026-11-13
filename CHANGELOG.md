@@ -10,6 +10,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
   («¡Victoria!», «Derrota», «Empate», «Gana jugador uno/dos»), con su propio volumen en
   Configuración.
 - **Frases de victoria**: el ganador del combate dice su frase en el cartel final.
+- **Volumen de efectos** separado en Configuración.
+- **Estadísticas** desde el menú principal: combates contra la CPU por luchador, mejor combo, modo
+  arcade completado y combates de dos jugadores, guardados en el navegador.
 
 ### Cambiado
 - Carga más rápida: las imágenes del juego se sirven en WebP (95,4 → 37,1 MB al arrancar; con

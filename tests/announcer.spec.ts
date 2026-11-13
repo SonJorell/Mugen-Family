@@ -82,7 +82,7 @@ test('the announcer volume in Configuración scales the voice and is saved', asy
   for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SettingsScene'));
-  for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowDown');
+  for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowDown');
   await expect.poll(() => page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('SettingsScene'); return s.rows[s.selectedIndex].label;
   })).toBe('Volumen del locutor');

@@ -29,6 +29,7 @@ import { FighterChoice, fighterPalette, normalizeChoice, rosterEntry } from '../
 import { CharacterManifest, createAliasLoader, createCharacterLoader, getManifest } from '../config/characters';
 import { SuperMove } from '../combat/SuperMove';
 import type { ArcadeRun } from '../config/arcade';
+import { recordCombo, recordMatch } from '../systems/Stats';
 
 /** Starting marks, reused at the start of every round. */
 const PLAYER_START_X = GAME_CONFIG.STAGE_WIDTH * 0.35;
@@ -338,7 +339,12 @@ export class FightScene extends Phaser.Scene {
     this.comboDisplay = new ComboDisplay(this);
     this.combos = new ComboTracker();
     this.combos.onChange = (attacker, combo) => this.comboDisplay.show(attacker === this.player ? 0 : 1, combo);
-    this.combos.onEnd = attacker => this.comboDisplay.end(attacker === this.player ? 0 : 1);
+    this.combos.onEnd = (attacker, combo) => {
+      this.comboDisplay.end(attacker === this.player ? 0 : 1);
+      // Only human players set records: player 1 always, the rival only in a two-player match.
+      if (attacker === this.player) recordCombo(combo.hits, combo.damage, this.playerChoice.characterId);
+      else if (this.mode === 'versus') recordCombo(combo.hits, combo.damage, this.opponentChoice.characterId);
+    };
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.comboDisplay.destroy());
     this.trainingOverlay = this.mode === 'training' ? new TrainingOverlay(this, this.training) : null;
     this.seenAttackSerial = this.player.attackSerial;
@@ -457,6 +463,7 @@ export class FightScene extends Phaser.Scene {
     if (this.roundSystem.matchOver) {
       // Best of 3 decided (or round cap reached): announce the match and return to the menu.
       const matchWinner = this.roundSystem.matchWinner;
+      recordMatch(this.mode, this.playerChoice.characterId, matchWinner);
       const winnerChoice = matchWinner === 'player' ? this.playerChoice : matchWinner === 'opponent' ? this.opponentChoice : null;
       const winnerEntry = winnerChoice ? rosterEntry(winnerChoice.characterId) : null;
       this.messages.showResult(matchWinner, reason, winnerEntry ? `${winnerEntry.name}: «${winnerEntry.victoryQuote}»` : undefined);

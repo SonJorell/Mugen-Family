@@ -62,6 +62,12 @@ export class SettingsScene extends Phaser.Scene {
         adjust: direction => { audio.changeMasterVolume(direction * 0.1); this.sound.play('hit-light', { volume: 0.5 }); },
       },
       {
+        label: 'Volumen de efectos',
+        value: () => `${Math.round(audio.sfxVolume * 100)}%`,
+        level: () => audio.sfxVolume,
+        adjust: direction => { audio.changeSfxVolume(direction * 0.1); this.sound.play('hit-heavy', { volume: 0.6 }); },
+      },
+      {
         label: 'Volumen del locutor',
         value: () => `${Math.round(audio.announcerVolume * 100)}%`,
         level: () => audio.announcerVolume,
@@ -83,9 +89,9 @@ export class SettingsScene extends Phaser.Scene {
     });
     this.add.text(100, 160, 'PANTALLA', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
     this.add.text(100, 236, 'AUDIO', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
-    this.add.text(100, 552, 'CONTROLES', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 520, 'CONTROLES', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
 
-    const ys = [200, 276, 326, 376, 426, 590, 646];
+    const ys = [200, 276, 326, 376, 426, 476, 558, 620];
     this.rows.forEach((row, i) => {
       const y = ys[i], back = i === this.rows.length - 1;
       const bg = this.add.rectangle(96, y, back ? 240 : 760, 44, 0x143a51, 0.4).setOrigin(0, 0.5)

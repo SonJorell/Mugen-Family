@@ -54,7 +54,7 @@ test('reduced motion shows the finished menu at once and navigates without a tra
   const s = await state(page);
   expect(s.introDone).toBe(true);
   expect(s.titleScale).toEqual([1, 1]);
-  expect(s.rowScaleY).toEqual([1, 1, 1, 1]);
+  expect(s.rowScaleY).toEqual([1, 1, 1, 1, 1]);
   expect(s.zoom).toBe(1);
   expect(s.embers).toEqual([false, false]);
   await page.keyboard.press('Enter');

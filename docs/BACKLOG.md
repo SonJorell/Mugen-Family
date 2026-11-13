@@ -42,6 +42,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] FUN-08 · Volumen de efectos y estadísticas guardadas
+- **Hacer:** volumen propio para los efectos en Configuración; estadísticas en `localStorage`
+  (victorias, derrotas, mejor combo, arcade completado) visibles desde el menú.
+- **Terminado cuando:** pruebas verifican el volumen de efectos (sin afectar la música) y que los
+  combates, el combo y el arcade quedan guardados y se ven en la pantalla.
+- **Hecho:** «Volumen de efectos» en Configuración (`GameAudio.sfxVolume`); `systems/Stats.ts`
+  (`fighter-stats`) y `StatsScene` (quinta opción del menú, Supr dos veces para borrar). Los
+  combates de práctica no cuentan; los de dos jugadores van aparte. Pruebas en
+  `tests/stats.spec.ts`.
+
 ### [x] PEL-07 · Locutor y frases de victoria
 - **Hacer:** voces sintetizadas por script para «Round N», «¡Pelea!», «K.O.», «¡Tiempo!» y el
   veredicto, con volumen propio; frase de victoria por luchador al ganar el combate.
