@@ -411,7 +411,7 @@ export class FightScene extends Phaser.Scene {
     const feel = GAME_CONFIG.HIT_FEEL;
     const strength = event.result === 'blocked' ? 'block'
       : event.attack.causesKnockdown ? 'knockdown'
-        : event.attack.name.startsWith('HEAVY') ? 'heavy' : 'light';
+        : event.attack.feel ?? (event.attack.name.startsWith('HEAVY') ? 'heavy' : 'light');
     this.hitstopMs = Math.max(this.hitstopMs, feel.HITSTOP_MS[strength]);
     if (event.result === 'hit') this.combos.registerHit(event.attacker, event.defender, event.attack.damage);
     if (this.trainingOverlay && event.attacker === this.player) {

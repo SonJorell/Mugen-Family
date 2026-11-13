@@ -30,6 +30,7 @@ export interface FrameData {
 
 const ATTACK_NAMES: Record<string, string> = {
   LIGHT_PUNCH: 'Puño suave', HEAVY_PUNCH: 'Puño fuerte', LIGHT_KICK: 'Patada suave', HEAVY_KICK: 'Patada fuerte', SPECIAL_ATTACK: 'Súper',
+  RUSH: 'Paso veloz', STOMP: 'Pisotón sísmico',
 };
 
 /** Signed frame count, e.g. +3, −11, 0. */
@@ -96,7 +97,7 @@ export class TrainingOverlay {
     this.framesText.setText(a ? [
       ATTACK_NAMES[a.name] ?? a.name,
       `Inicio ${a.startup} · Activo ${a.active} · Recup. ${a.recovery}`,
-      `Al golpear: ${a.onHit === null ? (a.name === 'HEAVY_KICK' ? 'derriba' : '—') : signed(a.onHit)}`,
+      `Al golpear: ${a.onHit === null ? (a.name === 'HEAVY_KICK' || a.name === 'STOMP' ? 'derriba' : '—') : signed(a.onHit)}`,
       `Al bloquear: ${a.onBlock === null ? '—' : signed(a.onBlock)}`,
     ].join('\n') : 'DATOS DE FRAMES\nAtaca al muñeco');
   }

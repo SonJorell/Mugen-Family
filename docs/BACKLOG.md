@@ -42,6 +42,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] PEL-08 · Segundo especial con comando
+- **Hacer:** ↓ ↘ → + puño, con tolerancia en `gameConfig`; un movimiento por luchador con
+  animaciones existentes; la CPU también lo usa; en la lista de movimientos y en `BALANCE.md`.
+- **Terminado cuando:** pruebas verifican el comando (y que uno lento no sale), el efecto de cada
+  luchador, la cancelación desde un golpe suave, la CPU y el teclado real.
+- **Hecho:** `COMMAND_MOVES` en `AttackDefinition.ts` (Tilin: «Paso veloz», avance con golpe con la
+  animación DASH; César: «Pisotón sísmico», pisotón bajo que derriba con HEAVY_KICK);
+  `FighterStats.commandMove`; detección en `PlayerFighter` con `GAME_CONFIG.COMMAND`;
+  `commandChance` por dificultad. Pruebas en `tests/command.spec.ts`.
+
 ### [x] FUN-07 · Controles táctiles
 - **Hacer:** botones en pantalla solo en dispositivos táctiles, sin tapar el HUD.
 - **Terminado cuando:** una prueba con emulación táctil mueve, salta y ataca, incluso con dos dedos.

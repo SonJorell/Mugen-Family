@@ -166,3 +166,13 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
 - **Alcance:** solo el jugador 1 (dos jugadores en una misma pantalla táctil no caben con este
   tamaño de botones). Se muestran si el dispositivo es táctil, se ocultan con una tecla y vuelven
   con el siguiente toque, así un portátil con pantalla táctil no queda tapado.
+
+## 2026-11-13 · Especiales de comando con animaciones existentes (PEL-08)
+- **Decisión:** un especial por luchador, sin energía, con el comando ↓ ↘ → + puño (la diagonal es
+  opcional; ↓ primero, → antes de 450 ms y el puño antes de 260 ms, en `GAME_CONFIG.COMMAND`).
+  Tilin: «Paso veloz», un avance con golpe sobre la animación DASH, ágil y castigable. César:
+  «Pisotón sísmico», bajo y lento, que derriba, sobre HEAVY_KICK. Ambos son datos en
+  `COMMAND_MOVES` y se cancelan desde los golpes suaves.
+- **Motivo:** dan a cada luchador una herramienta propia sin arte nuevo, y siguen su estilo: Tilin
+  entra rápido desde lejos y César castiga de cerca a costa de quedar muy expuesto.
+- **Tiempo:** la detección usa un reloj sumado con `delta`, no la hora del sistema ni los cuadros.

@@ -24,6 +24,16 @@ export interface AttackDefinition {
   blockPushback: number;
   /** Attacks this one may be cancelled into once it has touched the defender (hit or block). */
   cancelsInto?: string[];
+  /** Animation to play when it is not the attack's own name (command specials reuse animations). */
+  animation?: string;
+  /** Forward speed (px/s) during startup and active frames, for attacks that travel. */
+  forwardSpeed?: number;
+  /** Hit-feel strength when the name does not say it (hitstop and camera shake). */
+  feel?: 'light' | 'heavy';
+  /** Name shown to the player (move list, frame data). */
+  label?: string;
+  /** Distance (px, centre to centre) at which the CPU considers it. */
+  cpuRange?: [number, number];
   /** Hitbox relative to fighter center (x, y, width, height) */
   hitbox: { x: number; y: number; width: number; height: number };
 }
@@ -33,6 +43,25 @@ export const DRIVE_GRAB_ATTACK: AttackDefinition = {
   name: 'SPECIAL_ATTACK', startup: 18, active: 7, recovery: 40,
   damage: 0, hitstun: 0, knockback: 0, causesKnockdown: false, blockstun: 0, blockPushback: 0,
   hitbox: { x: 28, y: -230, width: 95, height: 170 },
+};
+
+/** Command specials (↓ ↘ → + punch). Each fighter names one in `FighterStats.commandMove`. */
+export type CommandMoveId = 'rush' | 'stomp';
+export const COMMAND_MOVES: Record<CommandMoveId, AttackDefinition> = {
+  // Tilin: a quick dashing strike that covers ground; light damage, punishable if blocked.
+  rush: {
+    name: 'RUSH', label: 'Paso veloz', animation: 'DASH', feel: 'heavy', forwardSpeed: 560, cpuRange: [150, 330],
+    startup: 7, active: 8, recovery: 18, damage: 9, hitstun: 20, knockback: 220, causesKnockdown: false,
+    blockstun: 14, blockPushback: 300,
+    hitbox: { x: 30, y: -200, width: 120, height: 110 },
+  },
+  // César: a slow, low stomp in front of him that knocks down; very unsafe if blocked.
+  stomp: {
+    name: 'STOMP', label: 'Pisotón sísmico', animation: 'HEAVY_KICK', feel: 'heavy', cpuRange: [0, 150],
+    startup: 10, active: 6, recovery: 20, damage: 12, hitstun: 0, knockback: 160, causesKnockdown: true,
+    blockstun: 16, blockPushback: 360,
+    hitbox: { x: 10, y: -110, width: 150, height: 110 },
+  },
 };
 
 export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
@@ -47,7 +76,7 @@ export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
     causesKnockdown: false,
     blockstun: 13,
     blockPushback: 220,
-    cancelsInto: ['LIGHT_KICK', 'HEAVY_PUNCH', 'HEAVY_KICK'],
+    cancelsInto: ['LIGHT_KICK', 'HEAVY_PUNCH', 'HEAVY_KICK', 'COMMAND_SPECIAL'],
     hitbox: { x: 35, y: -210, width: 105, height: 60 },
   },
   HEAVY_PUNCH: {
@@ -74,7 +103,7 @@ export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
     causesKnockdown: false,
     blockstun: 13,
     blockPushback: 240,
-    cancelsInto: ['HEAVY_PUNCH', 'HEAVY_KICK'],
+    cancelsInto: ['HEAVY_PUNCH', 'HEAVY_KICK', 'COMMAND_SPECIAL'],
     hitbox: { x: 35, y: -120, width: 110, height: 65 },
   },
   HEAVY_KICK: {

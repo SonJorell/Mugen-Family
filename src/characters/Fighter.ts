@@ -9,7 +9,7 @@ import { AnimationDefinition } from '../animation/AnimationDefinition';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { CombatState } from '../combat/CombatState';
 import { Hitbox, Hurtbox, DEFAULT_HURTBOX } from '../combat/Hitbox';
-import { AttackDefinition, ATTACK_DEFINITIONS, DRIVE_GRAB_ATTACK } from '../combat/AttackDefinition';
+import { AttackDefinition, ATTACK_DEFINITIONS, COMMAND_MOVES, DRIVE_GRAB_ATTACK } from '../combat/AttackDefinition';
 import { SonicWave } from '../combat/SonicWave';
 import { DEFAULT_STATS, FighterStats } from '../config/roster';
 
@@ -281,7 +281,9 @@ export class Fighter {
     if (attackName === 'SPECIAL_ATTACK' && (!this.superReady || !this.isGrounded)) return;
 
     const driveGrab = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'drive';
-    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : ATTACK_DEFINITIONS[attackName];
+    const command = attackName === 'COMMAND_SPECIAL';
+    if (command && !this.isGrounded) return;
+    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : command ? COMMAND_MOVES[this.stats.commandMove] : ATTACK_DEFINITIONS[attackName];
     if (!baseDef) return;
     const attackDef = this.scaleAttack(baseDef);
 
@@ -296,9 +298,9 @@ export class Fighter {
     this.sonicReleased = false;
     if (attackName === 'SPECIAL_ATTACK') this.energyValue = 0;
 
-    this.combatState.setState('ATTACKING', attackName);
-    const aerial = driveGrab ? 'HEAVY_PUNCH' : !this.isGrounded && attackName !== 'SPECIAL_ATTACK'
-      ? (attackName.includes('KICK') ? 'AIR_KICK' : 'AIR_PUNCH') : attackName;
+    this.combatState.setState('ATTACKING', command ? attackDef.name : attackName);
+    const aerial = driveGrab ? 'HEAVY_PUNCH' : attackDef.animation ?? (!this.isGrounded && attackName !== 'SPECIAL_ATTACK'
+      ? (attackName.includes('KICK') ? 'AIR_KICK' : 'AIR_PUNCH') : attackName);
     this.playAnimation(this.registry.has(aerial) ? aerial : attackName, true);
 
     if (attackName === 'SPECIAL_ATTACK' && !driveGrab) { this.hitbox = null; return; }
@@ -326,6 +328,11 @@ export class Fighter {
     if (elapsedFrames + 1e-6 >= startup + active + recovery) {
       this.endAttack();
       return;
+    }
+    // Travelling attacks push forward until their active frames end.
+    const speed = this.currentAttackDef.forwardSpeed;
+    if (speed && this.isGrounded && elapsedFrames < startup + active && !this.hasHitThisSwing) {
+      this.velocityX = (this.facingRight ? 1 : -1) * speed;
     }
     if (this.hitbox) this.hitbox.active = !this.hasHitThisSwing && elapsedFrames >= startup && elapsedFrames < startup + active;
   }

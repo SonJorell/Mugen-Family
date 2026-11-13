@@ -1,3 +1,4 @@
+import type { CommandMoveId } from '../combat/AttackDefinition';
 export interface FighterChoice { characterId: string; paletteId: string; }
 
 /**
@@ -18,10 +19,12 @@ export interface FighterStats {
   weight: number;
   /** Opener for the super with O: a sonic wave or a close-range grab. */
   special: 'sonic' | 'drive';
+  /** Command special (↓ ↘ → + punch), from `COMMAND_MOVES` in AttackDefinition.ts. */
+  commandMove: CommandMoveId;
 }
 
 export const DEFAULT_STATS: FighterStats = {
-  size: 1, maxHealth: 100, walkSpeed: 1, jumpPower: 1, attackSpeed: 1, damage: 1, weight: 1, special: 'sonic',
+  size: 1, maxHealth: 100, walkSpeed: 1, jumpPower: 1, attackSpeed: 1, damage: 1, weight: 1, special: 'sonic', commandMove: 'rush',
 };
 
 export interface RosterEntry {
@@ -78,7 +81,7 @@ export const FIGHTER_ROSTER: readonly RosterEntry[] = [
     victoryQuote: 'Súbete al i30, que te llevo a casa.',
     ending: 'Con el motor todavía caliente y una Monster en la mano,\nCésar estacionó el i30 frente a la Catedral.\n\nNadie volvió a discutirle el último puesto\nen la fila del completo.',
     // Big and heavy: more health and damage, slower legs and fists, barely moved by hits.
-    stats: { size: 1.14, maxHealth: 125, walkSpeed: 0.72, jumpPower: 0.86, attackSpeed: 0.8, damage: 1.2, weight: 1.7, special: 'drive' },
+    stats: { size: 1.14, maxHealth: 125, walkSpeed: 0.72, jumpPower: 0.86, attackSpeed: 0.8, damage: 1.2, weight: 1.7, special: 'drive', commandMove: 'stomp' },
   },
 ];
 

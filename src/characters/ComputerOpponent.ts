@@ -1,5 +1,6 @@
 import { Fighter, FighterOptions } from './Fighter';
 import { CpuDifficulty, CpuProfile, GAME_CONFIG } from '../config/gameConfig';
+import { COMMAND_MOVES } from '../combat/AttackDefinition';
 import { makeRandom } from '../utils/Random';
 
 const ATTACKS = ['LIGHT_PUNCH', 'LIGHT_KICK', 'HEAVY_PUNCH', 'HEAVY_KICK'] as const;
@@ -91,6 +92,12 @@ export class ComputerOpponent extends Fighter {
           return;
         }
       } else if (this.combatState.state === 'BLOCKING') return;
+    }
+    // Command special when the rival stands in its range.
+    const [near, far] = COMMAND_MOVES[this.stats.commandMove].cpuRange ?? [0, 0];
+    if (this.attackCooldown <= 0 && !busy && distance >= near && distance <= far && this.chance(this.profile.commandChance)) {
+      this.strike('COMMAND_SPECIAL');
+      return;
     }
     if (this.jumpCooldown <= 0 && distance > 60 && distance < 230) {
       this.velocityX = (this.facingRight ? 1 : -1) * this.walkSpeed;

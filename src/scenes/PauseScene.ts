@@ -10,6 +10,7 @@ import { musicControls } from '../systems/GameAudio';
 import { MOVE_LIST, describeKeys } from '../input/InputMapping';
 import { activeKeys, loadBindings } from '../input/Bindings';
 import { rosterEntry } from '../config/roster';
+import { COMMAND_MOVES } from '../combat/AttackDefinition';
 import type { TrainingOptions } from '../ui/TrainingOverlay';
 
 export class PauseScene extends Phaser.Scene {
@@ -139,6 +140,7 @@ export class PauseScene extends Phaser.Scene {
       box.add(this.add.text(x, y, f.name.toUpperCase(), { fontFamily: 'Arial Black', fontSize: '22px', color: '#ffffff' }));
       box.add(this.add.text(x, y + 34, `${f.power}  ·  ${superKeys}`, { ...row, color: '#ffdd77' }));
       box.add(this.add.text(x, y + 64, 'Súper con la energía al 100 %', { ...row, fontSize: '16px', color: '#9aa4b2' }));
+      box.add(this.add.text(x, y + 92, `${COMMAND_MOVES[f.stats.commandMove].label}  ·  ↓ ↘ → + Puño`, { ...row, fontSize: '17px', color: '#a1ece5' }));
     });
     box.add(this.add.text(W / 2, 660, 'Esc o Enter para volver', { ...row, fontSize: '18px', color: '#9aa4b2' }).setOrigin(0.5));
     return box;

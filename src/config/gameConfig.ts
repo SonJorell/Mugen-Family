@@ -22,6 +22,8 @@ export interface CpuProfile {
   attacks: [number, number, number, number];
   /** Chance to cancel a light hit that connected into a heavy follow-up. */
   comboChance: number;
+  /** Chance per decision to use the command special when the rival is in its range. */
+  commandChance: number;
 }
 export function normalizeDifficulty(value?: string): CpuDifficulty {
   return CPU_DIFFICULTIES.includes(value as CpuDifficulty) ? value as CpuDifficulty : 'normal';
@@ -116,14 +118,21 @@ export const GAME_CONFIG = {
    * attackCooldownMs: [min, max] gap between attacks · antiAirChance: heavy punch at a close jump ·
    * punishChance: strike a whiffed or blocked attack during its recovery · jumpCooldownMs: gap
    * between approach jumps · attacks: weights for LIGHT_PUNCH, LIGHT_KICK, HEAVY_PUNCH, HEAVY_KICK ·
-   * comboChance: cancel a light hit that connected into a heavy one.
+   * comboChance: cancel a light hit that connected into a heavy one · commandChance: use the
+   * command special when the rival is in its range.
    */
   CPU_DIFFICULTY: {
-    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0 },
-    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35 },
-    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8 },
+    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0, commandChance: 0.06 },
+    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35, commandChance: 0.15 },
+    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8, commandChance: 0.25 },
   } as Record<CpuDifficulty, CpuProfile>,
   DEFAULT_CPU_DIFFICULTY: 'normal' as CpuDifficulty,
+
+  /**
+   * Command input ↓ ↘ → + punch: down must come first, then forward within WINDOW_MS, and the punch
+   * within PRESS_MS of reaching forward. The diagonal is optional.
+   */
+  COMMAND: { WINDOW_MS: 450, PRESS_MS: 260 },
 
   /** Arcade ladder: fewest fights, and the arenas used in order. */
   ARCADE: { MIN_FIGHTS: 3, STAGE_ORDER: [0, 1, 2, 3, 4, 5] },

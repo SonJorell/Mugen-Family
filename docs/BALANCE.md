@@ -36,6 +36,18 @@ atacante, contando el contacto en el primer frame activo. Negativo: el atacante 
 Los golpes suaves que tocan al rival se cancelan en fuertes (`cancelsInto`), así que el «−2 al
 golpear» de un puño suave no se nota si se sigue con un puño fuerte.
 
+## Especiales de comando (↓ ↘ → + puño)
+
+Sin coste de energía. Se pueden cancelar desde un golpe suave que toca al rival.
+
+| Especial | Luchador | Inicio / activo / recup. | Daño | Alcance | Al golpear | Al bloquear | Notas |
+| --- | --- | --- | ---: | ---: | ---: | ---: | --- |
+| Paso veloz | Tilin | 7 / 8 / 18 | 9 | 150 + avance de ~140 px | −6 (lo aleja el retroceso) | −12 | Cubre distancia; castigable al bloquearse |
+| Pisotón sísmico | César | 13 / 8 / 25 | 14 | 182, bajo | derriba | −17 | Lento y muy expuesto si lo bloquean |
+
+La CPU los usa con probabilidad 6 % (Fácil), 15 % (Normal) y 25 % (Difícil) por decisión cuando el
+rival está en su rango (`cpuRange`).
+
 ## Golpes para ganar un round
 
 | Golpe repetido | Tilin vence a César (125) | César vence a Tilin (100) |
@@ -47,6 +59,7 @@ golpear» de un puño suave no se nota si se sigue con un puño fuerte.
 | Combo puño suave → puño fuerte | 8 combos (17 c/u) | 5 combos (20 c/u) |
 | Combo suave → patada suave → patada fuerte | 5 combos (26 c/u) | 4 combos (31 c/u) |
 | Súper | 48 % de la vida de César | 60 % de la vida de Tilin |
+| Especial de comando | 14 Pasos veloces | 8 Pisotones |
 
 César necesita menos golpes, pero cada uno tarda un 25 % más, alcanza 14 % más lejos y deja más
 expuesto al ser bloqueado; además ofrece un blanco más grande y camina un 28 % más lento.
@@ -68,8 +81,12 @@ posición inicial no pese. Cada round empieza con la vida llena.
 | `damage: 1.2`, Normal (muestra grande) | 120 | 50 % | 50 % |
 | `damage: 1.2`, Difícil (muestra grande) | 120 | 57 % | 43 % |
 | **`damage: 1.2`, total (muestra grande)** | **240** | **53 %** | **47 %** |
+| Con especiales de comando, Normal | 60 | 65 % | 35 % |
+| Con especiales de comando, Difícil | 60 | 37 % | 63 % |
+| **Con especiales de comando, total** | **120** | **51 %** | **49 %** |
 
-Sin empates ni rounds por tiempo: todos terminaron por K.O.
+Sin empates ni rounds por tiempo: todos terminaron por K.O. Con 60 rounds por dificultad las
+cifras de cada nivel oscilan bastante (y en sentidos opuestos); el total sigue parejo.
 
 ## Ajuste
 

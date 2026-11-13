@@ -12,6 +12,10 @@ export class PlayerFighter extends Fighter {
   lastInput: InputState | null = null;
   /** Last attack pressed while the fighter could not act, and how long ago (ms). */
   private bufferedAttack: { name: string; age: number } | null = null;
+  /** Clock (ms, from delta) and the moments ↓ and then → were last held, for the command special. */
+  private motionClock = 0;
+  private lastDown = -Infinity;
+  private lastForwardAfterDown = -Infinity;
 
   constructor(opts: FighterOptions, input: InputManager) {
     super(opts);
@@ -26,6 +30,7 @@ export class PlayerFighter extends Fighter {
     }
     const state = this.input.getState();
     this.lastInput = state;
+    this.trackMotion(state, delta);
     this.handleMovement(state, delta);
     this.handleCombat(state, delta);
   }
@@ -108,7 +113,9 @@ export class PlayerFighter extends Fighter {
   private handleCombat(state: InputState, delta: number): void {
     if (this.combatState.state === 'BLOCKING') { this.bufferedAttack = null; return; }
 
-    const pressed = state.lightPunch ? 'LIGHT_PUNCH' : state.heavyPunch ? 'HEAVY_PUNCH'
+    const punch = state.lightPunch || state.heavyPunch;
+    const command = punch && this.readCommand();
+    const pressed = command ? 'COMMAND_SPECIAL' : state.lightPunch ? 'LIGHT_PUNCH' : state.heavyPunch ? 'HEAVY_PUNCH'
       : state.lightKick ? 'LIGHT_KICK' : state.heavyKick ? 'HEAVY_KICK' : state.special ? 'SPECIAL_ATTACK' : null;
     if (pressed) {
       this.bufferedAttack = { name: pressed, age: 0 };
@@ -128,6 +135,23 @@ export class PlayerFighter extends Fighter {
       this.combatState.setState('TAUNTING');
       this.playAnimation('TAUNT', true);
     }
+  }
+
+  /** Tracks ↓ then → (relative to facing) for the ↓ ↘ → + punch command. */
+  private trackMotion(state: InputState, delta: number): void {
+    this.motionClock += delta;
+    const forward = this.facingRight ? state.moveRight : state.moveLeft;
+    if (state.crouch) this.lastDown = this.motionClock;
+    if (forward && this.motionClock - this.lastDown <= GAME_CONFIG.COMMAND.WINDOW_MS) this.lastForwardAfterDown = this.motionClock;
+  }
+
+  /** True when ↓ and then → were entered in time for the punch pressed now. */
+  private readCommand(): boolean {
+    const ok = this.lastForwardAfterDown >= this.lastDown
+      && this.lastForwardAfterDown - this.lastDown <= GAME_CONFIG.COMMAND.WINDOW_MS
+      && this.motionClock - this.lastForwardAfterDown <= GAME_CONFIG.COMMAND.PRESS_MS;
+    if (ok) { this.lastDown = -Infinity; this.lastForwardAfterDown = -Infinity; }
+    return ok;
   }
 
   override update(delta: number): void {
