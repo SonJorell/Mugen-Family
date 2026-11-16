@@ -91,6 +91,8 @@ export class ComputerOpponent extends Fighter {
           this.playAnimation('BLOCK');
           return;
         }
+        // Otherwise it may slip out with a back dash (invulnerable at the start).
+        if (this.chance(this.profile.backdashChance) && this.dash(true)) return;
       } else if (this.combatState.state === 'BLOCKING') return;
     }
     // Command special when the rival stands in its range.
@@ -105,6 +107,8 @@ export class ComputerOpponent extends Fighter {
       this.jumpCooldown = this.profile.jumpCooldownMs;
       return;
     }
+    // Close the gap quickly from far away.
+    if (distance > 320 && this.chance(this.profile.dashChance) && this.dash(false)) return;
     if (distance > 125) {
       this.combatState.setState('WALKING_FORWARD');
       this.playAnimation('WALK_FORWARD');

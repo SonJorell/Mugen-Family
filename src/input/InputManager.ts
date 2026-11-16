@@ -16,6 +16,8 @@ export interface InputState {
   lightKick: boolean;
   heavyKick: boolean;
   block: boolean;
+  /** Dash key: forward dash, or back dash while holding back. */
+  dash: boolean;
   special: boolean;
   taunt: boolean;
   pause: boolean;
@@ -23,15 +25,15 @@ export interface InputState {
 
 /**
  * Standard-layout gamepad buttons per action (Xbox names): X/Y punches, A/B kicks, RB or LT
- * block, RT super, LB taunt, Start pause. Movement uses the d-pad or the left stick.
+ * block, RT super, LB dash, Back taunt, Start pause. Movement uses the d-pad or the left stick.
  */
 export const PAD_BUTTONS = {
   lightPunch: [2], heavyPunch: [3], lightKick: [0], heavyKick: [1],
-  block: [5, 6], special: [7], taunt: [4], pause: [9],
+  block: [5, 6], special: [7], dash: [4], taunt: [8], pause: [9],
 } as const;
 const STICK_DEADZONE = 0.55;
 
-type PressAction = 'jump' | 'lightPunch' | 'heavyPunch' | 'lightKick' | 'heavyKick' | 'special' | 'taunt' | 'pause';
+type PressAction = 'jump' | 'lightPunch' | 'heavyPunch' | 'lightKick' | 'heavyKick' | 'special' | 'dash' | 'taunt' | 'pause';
 
 export class InputManager {
   private keys: Map<string, Phaser.Input.Keyboard.Key> = new Map();
@@ -90,7 +92,7 @@ export class InputManager {
       jump: pad.up || stick.y < -STICK_DEADZONE,
       lightPunch: button(PAD_BUTTONS.lightPunch), heavyPunch: button(PAD_BUTTONS.heavyPunch),
       lightKick: button(PAD_BUTTONS.lightKick), heavyKick: button(PAD_BUTTONS.heavyKick),
-      special: button(PAD_BUTTONS.special), taunt: button(PAD_BUTTONS.taunt), pause: button(PAD_BUTTONS.pause),
+      special: button(PAD_BUTTONS.special), dash: button(PAD_BUTTONS.dash), taunt: button(PAD_BUTTONS.taunt), pause: button(PAD_BUTTONS.pause),
     };
     const pressed = {} as Record<PressAction, boolean>;
     for (const action of Object.keys(held) as PressAction[]) {
@@ -122,6 +124,7 @@ export class InputManager {
       lightKick:  this.justDown(b.LIGHT_KICK) || !!pad.lightKick,
       heavyKick:  this.justDown(b.HEAVY_KICK) || !!pad.heavyKick,
       block:      this.isDown(b.BLOCK) || !!pad.block,
+      dash:       this.justDown(b.DASH ?? []) || !!pad.dash,
       special:    this.justDown(b.SPECIAL) || !!pad.special,
       taunt:      this.justDown(b.TAUNT) || !!pad.taunt,
       pause:      !!pad.pause,

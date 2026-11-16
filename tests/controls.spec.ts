@@ -84,7 +84,7 @@ test('Restaurar valores brings back the default keys for both players', async ({
   await page.evaluate(() => { const g = (window as any).__game; g.scene.stop('MenuScene'); g.scene.start('ControlsScene'); });
   await page.waitForFunction(() => (window as any).__game.scene.isActive('ControlsScene'));
   expect((await controls(page)).p1.LIGHT_PUNCH).toEqual(['G']);
-  await selectRow(page, 11);                                  // Restaurar valores
+  await selectRow(page, 12);                                  // Restaurar valores
   await page.keyboard.press('Enter');
   const after = await controls(page);
   expect(after.p1.LIGHT_PUNCH).toEqual(['J']);

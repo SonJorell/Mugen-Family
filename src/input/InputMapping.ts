@@ -12,6 +12,7 @@ export interface KeyBindings {
   LIGHT_KICK: string[];
   HEAVY_KICK: string[];
   BLOCK: string[];
+  DASH: string[];
   SPECIAL: string[];
   TAUNT: string[];
   PAUSE: string[];
@@ -28,6 +29,7 @@ export const DEFAULT_BINDINGS: KeyBindings = {
   LIGHT_KICK:  ['U'],
   HEAVY_KICK:  ['I'],
   BLOCK:       ['L'],
+  DASH:        ['SPACE'],
   SPECIAL:     ['O'],
   TAUNT:       ['P'],
   PAUSE:       ['ESC'],
@@ -60,13 +62,14 @@ export const MOVE_LIST: readonly { binding: keyof KeyBindings; label: string; no
   { binding: 'LIGHT_KICK', label: 'Patada suave' },
   { binding: 'HEAVY_KICK', label: 'Patada fuerte', note: 'derriba' },
   { binding: 'BLOCK', label: 'Bloquear', note: 'solo de frente' },
+  { binding: 'DASH', label: 'Dash', note: 'o doble toque → / ←' },
   { binding: 'TAUNT', label: 'Provocar' },
 ];
 
 const KEY_NAMES: Record<string, string> = {
   LEFT: '←', RIGHT: '→', UP: '↑', DOWN: '↓', ESC: 'Esc', SPACE: 'Espacio', INSERT: 'Insert', HOME: 'Inicio',
   DELETE: 'Supr', END: 'Fin', PAGE_UP: 'RePág', PAGE_DOWN: 'AvPág', SHIFT: 'Shift', CTRL: 'Ctrl', ALT: 'Alt',
-  BACKSPACE: 'Retroceso', ENTER: 'Enter', TAB: 'Tab', COMMA: ',', PERIOD: '.', SEMICOLON: 'Ñ', MINUS: '-',
+  BACKSPACE: 'Retroceso', NUMPAD_ADD: 'Num +', ENTER: 'Enter', TAB: 'Tab', COMMA: ',', PERIOD: '.', SEMICOLON: 'Ñ', MINUS: '-',
 };
 const DIGITS: Record<string, string> = {
   ZERO: '0', ONE: '1', TWO: '2', THREE: '3', FOUR: '4', FIVE: '5', SIX: '6', SEVEN: '7', EIGHT: '8', NINE: '9',

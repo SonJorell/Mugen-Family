@@ -189,3 +189,18 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
   desvanecimiento final.
 - **Licencia:** la canción no es un recurso generado por el proyecto. **Hay que confirmar su
   licencia antes de publicar el juego**; los créditos lo indican.
+
+## 2026-11-15 · Dash, dash atrás y lo que quedó fuera (PEL-09)
+- **Decisión:** el dash es un estado (`DASHING`), no un ataque, así no se confunde con el «Paso
+  veloz» de Tilin (un ataque que solo reutiliza la animación DASH). Doble toque en 220 ms o tecla
+  de dash con dirección. Los toques hechos con ↓ pulsado no cuentan, así ↓ ↘ → + puño sigue siendo
+  el comando, y mantener una dirección para caminar es un solo toque. El dash adelante usa la
+  animación DASH; el dash atrás, WALK_BACKWARD (no hay animación propia y no se genera arte nuevo).
+  Bloquear tiene prioridad sobre el dash.
+- **Valores:** adelante 640 px/s durante 190 ms y 90 ms de recuperación; atrás 560 px/s durante
+  210 ms, invulnerable los primeros 110 ms y 170 ms de recuperación castigable.
+- **Mando:** LB pasa a ser dash y provocar pasa a Back, porque provocar no tiene uso en combate.
+- **Fuera de alcance:** dash aéreo, porque el doble salto ya da la movilidad aérea y un tercer
+  impulso en el aire rompería la lectura de los saltos; y carrera al mantener adelante tras el dash,
+  porque cerraba la distancia demasiado rápido para el espaciado actual (los dos luchadores quedan
+  a 90 px como mínimo y César camina un 28 % más lento). Se pueden retomar como tickets propios.

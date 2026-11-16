@@ -42,6 +42,19 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] PEL-09 · Dash y dash atrás
+- **Hacer:** doble toque adelante/atrás, tecla de dash reasignable para J1 y J2, botón de mando y
+  táctil; el dash atrás con invulnerabilidad inicial y recuperación castigable; la CPU lo usa.
+- **Terminado cuando:** pruebas verifican el doble toque (y que caminar o el comando ↓ → + puño no
+  lo disparan), la invulnerabilidad y el castigo, la tecla de ambos jugadores, el mando, el táctil
+  y la CPU.
+- **Hecho:** estado `DASHING` y `Fighter.dash`; `GAME_CONFIG.DASH` (ventana de doble toque,
+  velocidad, duración, invulnerabilidad y recuperación); tecla DASH (Espacio / Retroceso o Num +)
+  en Controles; LB en el mando (provocar pasa a Back); botón DS y doble toque en el táctil;
+  `dashChance` y `backdashChance` por dificultad. Pruebas en `tests/dash.spec.ts` y
+  `tests/touch.spec.ts`.
+- **Fuera:** dash aéreo y carrera al mantener adelante (ver DECISIONES).
+
 ### [x] PEL-08 · Segundo especial con comando
 - **Hacer:** ↓ ↘ → + puño, con tolerancia en `gameConfig`; un movimiento por luchador con
   animaciones existentes; la CPU también lo usa; en la lista de movimientos y en `BALANCE.md`.

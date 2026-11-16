@@ -24,6 +24,9 @@ export interface CpuProfile {
   comboChance: number;
   /** Chance per decision to use the command special when the rival is in its range. */
   commandChance: number;
+  /** Chance to dash in from far away, and to back-dash out of an incoming attack. */
+  dashChance: number;
+  backdashChance: number;
 }
 export function normalizeDifficulty(value?: string): CpuDifficulty {
   return CPU_DIFFICULTIES.includes(value as CpuDifficulty) ? value as CpuDifficulty : 'normal';
@@ -119,14 +122,26 @@ export const GAME_CONFIG = {
    * punishChance: strike a whiffed or blocked attack during its recovery · jumpCooldownMs: gap
    * between approach jumps · attacks: weights for LIGHT_PUNCH, LIGHT_KICK, HEAVY_PUNCH, HEAVY_KICK ·
    * comboChance: cancel a light hit that connected into a heavy one · commandChance: use the
-   * command special when the rival is in its range.
+   * command special when the rival is in its range · dashChance / backdashChance: dash in from far
+   * away / back-dash out of an incoming attack.
    */
   CPU_DIFFICULTY: {
-    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0, commandChance: 0.06 },
-    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35, commandChance: 0.15 },
-    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8, commandChance: 0.25 },
+    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0, commandChance: 0.06, dashChance: 0.05, backdashChance: 0 },
+    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35, commandChance: 0.15, dashChance: 0.15, backdashChance: 0.1 },
+    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8, commandChance: 0.25, dashChance: 0.3, backdashChance: 0.25 },
   } as Record<CpuDifficulty, CpuProfile>,
   DEFAULT_CPU_DIFFICULTY: 'normal' as CpuDifficulty,
+
+  /**
+   * Dashes: a double tap on forward or back (both taps within DOUBLE_TAP_MS) or the dash key with a
+   * direction. Speed in px/s, times in ms. The back dash starts invulnerable and ends with a
+   * recovery the rival can punish. No air dash (the double jump already covers air movement).
+   */
+  DASH: {
+    DOUBLE_TAP_MS: 220,
+    FORWARD: { SPEED: 640, ACTIVE_MS: 190, RECOVERY_MS: 90, INVULN_MS: 0 },
+    BACK: { SPEED: 560, ACTIVE_MS: 210, RECOVERY_MS: 170, INVULN_MS: 110 },
+  },
 
   /**
    * Command input ↓ ↘ → + punch: down must come first, then forward within WINDOW_MS, and the punch

@@ -8,14 +8,14 @@ export type PlayerSlot = 'p1' | 'p2';
 
 /** Actions a player can remap, in the order shown in Configuración. */
 export const REMAPPABLE: readonly (keyof KeyBindings)[] = [
-  'MOVE_LEFT', 'MOVE_RIGHT', 'JUMP', 'CROUCH', 'LIGHT_PUNCH', 'HEAVY_PUNCH', 'LIGHT_KICK', 'HEAVY_KICK', 'BLOCK', 'SPECIAL', 'TAUNT',
+  'MOVE_LEFT', 'MOVE_RIGHT', 'JUMP', 'CROUCH', 'LIGHT_PUNCH', 'HEAVY_PUNCH', 'LIGHT_KICK', 'HEAVY_KICK', 'BLOCK', 'DASH', 'SPECIAL', 'TAUNT',
 ];
 
 /** Spanish names for the remappable actions. */
 export const ACTION_LABELS: Record<string, string> = {
   MOVE_LEFT: 'Izquierda', MOVE_RIGHT: 'Derecha', JUMP: 'Saltar', CROUCH: 'Agacharse',
   LIGHT_PUNCH: 'Puño suave', HEAVY_PUNCH: 'Puño fuerte', LIGHT_KICK: 'Patada suave', HEAVY_KICK: 'Patada fuerte',
-  BLOCK: 'Bloquear', SPECIAL: 'Súper', TAUNT: 'Provocar',
+  BLOCK: 'Bloquear', DASH: 'Dash', SPECIAL: 'Súper', TAUNT: 'Provocar',
 };
 
 /**
@@ -32,6 +32,7 @@ export const DEFAULT_P2_BINDINGS: KeyBindings = {
   LIGHT_KICK:  ['DELETE', 'NUMPAD_ONE'],
   HEAVY_KICK:  ['END', 'NUMPAD_TWO'],
   BLOCK:       ['PAGE_DOWN', 'NUMPAD_THREE'],
+  DASH:        ['BACKSPACE', 'NUMPAD_ADD'],
   SPECIAL:     ['PAGE_UP', 'NUMPAD_SIX'],
   TAUNT:       ['NUMPAD_ZERO'],
   PAUSE:       ['ESC'],

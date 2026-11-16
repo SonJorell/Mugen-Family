@@ -72,7 +72,8 @@ El HUD de combate está animado. Las barras de vida se llenan al abrir la ronda,
 | Patada suave / fuerte | U / I | Supr / Fin, o Num 1 / Num 2 | A / B |
 | Bloquear de frente | L | AvPág o Num 3 | RB o LT |
 | Súper del personaje (energía completa) | O | RePág o Num 6 | RT |
-| Provocar | P | Num 0 | LB |
+| Dash adelante / atrás | Espacio (+ A atrás), o doble toque D / A | Retroceso o Num + (+ ← atrás), o doble toque → / ← | LB (+ atrás) |
+| Provocar | P | Num 0 | Back |
 | Pausa | Esc o botón de pantalla | Esc | Start |
 
 El mando 1 controla al jugador 1 y el mando 2 al jugador 2. Las teclas de J1 y J2 se cambian en **Configuración → Teclas de J1 y J2**.

@@ -16,6 +16,11 @@ export class PlayerFighter extends Fighter {
   private motionClock = 0;
   private lastDown = -Infinity;
   private lastForwardAfterDown = -Infinity;
+  /** Double-tap detection: when ← / → (relative to facing) were last pressed, and held last frame. */
+  private lastTap = { forward: -Infinity, back: -Infinity };
+  private wasHeld = { forward: false, back: false };
+  /** Dash asked for this frame by a double tap or the dash key: 'forward', 'back' or null. */
+  private dashRequest: 'forward' | 'back' | null = null;
 
   constructor(opts: FighterOptions, input: InputManager) {
     super(opts);
@@ -31,6 +36,10 @@ export class PlayerFighter extends Fighter {
     const state = this.input.getState();
     this.lastInput = state;
     this.trackMotion(state, delta);
+    this.trackDash(state);
+    // A dash wins over walking this frame; blocking wins over dashing.
+    if (this.dashRequest && !state.block && this.combatState.canAct()) this.dash(this.dashRequest === 'back');
+    this.dashRequest = null;
     this.handleMovement(state, delta);
     this.handleCombat(state, delta);
   }
@@ -143,6 +152,27 @@ export class PlayerFighter extends Fighter {
     const forward = this.facingRight ? state.moveRight : state.moveLeft;
     if (state.crouch) this.lastDown = this.motionClock;
     if (forward && this.motionClock - this.lastDown <= GAME_CONFIG.COMMAND.WINDOW_MS) this.lastForwardAfterDown = this.motionClock;
+  }
+
+  /**
+   * Double tap: two presses of the same direction within DASH.DOUBLE_TAP_MS, releasing in between.
+   * Presses made while holding ↓ never count, so ↓ ↘ → + punch stays a command, and holding a
+   * direction to walk is a single press. The dash key dashes toward the held direction.
+   */
+  private trackDash(state: InputState): void {
+    const forward = !!(this.facingRight ? state.moveRight : state.moveLeft);
+    const back = !!(this.facingRight ? state.moveLeft : state.moveRight);
+    for (const [dir, held] of [['forward', forward], ['back', back]] as const) {
+      if (held && !this.wasHeld[dir]) {
+        if (state.crouch) this.lastTap[dir] = -Infinity;
+        else if (this.motionClock - this.lastTap[dir] <= GAME_CONFIG.DASH.DOUBLE_TAP_MS) {
+          this.dashRequest = dir;
+          this.lastTap[dir] = -Infinity;
+        } else this.lastTap[dir] = this.motionClock;
+      }
+      this.wasHeld[dir] = held;
+    }
+    if (state.dash) this.dashRequest = back ? 'back' : 'forward';
   }
 
   /** True when ↓ and then → were entered in time for the punch pressed now. */

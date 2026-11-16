@@ -61,11 +61,33 @@ test.describe('on a touch screen', () => {
     await expect.poll(async () => (await state(page)).visible).toBe(true);
   });
 
+  test('the DS button and a double tap on the pad dash', async ({ page }) => {
+    await startFight(page, 'tilin', 'cesar', { mode: 'training' });
+    await page.evaluate(() => {
+      const s = (window as any).__game.scene.getScene('FightScene');
+      s.player.x = 600; s.opponent.x = 1200;
+      (window as any).__game.loop.start((window as any).__game.loop.callback);
+    });
+    const dashing = () => page.evaluate(() => (window as any).__game.scene.getScene('FightScene').player.combatState.state === 'DASHING');
+    const cdp = await touch(page);
+    // DS sits left of KS: (1000 − 104, 560 + 104).
+    await down(cdp, [{ x: 896, y: 664, id: 1 }]);
+    await expect.poll(dashing).toBe(true);
+    await up(cdp);
+    await page.waitForTimeout(500);
+    // Double tap on ▶.
+    await down(cdp, [{ x: 278, y: 575, id: 2 }]); await page.waitForTimeout(50); await up(cdp);
+    await page.waitForTimeout(60);
+    await down(cdp, [{ x: 278, y: 575, id: 3 }]);
+    await expect.poll(dashing).toBe(true);
+    await up(cdp);
+  });
+
   test('the buttons stay clear of the HUD', async ({ page }) => {
     await startFight(page, 'tilin', 'tilin', { mode: 'training' });
     const tops = await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').children.list
       .filter((c: any) => c.name?.startsWith('touch-')).map((c: any) => c.y - c.radius));
-    expect(tops.length).toBe(10);
+    expect(tops.length).toBe(11);
     expect(Math.min(...tops)).toBeGreaterThan(260);
   });
 });

@@ -6,6 +6,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 ## [Sin publicar]
 
 ### Añadido
+- **Dash y dash atrás**: doble toque adelante o atrás, o la tecla de dash (Espacio para J1,
+  Retroceso o Num + para J2, LB en el mando, botón DS en táctil). El dash atrás es invulnerable al
+  empezar y castigable al final. La CPU también los usa.
 - **Música del menú**: «Cinturão de Elite», aportada por Jorell, en bucle en el menú y sus
   pantallas; «Música del menú: Cinturão de Elite / Original» en Configuración. El combate conserva
   su música.

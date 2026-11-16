@@ -71,8 +71,15 @@ export class Fighter {
   get energy(): number { return this.energyValue; }
   get superReady(): boolean { return this.energyValue >= 100; }
   get inSuper(): boolean { return this.combatState.state === 'SPECIAL' || this.combatState.state === 'SUPER_CAUGHT'; }
+  /** Direction of the current dash in screen terms (1 right, −1 left) and whether it goes back. */
+  private dashSign = 0;
+  dashBack = false;
+  /** The first frames of a back dash cannot be hit. */
+  get dashInvulnerable(): boolean {
+    return this.combatState.state === 'DASHING' && this.dashBack && this.combatState.stateTimer < GAME_CONFIG.DASH.BACK.INVULN_MS;
+  }
   get canReceiveHit(): boolean {
-    return this.currentHealth > 0 && !this.inSuper && !['KNOCKED_DOWN', 'GETTING_UP', 'DEFEAT', 'VICTORY'].includes(this.combatState.state);
+    return this.currentHealth > 0 && !this.inSuper && !this.dashInvulnerable && !['KNOCKED_DOWN', 'GETTING_UP', 'DEFEAT', 'VICTORY'].includes(this.combatState.state);
   }
   private stunArt!: Phaser.GameObjects.Graphics;
 
@@ -361,6 +368,27 @@ export class Fighter {
     return this.combatState.state === 'BLOCKING' || this.combatState.state === 'BLOCKSTUN';
   }
 
+  /** Starts a forward dash or a back dash from the ground. Returns whether it started. */
+  dash(back: boolean): boolean {
+    if (!this.combatState.canAct() || !this.isGrounded) return false;
+    this.dashBack = back;
+    this.dashSign = (this.facingRight ? 1 : -1) * (back ? -1 : 1);
+    this.hurtbox.rect = this.standingHurtbox;
+    this.combatState.setState('DASHING');
+    this.playAnimation(back ? 'WALK_BACKWARD' : 'DASH', true);
+    return true;
+  }
+
+  private updateDash(): void {
+    if (this.combatState.state !== 'DASHING') return;
+    const cfg = this.dashBack ? GAME_CONFIG.DASH.BACK : GAME_CONFIG.DASH.FORWARD, t = this.combatState.stateTimer;
+    if (t < cfg.ACTIVE_MS) this.velocityX = this.dashSign * cfg.SPEED;
+    else if (t >= cfg.ACTIVE_MS + cfg.RECOVERY_MS) {
+      this.combatState.setState('IDLE');
+      this.playAnimation('IDLE');
+    }
+  }
+
   receiveHit(damage: number, hitstun: number, knockback: number, causesKnockdown: boolean, fromRight: boolean, sonic = false,
     blockstun = 0, blockPushback = 0): 'hit' | 'blocked' | 'ignored' {
     if (!this.canReceiveHit) return 'ignored';
@@ -571,6 +599,7 @@ export class Fighter {
     }
     this.advanceAnimation(delta);
     this.applyGravity(delta);
+    this.updateDash();
     this.updateAttackFrames(delta);
     this.applyMovement(delta);
     this.stunArt.clear();

@@ -6,9 +6,9 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { InputState } from '../input/InputManager';
 
-type HeldAction = 'moveLeft' | 'moveRight' | 'jump' | 'crouch' | 'lightPunch' | 'heavyPunch' | 'lightKick' | 'heavyKick' | 'block' | 'special';
+type HeldAction = 'moveLeft' | 'moveRight' | 'jump' | 'crouch' | 'lightPunch' | 'heavyPunch' | 'lightKick' | 'heavyKick' | 'block' | 'special' | 'dash';
 /** Actions that fire once per touch, like a key's JustDown; the rest act while held. */
-const PRESS_ACTIONS: ReadonlySet<HeldAction> = new Set(['jump', 'lightPunch', 'heavyPunch', 'lightKick', 'heavyKick', 'special']);
+const PRESS_ACTIONS: ReadonlySet<HeldAction> = new Set(['jump', 'lightPunch', 'heavyPunch', 'lightKick', 'heavyKick', 'special', 'dash']);
 
 interface TouchButton { action: HeldAction; x: number; y: number; r: number; label: string; color: number; shape: Phaser.GameObjects.Arc; text: Phaser.GameObjects.Text; }
 
@@ -49,6 +49,8 @@ export class TouchControls {
     make('lightKick', act.x, act.y + act.gap, 'KS', 0x3a7f8a);
     make('heavyKick', act.x + act.gap, act.y + act.gap, 'KF', 0x3a7f8a);
     make('block', act.x + act.gap * 2, act.y + act.gap, 'BL', 0x4b4f63);
+    // Dash with the d-pad direction held; a double tap on ◀ or ▶ also dashes.
+    make('dash', act.x - act.gap, act.y + act.gap, 'DS', 0x5a4b8a, layout.BUTTON_RADIUS * 0.85);
 
     const keyboardHides = () => this.setVisible(false);
     const touchShows = (pointer: Phaser.Input.Pointer) => { if (pointer.wasTouch) this.setVisible(true); };

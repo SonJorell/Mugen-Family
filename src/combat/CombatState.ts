@@ -6,6 +6,10 @@ export type FighterState =
   | 'IDLE'
   | 'WALKING_FORWARD'
   | 'WALKING_BACKWARD'
+  /**
+   * Forward dash or back dash. Entered from IDLE/walking/crouching with `Fighter.dash`; ends in
+   * IDLE after its active and recovery time (GAME_CONFIG.DASH), or earlier if hit.
+   */
   | 'DASHING'
   | 'CROUCHING'
   | 'JUMPING'
@@ -53,6 +57,7 @@ export const STATE_TO_ANIMATION: Record<FighterState, string> = {
 /** States during which the fighter cannot move */
 export const LOCKED_STATES: Set<FighterState> = new Set([
   'ATTACKING',
+  'DASHING',
   'BLOCKSTUN',
   'HIT',
   'STUNNED',
