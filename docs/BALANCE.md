@@ -48,6 +48,33 @@ Sin coste de energía. Se pueden cancelar desde un golpe suave que toca al rival
 La CPU los usa con probabilidad 6 % (Fácil), 15 % (Normal) y 25 % (Difícil) por decisión cuando el
 rival está en su rango (`cpuRange`).
 
+## Ataques bajos, aéreos y agarre
+
+César escala igual que en sus golpes de pie (frames ×1,25, daño ×1,2, alcance ×1,14).
+
+| Ataque | Luchador | Inicio / activo / recup. | Daño | Al bloquear | Notas |
+| --- | --- | --- | ---: | ---: | --- |
+| Patada baja (↓ + suave) | Tilin | 3 / 5 / 9 | 5 | −1 | Se cancela en fuerte, lanzador, barrido o especial |
+| | César | 4 / 6 / 11 | 6 | −4 | |
+| Lanzador (↓ + puño fuerte) | Tilin | 6 / 6 / 24 | 9 | −18 | Lanza: hasta 3 golpes en el aire |
+| | César | 8 / 8 / 30 | 11 | −26 | |
+| Barrido (↓ + patada fuerte) | Tilin | 7 / 6 / 22 | 11 | −15 | Derriba |
+| | César | 9 / 8 / 28 | 13 | −23 | |
+| Puño aéreo | Tilin | 3 / 8 / 10 | 7 | — | 22 de aturdimiento: enlaza al aterrizar |
+| | César | 4 / 10 / 13 | 8 | — | |
+| Patada aérea | Tilin | 4 / 8 / 12 | 9 | — | 24 de aturdimiento |
+| | César | 5 / 10 / 15 | 11 | — | |
+| Agarre (J + U) | Tilin | 3 / 3 / 26 | 13 | no se bloquea | Se escapa con J + U en 250 ms; derriba |
+| | César | 4 / 4 / 33 | 16 | no se bloquea | |
+
+## Límites de los combos
+
+`GAME_CONFIG.COMBO`: los dos primeros golpes hacen daño entero; después, −15 % por golpe hasta un
+mínimo del 30 %. Al octavo golpe el combo termina con un derribo y el daño acumulado nunca supera el
+45 % de la vida máxima del rival (el súper queda fuera). Un ejemplo: cuatro puños fuertes de Tilin
+seguidos harían 12 + 12 + 10 + 8 = 42, y el quinto solo 3 (tope de 45). `tests/combos.spec.ts`
+intenta un bucle de 10 s con dash cancels con ambos luchadores y lo comprueba.
+
 ## Golpes para ganar un round
 
 | Golpe repetido | Tilin vence a César (125) | César vence a Tilin (100) |
@@ -84,11 +111,20 @@ posición inicial no pese. Cada round empieza con la vida llena.
 | Con especiales de comando, Normal | 60 | 65 % | 35 % |
 | Con especiales de comando, Difícil | 60 | 37 % | 63 % |
 | **Con especiales de comando, total** | **120** | **51 %** | **49 %** |
+| Con dash, combos y agarre, Normal | 120 | 63 % | 37 % |
+| Con dash, combos y agarre, Difícil | 120 | 47 % | 53 % |
+| **Con dash, combos y agarre, total** | **240** | **55 %** | **45 %** |
 
 Sin empates ni rounds por tiempo: todos terminaron por K.O. Con 60 rounds por dificultad las
 cifras de cada nivel oscilan bastante (y en sentidos opuestos); el total sigue parejo.
 
 ## Ajuste
+
+Tras el dash, los combos y el agarre (noviembre 2026) el total queda en 55 % – 45 %, dentro de la
+banda acordada de 45–55 %, así que no se tocaron valores. En Normal Tilin gana más (63 %): la CPU
+Normal casi no usa juggles ni dash cancels y Tilin, más rápido, aprovecha mejor la patada baja y el
+Paso veloz. Conviene revisarlo con partidas de dos jugadores antes de ajustar.
+
 
 César bajó su multiplicador de daño de 1.3 a 1.2. Motivo y alternativas descartadas en
 `docs/DECISIONES.md`. La CPU no aprovecha del todo la velocidad de Tilin (no castiga por frames ni
