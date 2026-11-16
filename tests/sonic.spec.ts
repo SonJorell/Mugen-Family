@@ -88,7 +88,8 @@ test('music switches with scenes, pauses with combat, and mute survives restart'
   await page.keyboard.press('ArrowDown');
   const currentMusic = () => page.evaluate(() => (window as any).__game.sound.sounds
     .filter((s: any) => s.key.startsWith('music-') && !s.pendingRemove).map((s: any) => ({ key: s.key, playing: s.isPlaying, paused: s.isPaused, mute: s.mute })));
-  await expect.poll(currentMusic).toEqual([{ key: 'music-menu', playing: true, paused: false, mute: false }]);
+  // The menu plays «Cinturão de Elite», loaded in the background (AUD-01).
+  await expect.poll(currentMusic, { timeout: 15000 }).toEqual([{ key: 'music-cinturao', playing: true, paused: false, mute: false }]);
   await page.keyboard.press('KeyM');
   await expect.poll(async () => (await currentMusic())[0]?.mute).toBe(true);
   await page.keyboard.press('ArrowUp'); await page.keyboard.press('Enter');
