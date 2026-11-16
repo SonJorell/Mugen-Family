@@ -38,6 +38,8 @@ export interface AttackDefinition {
   crouch?: boolean;
   /** Sends the defender up into a juggle (see GAME_CONFIG.JUGGLE). */
   launches?: boolean;
+  /** A throw: ignores guard, holds the defender and can be broken (see GAME_CONFIG.GRAB). */
+  throw?: boolean;
   /** Hitbox relative to fighter center (x, y, width, height) */
   hitbox: { x: number; y: number; width: number; height: number };
 }
@@ -90,6 +92,13 @@ export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
     startup: 7, active: 6, recovery: 22, damage: 11, hitstun: 0, knockback: 140, causesKnockdown: true,
     blockstun: 13, blockPushback: 300,
     hitbox: { x: 20, y: -80, width: 150, height: 80 },
+  },
+  // Throw: light punch + light kick up close. Beats a guard; damage lands when it is not broken.
+  THROW: {
+    name: 'THROW', label: 'Agarre', animation: 'HEAVY_PUNCH', throw: true, feel: 'heavy',
+    startup: 3, active: 3, recovery: 26, damage: 13, hitstun: 0, knockback: 420, causesKnockdown: true,
+    blockstun: 0, blockPushback: 0,
+    hitbox: { x: 25, y: -230, width: 70, height: 200 },
   },
   // Jump attacks: longer hitstun, so a jump-in links into a ground hit after landing.
   AIR_PUNCH: {

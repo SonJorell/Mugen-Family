@@ -42,6 +42,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] PEL-11 · Agarre
+- **Hacer:** puño suave + patada suave de cerca, rompe la guardia, se escapa pulsando lo mismo en
+  una ventana corta; animaciones existentes.
+- **Terminado cuando:** pruebas verifican el agarre a un rival que bloquea, la tolerancia entre
+  botones, el fallo de lejos, que no se puede agarrar a un rival aturdido, el escape a tiempo y
+  tarde, y la CPU.
+- **Hecho:** `THROW` en `AttackDefinition.ts` (13 de daño, derriba); estado `GRABBED`;
+  `GAME_CONFIG.GRAB` (60 ms entre botones, 250 ms para escapar); `throwChance` y `techChance` en
+  la CPU. Pruebas en `tests/grab.spec.ts`.
+
 ### [x] PEL-10 · Sistema de combos completo
 - **Hacer:** rutas de cancelación suave → suave (un paso) → fuerte → especial → súper solo al
   conectar; ataques agachado (el fuerte como barrido); ataques aéreos que enlazan al aterrizar;

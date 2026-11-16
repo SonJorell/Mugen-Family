@@ -6,6 +6,8 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 ## [Sin publicar]
 
 ### Añadido
+- **Agarre**: J + U de cerca rompe la guardia y derriba; quien es agarrado escapa pulsando J + U a
+  tiempo. La CPU agarra a quien se queda bloqueando y en Difícil escapa a menudo.
 - **Combos más completos**: suave → patada suave → fuerte → especial de comando → súper, solo al
   conectar; ataques agachado (patada baja, lanzador y barrido que derriba); los ataques en el aire
   enlazan con un golpe al aterrizar; juggle de hasta 3 golpes tras el lanzador; dash cancel desde

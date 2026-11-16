@@ -42,8 +42,7 @@ async function play(page: Page, opts: { gap?: number; steps?: Step[]; chain?: Re
   }, { gap: opts.gap ?? 105, steps: opts.steps ?? [], chain: opts.chain ?? [], frames: opts.frames ?? 150, energy: !!opts.energy, dummyCrouch: !!opts.dummyCrouch });
 }
 
-const LP = { lightPunch: true }, LK = { lightKick: true }, HP = { heavyPunch: true }, HK = { heavyKick: true };
-const MOTION_PUNCH = { crouch: true, moveRight: true, heavyPunch: true };
+const LP = { lightPunch: true }, LK = { lightKick: true }, HP = { heavyPunch: true };
 
 test('the full route light → light → heavy → command special → super connects as one combo', async ({ page }) => {
   await startFight(page, 'tilin', 'cesar', { mode: 'training' });

@@ -222,3 +222,13 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
   propio daño fijo). Una prueba intenta un bucle con dash cancels durante 10 s y lo comprueba.
 - **Dash cancel:** el puño fuerte que conecta se cancela en dash adelante, y del dash adelante se
   puede atacar tras 100 ms, para seguir el combo dentro del aturdimiento.
+
+## 2026-11-16 · Agarre (PEL-11)
+- **Decisión:** J + U de cerca (reasignables como puño y patada suaves). Los dos botones pueden
+  llegar con hasta 60 ms de diferencia: un golpe suave que todavía está arrancando y no ha tocado se
+  convierte en agarre; si ya conectó, sigue siendo la cadena del combo (J → U). El agarre ignora la
+  guardia y, si no se escapa en 250 ms, hace 13 de daño y derriba.
+- **Sin bucles imbloqueables:** no se puede agarrar a un rival en el aire, aturdido, en guardia tras
+  un golpe, en un juggle ni en el suelo, y escapar empuja a ambos.
+- **Animaciones:** quien agarra usa HEAVY_PUNCH y quien es agarrado HIT_REACTION; no hay animación
+  de lanzamiento propia (no se genera arte nuevo).

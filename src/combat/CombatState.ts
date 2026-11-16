@@ -27,6 +27,11 @@ export type FighterState =
    * ends knocked down on landing. Only GAME_CONFIG.JUGGLE.MAX_HITS hits land while in it.
    */
   | 'JUGGLED'
+  /**
+   * Held by a throw. Entered when a THROW connects; leaves to IDLE if broken (light punch + light
+   * kick within GAME_CONFIG.GRAB.TECH_WINDOW_MS) or knocked down when the throw lands.
+   */
+  | 'GRABBED'
   | 'LANDING'
   | 'KNOCKED_DOWN'
   | 'GETTING_UP'
@@ -50,6 +55,7 @@ export const STATE_TO_ANIMATION: Record<FighterState, string> = {
   HIT:              'HIT_REACTION',
   STUNNED:          'STUN',
   JUGGLED:          'HIT_REACTION',
+  GRABBED:          'HIT_REACTION',
   LANDING:          'LANDING',
   KNOCKED_DOWN:     'KNOCKDOWN',
   GETTING_UP:       'GET_UP',
@@ -68,6 +74,7 @@ export const LOCKED_STATES: Set<FighterState> = new Set([
   'HIT',
   'STUNNED',
   'JUGGLED',
+  'GRABBED',
   'KNOCKED_DOWN',
   'GETTING_UP',
   'TAUNTING',

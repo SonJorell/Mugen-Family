@@ -71,6 +71,53 @@ export class Fighter {
   get energy(): number { return this.energyValue; }
   get superReady(): boolean { return this.energyValue >= 100; }
   get inSuper(): boolean { return this.combatState.state === 'SPECIAL' || this.combatState.state === 'SUPER_CAUGHT'; }
+  /** Who holds this fighter in a throw, while GRABBED. */
+  grabbedBy: Fighter | null = null;
+
+  /** Can a throw take this fighter now? Not in the air, nor while stunned, guarding a hit or down. */
+  get throwable(): boolean {
+    return this.isGrounded && this.canReceiveHit
+      && !['HIT', 'STUNNED', 'BLOCKSTUN', 'JUGGLED', 'KNOCKED_DOWN', 'GETTING_UP'].includes(this.combatState.state);
+  }
+
+  /** A throw connected: held in front of the thrower until it lands or is broken. */
+  grabbedFrom(thrower: Fighter): void {
+    this.cancelAttack(); this.clearSonicWaves();
+    this.velocityX = 0; this.velocityY = 0;
+    this.hurtbox.rect = this.standingHurtbox;
+    this.grabbedBy = thrower;
+    this.combatState.setState('GRABBED');
+    this.playAnimation('HIT_REACTION', true);
+  }
+
+  /** Breaks the throw if still inside the window: both fighters are pushed apart, no damage. */
+  techThrow(): boolean {
+    const thrower = this.grabbedBy;
+    if (this.combatState.state !== 'GRABBED' || !thrower || this.combatState.stateTimer > GAME_CONFIG.GRAB.TECH_WINDOW_MS) return false;
+    this.grabbedBy = null;
+    const away = this.x >= thrower.x ? 1 : -1;
+    this.combatState.setState('IDLE'); this.playAnimation('IDLE', true);
+    this.velocityX = away * GAME_CONFIG.GRAB.TECH_PUSH;
+    thrower.endAttack();
+    thrower.velocityX = -away * GAME_CONFIG.GRAB.TECH_PUSH;
+    this.playImpactSound('hit-block');
+    return true;
+  }
+
+  private updateGrab(): void {
+    const thrower = this.grabbedBy;
+    if (this.combatState.state !== 'GRABBED' || !thrower) return;
+    const side = thrower.facingRight ? 1 : -1;
+    this.x = thrower.x + side * GAME_CONFIG.GRAB.HOLD_DISTANCE * Math.max(thrower.stats.size, this.stats.size);
+    if (this.combatState.stateTimer < GAME_CONFIG.GRAB.TECH_WINDOW_MS) return;
+    // Not broken in time: the throw lands.
+    const def = thrower.getActiveAttackDef();
+    const damage = def?.throw ? def.damage : Math.round(13 * thrower.stats.damage);
+    this.grabbedBy = null;
+    this.combatState.setState('IDLE');
+    if (this.receiveHit(damage, 0, def?.knockback ?? 420, true, thrower.x > this.x) === 'hit') thrower.gainEnergy(damage * 2 + 6);
+  }
+
   /** Air hits taken in the current juggle. */
   juggleHits = 0;
   /** A juggle that reached its hit limit cannot be hit again until the fighter lands. */
@@ -85,7 +132,7 @@ export class Fighter {
     return this.combatState.state === 'DASHING' && this.dashBack && this.combatState.stateTimer < GAME_CONFIG.DASH.BACK.INVULN_MS;
   }
   get canReceiveHit(): boolean {
-    return this.currentHealth > 0 && !this.inSuper && !this.dashInvulnerable && !this.juggleSpent && !['KNOCKED_DOWN', 'GETTING_UP', 'DEFEAT', 'VICTORY'].includes(this.combatState.state);
+    return this.currentHealth > 0 && !this.inSuper && !this.dashInvulnerable && !this.juggleSpent && this.combatState.state !== 'GRABBED' && !['KNOCKED_DOWN', 'GETTING_UP', 'DEFEAT', 'VICTORY'].includes(this.combatState.state);
   }
   private stunArt!: Phaser.GameObjects.Graphics;
 
@@ -284,6 +331,10 @@ export class Fighter {
    * attacks listed in its `cancelsInto`, which is what lets light hits chain into heavy ones.
    */
   canCancelInto(attackName: string): boolean {
+    // A light attack still starting may turn into a throw (the second button came a moment late).
+    if (attackName === 'THROW' && this.combatState.state === 'ATTACKING' && !this.hasHitThisSwing
+      && ['LIGHT_PUNCH', 'LIGHT_KICK'].includes(this.currentAttackDef?.name ?? '')
+      && this.combatState.stateTimer <= GAME_CONFIG.GRAB.PRESS_WINDOW_MS) return true;
     // Out of a forward dash, once it has run a little, into a ground attack.
     if (this.combatState.state === 'DASHING' && !this.dashBack && attackName !== 'DASH'
       && this.combatState.stateTimer >= GAME_CONFIG.DASH.FORWARD.ATTACK_CANCEL_MS) return true;
@@ -369,7 +420,8 @@ export class Fighter {
     this.hasHitThisSwing = false;
   }
 
-  private endAttack(): void {
+  /** Ends the current attack at once (also used when a throw is broken). */
+  endAttack(): void {
     this.cancelAttack();
     this.hurtbox.rect = this.standingHurtbox;
     this.combatState.setState(this.isGrounded ? 'IDLE' : 'JUMPING');
@@ -503,7 +555,7 @@ export class Fighter {
     this.knockdownDuration = (def?.available ? def.frames.length * 1000 / def.frameRate : 500) + 800;
   }
 
-  private playImpactSound(key: string): void {
+  protected playImpactSound(key: string): void {
     if (this.scene.cache.audio.exists(key)) this.scene.sound.play(key, { volume: 0.65 });
   }
 
@@ -634,6 +686,7 @@ export class Fighter {
     this.advanceAnimation(delta);
     this.applyGravity(delta);
     this.updateDash();
+    this.updateGrab();
     this.updateAttackFrames(delta);
     this.applyMovement(delta);
     this.stunArt.clear();

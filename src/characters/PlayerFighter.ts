@@ -19,6 +19,8 @@ export class PlayerFighter extends Fighter {
   /** Double-tap detection: when ← / → (relative to facing) were last pressed, and held last frame. */
   private lastTap = { forward: -Infinity, back: -Infinity };
   private wasHeld = { forward: false, back: false };
+  /** When light punch and light kick were last pressed, for the throw and breaking a throw. */
+  private lastLight = { punch: -Infinity, kick: -Infinity };
   /** Dash asked for this frame by a double tap or the dash key: 'forward', 'back' or null. */
   private dashRequest: 'forward' | 'back' | null = null;
 
@@ -122,12 +124,23 @@ export class PlayerFighter extends Fighter {
   private handleCombat(state: InputState, delta: number): void {
     if (this.combatState.state === 'BLOCKING') { this.bufferedAttack = null; return; }
 
+    // Light punch + light kick (together, or a moment apart) is a throw; when held, it breaks one.
+    if (state.lightPunch) this.lastLight.punch = this.motionClock;
+    if (state.lightKick) this.lastLight.kick = this.motionClock;
+    // Not pressed together, it only counts while the first light attack is still starting up and
+    // has not landed; otherwise J then U stays the light chain of a combo.
+    const together = !!(state.lightPunch && state.lightKick);
+    const bothLights = (state.lightPunch || state.lightKick)
+      && Math.abs(this.lastLight.punch - this.lastLight.kick) <= GAME_CONFIG.GRAB.PRESS_WINDOW_MS
+      && (together || this.combatState.state === 'GRABBED' || this.combatState.canAct() || this.canCancelInto('THROW'));
+    if (bothLights) this.lastLight = { punch: -Infinity, kick: -Infinity };
+    if (this.combatState.state === 'GRABBED') { if (bothLights) this.techThrow(); return; }
     const punch = state.lightPunch || state.heavyPunch;
     const command = punch && this.readCommand();
     // Holding ↓ on the ground turns buttons into crouching attacks: light → low kick,
     // heavy punch → launcher, heavy kick → sweep.
     const low = !!state.crouch && this.isGrounded;
-    const pressed = command ? 'COMMAND_SPECIAL'
+    const pressed = command ? 'COMMAND_SPECIAL' : bothLights && !low ? 'THROW'
       : low && (state.lightPunch || state.lightKick) ? 'CROUCH_LIGHT' : low && state.heavyPunch ? 'LAUNCHER' : low && state.heavyKick ? 'SWEEP'
       : state.lightPunch ? 'LIGHT_PUNCH' : state.heavyPunch ? 'HEAVY_PUNCH'
       : state.lightKick ? 'LIGHT_KICK' : state.heavyKick ? 'HEAVY_KICK' : state.special ? 'SPECIAL_ATTACK' : null;

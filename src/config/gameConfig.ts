@@ -29,6 +29,9 @@ export interface CpuProfile {
   backdashChance: number;
   /** Chance to sweep when close, and to cancel a heavy hit that connected into the command special. */
   sweepChance: number;
+  /** Chance to throw a rival standing close (above all a blocking one), and to break a throw. */
+  throwChance: number;
+  techChance: number;
 }
 export function normalizeDifficulty(value?: string): CpuDifficulty {
   return CPU_DIFFICULTIES.includes(value as CpuDifficulty) ? value as CpuDifficulty : 'normal';
@@ -128,9 +131,9 @@ export const GAME_CONFIG = {
    * away / back-dash out of an incoming attack.
    */
   CPU_DIFFICULTY: {
-    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0, commandChance: 0.06, dashChance: 0.05, backdashChance: 0, sweepChance: 0.03 },
-    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35, commandChance: 0.15, dashChance: 0.15, backdashChance: 0.1, sweepChance: 0.08 },
-    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8, commandChance: 0.25, dashChance: 0.3, backdashChance: 0.25, sweepChance: 0.12 },
+    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0, commandChance: 0.06, dashChance: 0.05, backdashChance: 0, sweepChance: 0.03, throwChance: 0.03, techChance: 0 },
+    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35, commandChance: 0.15, dashChance: 0.15, backdashChance: 0.1, sweepChance: 0.08, throwChance: 0.1, techChance: 0.3 },
+    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8, commandChance: 0.25, dashChance: 0.3, backdashChance: 0.25, sweepChance: 0.12, throwChance: 0.2, techChance: 0.6 },
   } as Record<CpuDifficulty, CpuProfile>,
   DEFAULT_CPU_DIFFICULTY: 'normal' as CpuDifficulty,
 
@@ -193,6 +196,14 @@ export const GAME_CONFIG = {
    * maximum health (supers excluded), so there are no infinite loops.
    */
   COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900, FREE_HITS: 2, SCALE_STEP: 0.15, MIN_SCALE: 0.3, MAX_HITS: 8, DAMAGE_CAP: 0.45 },
+
+  /**
+   * Throw (light punch + light kick up close). The two presses may be PRESS_WINDOW_MS apart (a light
+   * attack still starting turns into the throw). The held fighter breaks free by pressing the same
+   * within TECH_WINDOW_MS; then both are pushed apart by TECH_PUSH (px/s). HOLD_DISTANCE keeps the
+   * held fighter in front of the thrower.
+   */
+  GRAB: { PRESS_WINDOW_MS: 60, TECH_WINDOW_MS: 250, HOLD_DISTANCE: 70, TECH_PUSH: 340 },
 
   /**
    * Juggles after a launcher (↓ + heavy punch): launch speed (px/s up), the pop each extra air hit

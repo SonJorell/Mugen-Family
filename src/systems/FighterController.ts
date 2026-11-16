@@ -52,6 +52,13 @@ export class FighterController {
       if (!attackDef) return;
 
       const fromRight = attacker.x > defender.x;
+      if (attackDef.throw) {
+        // Throws ignore the guard; they miss fighters in the air, stunned, guarding a hit or down.
+        attacker.hasHitThisSwing = true;
+        attacker.hitbox.active = false;
+        if (defender.throwable) defender.grabbedFrom(attacker);
+        return;
+      }
       if (attackDef.name === 'SPECIAL_ATTACK' && attacker.stats.special === 'drive') {
         // Airborne opponents escape a grounded grab; frontal guard also stops the opener.
         if (!defender.isGrounded || !defender.canReceiveHit) return;

@@ -24,6 +24,8 @@ export class ComputerOpponent extends Fighter {
   private judgedJump = false;
   private judgedRecovery = false;
   private judgedCombo = -1;
+  /** A throw on this CPU was already judged (break it or not). */
+  private judgedGrab = false;
 
   constructor(opts: FighterOptions, cpu: CpuOptions = {}) {
     super(opts);
@@ -60,6 +62,12 @@ export class ComputerOpponent extends Fighter {
       this.judgedCombo = this.attackSerial;
       if (this.chance(this.profile.comboChance)) { this.executeAttack('HEAVY_PUNCH'); return; }
     }
+    // Held by a throw: break it or not, decided once.
+    if (this.combatState.state === 'GRABBED') {
+      if (!this.judgedGrab) { this.judgedGrab = true; if (this.chance(this.profile.techChance)) this.techThrow(); }
+      return;
+    }
+    this.judgedGrab = false;
     // Heavy that connected → command special, half as often as light → heavy.
     if (this.judgedCombo !== this.attackSerial && ['HIT', 'STUNNED'].includes(target.combatState.state)
       && this.canCancelInto('COMMAND_SPECIAL') && !this.canCancelInto('HEAVY_PUNCH')) {
@@ -111,6 +119,12 @@ export class ComputerOpponent extends Fighter {
       this.velocityX = (this.facingRight ? 1 : -1) * this.walkSpeed;
       this.jump();
       this.jumpCooldown = this.profile.jumpCooldownMs;
+      return;
+    }
+    // Throw a rival standing close, above all one that keeps guarding.
+    if (this.attackCooldown <= 0 && !busy && distance < 115 && target.isGrounded
+      && this.chance(target.combatState.state === 'BLOCKING' ? this.profile.throwChance * 2 : this.profile.throwChance)) {
+      this.strike('THROW');
       return;
     }
     // A sweep from up close now and then.

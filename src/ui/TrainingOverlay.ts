@@ -31,7 +31,7 @@ export interface FrameData {
 const ATTACK_NAMES: Record<string, string> = {
   LIGHT_PUNCH: 'Puño suave', HEAVY_PUNCH: 'Puño fuerte', LIGHT_KICK: 'Patada suave', HEAVY_KICK: 'Patada fuerte', SPECIAL_ATTACK: 'Súper',
   RUSH: 'Paso veloz', STOMP: 'Pisotón sísmico', CROUCH_LIGHT: 'Patada baja', LAUNCHER: 'Lanzador', SWEEP: 'Barrido',
-  AIR_PUNCH: 'Puño aéreo', AIR_KICK: 'Patada aérea',
+  AIR_PUNCH: 'Puño aéreo', AIR_KICK: 'Patada aérea', THROW: 'Agarre',
 };
 
 /** Signed frame count, e.g. +3, −11, 0. */
