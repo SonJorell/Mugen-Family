@@ -27,6 +27,8 @@ export interface CpuProfile {
   /** Chance to dash in from far away, and to back-dash out of an incoming attack. */
   dashChance: number;
   backdashChance: number;
+  /** Chance to sweep when close, and to cancel a heavy hit that connected into the command special. */
+  sweepChance: number;
 }
 export function normalizeDifficulty(value?: string): CpuDifficulty {
   return CPU_DIFFICULTIES.includes(value as CpuDifficulty) ? value as CpuDifficulty : 'normal';
@@ -126,9 +128,9 @@ export const GAME_CONFIG = {
    * away / back-dash out of an incoming attack.
    */
   CPU_DIFFICULTY: {
-    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0, commandChance: 0.06, dashChance: 0.05, backdashChance: 0 },
-    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35, commandChance: 0.15, dashChance: 0.15, backdashChance: 0.1 },
-    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8, commandChance: 0.25, dashChance: 0.3, backdashChance: 0.25 },
+    easy:   { label: 'Fácil',   reactionMs: 260, blockChance: 0.12, attackCooldownMs: [1150, 1550], antiAirChance: 0,    punishChance: 0,    jumpCooldownMs: 7000, attacks: [4, 4, 1, 1], comboChance: 0, commandChance: 0.06, dashChance: 0.05, backdashChance: 0, sweepChance: 0.03 },
+    normal: { label: 'Normal',  reactionMs: 160, blockChance: 0.34, attackCooldownMs: [750, 950],   antiAirChance: 0.25, punishChance: 0.25, jumpCooldownMs: 5200, attacks: [3, 3, 2, 2], comboChance: 0.35, commandChance: 0.15, dashChance: 0.15, backdashChance: 0.1, sweepChance: 0.08 },
+    hard:   { label: 'Difícil', reactionMs: 105, blockChance: 0.7,  attackCooldownMs: [420, 650],   antiAirChance: 0.65, punishChance: 0.75, jumpCooldownMs: 3800, attacks: [2, 2, 3, 3], comboChance: 0.8, commandChance: 0.25, dashChance: 0.3, backdashChance: 0.25, sweepChance: 0.12 },
   } as Record<CpuDifficulty, CpuProfile>,
   DEFAULT_CPU_DIFFICULTY: 'normal' as CpuDifficulty,
 
@@ -139,7 +141,8 @@ export const GAME_CONFIG = {
    */
   DASH: {
     DOUBLE_TAP_MS: 220,
-    FORWARD: { SPEED: 640, ACTIVE_MS: 190, RECOVERY_MS: 90, INVULN_MS: 0 },
+    // A forward dash can turn into a ground attack after ATTACK_CANCEL_MS (dash-cancel combos).
+    FORWARD: { SPEED: 640, ACTIVE_MS: 190, RECOVERY_MS: 90, INVULN_MS: 0, ATTACK_CANCEL_MS: 100 },
     BACK: { SPEED: 560, ACTIVE_MS: 210, RECOVERY_MS: 170, INVULN_MS: 110 },
   },
 
@@ -183,8 +186,20 @@ export const GAME_CONFIG = {
   /** Announcer lines play at this level before the announcer volume of Configuración. */
   ANNOUNCER_GAIN: 0.9,
 
-  /** Combo counter: shown from this many hits, and kept on screen this long after it ends. */
-  COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900 },
+  /**
+   * Combos. The counter shows from MIN_HITS_SHOWN hits and lingers LINGER_MS. Damage scaling: the
+   * first FREE_HITS hits are whole, then each hit loses SCALE_STEP down to MIN_SCALE. A combo stops
+   * at MAX_HITS (the last hit knocks down) and never takes more than DAMAGE_CAP of the defender's
+   * maximum health (supers excluded), so there are no infinite loops.
+   */
+  COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900, FREE_HITS: 2, SCALE_STEP: 0.15, MIN_SCALE: 0.3, MAX_HITS: 8, DAMAGE_CAP: 0.45 },
+
+  /**
+   * Juggles after a launcher (↓ + heavy punch): launch speed (px/s up), the pop each extra air hit
+   * gives, sideways carry, how many hits fit in the air, and how much heavier gravity gets per air
+   * hit. The defender lands knocked down.
+   */
+  JUGGLE: { LAUNCH_VELOCITY: 760, POP_VELOCITY: 380, CARRY_SPEED: 60, MAX_HITS: 3, GRAVITY_STEP: 0.35 },
 
   /** Hit feel: freeze on contact, camera shake and sparks. Times in ms. */
   HIT_FEEL: {

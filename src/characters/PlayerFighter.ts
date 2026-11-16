@@ -38,7 +38,7 @@ export class PlayerFighter extends Fighter {
     this.trackMotion(state, delta);
     this.trackDash(state);
     // A dash wins over walking this frame; blocking wins over dashing.
-    if (this.dashRequest && !state.block && this.combatState.canAct()) this.dash(this.dashRequest === 'back');
+    if (this.dashRequest && !state.block && (this.combatState.canAct() || this.canCancelInto('DASH'))) this.dash(this.dashRequest === 'back');
     this.dashRequest = null;
     this.handleMovement(state, delta);
     this.handleCombat(state, delta);
@@ -124,7 +124,12 @@ export class PlayerFighter extends Fighter {
 
     const punch = state.lightPunch || state.heavyPunch;
     const command = punch && this.readCommand();
-    const pressed = command ? 'COMMAND_SPECIAL' : state.lightPunch ? 'LIGHT_PUNCH' : state.heavyPunch ? 'HEAVY_PUNCH'
+    // Holding ↓ on the ground turns buttons into crouching attacks: light → low kick,
+    // heavy punch → launcher, heavy kick → sweep.
+    const low = !!state.crouch && this.isGrounded;
+    const pressed = command ? 'COMMAND_SPECIAL'
+      : low && (state.lightPunch || state.lightKick) ? 'CROUCH_LIGHT' : low && state.heavyPunch ? 'LAUNCHER' : low && state.heavyKick ? 'SWEEP'
+      : state.lightPunch ? 'LIGHT_PUNCH' : state.heavyPunch ? 'HEAVY_PUNCH'
       : state.lightKick ? 'LIGHT_KICK' : state.heavyKick ? 'HEAVY_KICK' : state.special ? 'SPECIAL_ATTACK' : null;
     if (pressed) {
       this.bufferedAttack = { name: pressed, age: 0 };

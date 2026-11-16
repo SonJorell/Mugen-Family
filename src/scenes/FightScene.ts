@@ -361,6 +361,7 @@ export class FightScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.trainingOverlay?.destroy(); this.trainingOverlay = null; });
     this.impacts = new ImpactEffects(this);
     this.fighterController.onImpact = event => this.onImpact(event);
+    this.fighterController.scaleHit = (attacker, defender, damage) => this.scaleComboHit(attacker, defender, damage);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.impacts.destroy());
     this.roundSystem = new RoundSystem(this);
     this.roundSystem.onRoundEnd = (winner, reason) => this.onRoundEnd(winner, reason);
@@ -413,7 +414,7 @@ export class FightScene extends Phaser.Scene {
       : event.attack.causesKnockdown ? 'knockdown'
         : event.attack.feel ?? (event.attack.name.startsWith('HEAVY') ? 'heavy' : 'light');
     this.hitstopMs = Math.max(this.hitstopMs, feel.HITSTOP_MS[strength]);
-    if (event.result === 'hit') this.combos.registerHit(event.attacker, event.defender, event.attack.damage);
+    if (event.result === 'hit') this.combos.registerHit(event.attacker, event.defender, event.damage);
     if (this.trainingOverlay && event.attacker === this.player) {
       this.trainingOverlay.recordContact(event.attack, Math.floor(event.attacker.combatState.stateTimer * 60 / 1000 + 1e-6));
     }
@@ -423,6 +424,16 @@ export class FightScene extends Phaser.Scene {
       const shake = feel.SHAKE[strength];
       this.cameras.main.shake(shake.duration, shake.intensity);
     }
+  }
+
+  /** Damage scaling and limits for the next hit of a combo (GAME_CONFIG.COMBO). */
+  private scaleComboHit(attacker: Fighter, defender: Fighter, damage: number): { damage: number; endCombo: boolean } {
+    const c = GAME_CONFIG.COMBO, combo = this.combos.ongoing(attacker, defender);
+    const prior = combo?.hits ?? 0, dealt = combo?.damage ?? 0;
+    const scale = prior < c.FREE_HITS ? 1 : Math.max(c.MIN_SCALE, 1 - c.SCALE_STEP * (prior - c.FREE_HITS + 1));
+    const room = Math.max(0, Math.floor(c.DAMAGE_CAP * defender.maxHealth) - dealt);
+    const scaled = Math.min(room, Math.max(1, Math.round(damage * scale)));
+    return { damage: scaled, endCombo: prior + 1 >= c.MAX_HITS || scaled >= room };
   }
 
   /** Practice tools toggled from the pause menu. */

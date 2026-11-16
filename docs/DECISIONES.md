@@ -204,3 +204,21 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
   impulso en el aire rompería la lectura de los saltos; y carrera al mantener adelante tras el dash,
   porque cerraba la distancia demasiado rápido para el espaciado actual (los dos luchadores quedan
   a 90 px como mínimo y César camina un 28 % más lento). Se pueden retomar como tickets propios.
+
+## 2026-11-16 · Combos: rutas, juggle, escalado y tope (PEL-10)
+- **Rutas como datos:** cada ataque lista en `cancelsInto` a qué puede cancelarse, y solo cuando ya
+  tocó al rival (golpe o bloqueo). La cadena de golpes suaves es de un paso (puño → patada, nunca al
+  revés), así no hay bucles de golpes suaves.
+- **Ataques nuevos sin arte nuevo:** agachado + suave = «Patada baja» (animación LIGHT_KICK con caja
+  baja), agachado + puño fuerte = «Lanzador» (HEAVY_PUNCH), agachado + patada fuerte = «Barrido»
+  (HEAVY_KICK, derriba). Los ataques en el aire usan datos propios (`AIR_PUNCH`, `AIR_KICK`) con más
+  aturdimiento, para enlazar al aterrizar. Visualmente reutilizan poses de pie: es la limitación de
+  no generar arte.
+- **Juggle acotado:** tras el lanzador el rival queda en `JUGGLED`; caben 3 golpes en el aire, cada
+  uno lo eleva menos y aumenta la gravedad un 35 %; al tocar el suelo queda derribado.
+- **Sin infinitos:** los dos primeros golpes de un combo hacen daño entero; desde el tercero, −15 %
+  por golpe hasta un mínimo del 30 %. Al octavo golpe el combo termina con un derribo, y el daño
+  acumulado nunca supera el 45 % de la vida máxima del rival (el súper queda fuera, porque tiene su
+  propio daño fijo). Una prueba intenta un bucle con dash cancels durante 10 s y lo comprueba.
+- **Dash cancel:** el puño fuerte que conecta se cancela en dash adelante, y del dash adelante se
+  puede atacar tras 100 ms, para seguir el combo dentro del aturdimiento.

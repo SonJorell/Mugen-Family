@@ -34,6 +34,10 @@ export interface AttackDefinition {
   label?: string;
   /** Distance (px, centre to centre) at which the CPU considers it. */
   cpuRange?: [number, number];
+  /** Done from a crouch: keeps the crouching hurtbox. */
+  crouch?: boolean;
+  /** Sends the defender up into a juggle (see GAME_CONFIG.JUGGLE). */
+  launches?: boolean;
   /** Hitbox relative to fighter center (x, y, width, height) */
   hitbox: { x: number; y: number; width: number; height: number };
 }
@@ -50,6 +54,7 @@ export type CommandMoveId = 'rush' | 'stomp';
 export const COMMAND_MOVES: Record<CommandMoveId, AttackDefinition> = {
   // Tilin: a quick dashing strike that covers ground; light damage, punishable if blocked.
   rush: {
+    cancelsInto: ['SPECIAL_ATTACK'],
     name: 'RUSH', label: 'Paso veloz', animation: 'DASH', feel: 'heavy', forwardSpeed: 560, cpuRange: [150, 330],
     startup: 7, active: 8, recovery: 18, damage: 9, hitstun: 20, knockback: 220, causesKnockdown: false,
     blockstun: 14, blockPushback: 300,
@@ -57,6 +62,7 @@ export const COMMAND_MOVES: Record<CommandMoveId, AttackDefinition> = {
   },
   // César: a slow, low stomp in front of him that knocks down; very unsafe if blocked.
   stomp: {
+    cancelsInto: ['SPECIAL_ATTACK'],
     name: 'STOMP', label: 'Pisotón sísmico', animation: 'HEAVY_KICK', feel: 'heavy', cpuRange: [0, 150],
     startup: 10, active: 6, recovery: 20, damage: 12, hitstun: 0, knockback: 160, causesKnockdown: true,
     blockstun: 16, blockPushback: 360,
@@ -65,6 +71,39 @@ export const COMMAND_MOVES: Record<CommandMoveId, AttackDefinition> = {
 };
 
 export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
+  // Crouching attacks (↓ + button). They reuse the standing animations with low hitboxes.
+  CROUCH_LIGHT: {
+    name: 'CROUCH_LIGHT', label: 'Patada baja', animation: 'LIGHT_KICK', crouch: true,
+    startup: 3, active: 5, recovery: 9, damage: 5, hitstun: 14, knockback: 60, causesKnockdown: false,
+    blockstun: 13, blockPushback: 200,
+    cancelsInto: ['HEAVY_PUNCH', 'COMMAND_SPECIAL', 'LAUNCHER', 'SWEEP'],
+    hitbox: { x: 30, y: -90, width: 115, height: 80 },
+  },
+  LAUNCHER: {
+    name: 'LAUNCHER', label: 'Lanzador', animation: 'HEAVY_PUNCH', crouch: true, launches: true, feel: 'heavy',
+    startup: 6, active: 6, recovery: 24, damage: 9, hitstun: 0, knockback: 0, causesKnockdown: false,
+    blockstun: 12, blockPushback: 260,
+    hitbox: { x: 30, y: -250, width: 105, height: 170 },
+  },
+  SWEEP: {
+    name: 'SWEEP', label: 'Barrido', animation: 'HEAVY_KICK', crouch: true, feel: 'heavy',
+    startup: 7, active: 6, recovery: 22, damage: 11, hitstun: 0, knockback: 140, causesKnockdown: true,
+    blockstun: 13, blockPushback: 300,
+    hitbox: { x: 20, y: -80, width: 150, height: 80 },
+  },
+  // Jump attacks: longer hitstun, so a jump-in links into a ground hit after landing.
+  AIR_PUNCH: {
+    name: 'AIR_PUNCH', label: 'Puño aéreo',
+    startup: 3, active: 8, recovery: 10, damage: 7, hitstun: 22, knockback: 60, causesKnockdown: false,
+    blockstun: 14, blockPushback: 200,
+    hitbox: { x: 20, y: -230, width: 115, height: 120 },
+  },
+  AIR_KICK: {
+    name: 'AIR_KICK', label: 'Patada aérea',
+    startup: 4, active: 8, recovery: 12, damage: 9, hitstun: 24, knockback: 80, causesKnockdown: false,
+    blockstun: 15, blockPushback: 220,
+    hitbox: { x: 15, y: -170, width: 125, height: 130 },
+  },
   LIGHT_PUNCH: {
     name: 'LIGHT_PUNCH',
     startup: 2,
@@ -76,11 +115,14 @@ export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
     causesKnockdown: false,
     blockstun: 13,
     blockPushback: 220,
-    cancelsInto: ['LIGHT_KICK', 'HEAVY_PUNCH', 'HEAVY_KICK', 'COMMAND_SPECIAL'],
+    // Light chain is one step only (punch → kick), so lights cannot loop on each other.
+    cancelsInto: ['LIGHT_KICK', 'HEAVY_PUNCH', 'HEAVY_KICK', 'COMMAND_SPECIAL', 'LAUNCHER', 'SWEEP'],
     hitbox: { x: 35, y: -210, width: 105, height: 60 },
   },
   HEAVY_PUNCH: {
     name: 'HEAVY_PUNCH',
+    // Heavy → command special → super, or a forward dash to keep the pressure.
+    cancelsInto: ['COMMAND_SPECIAL', 'SPECIAL_ATTACK', 'DASH'],
     startup: 4,
     active: 8,
     recovery: 14,
@@ -103,11 +145,12 @@ export const ATTACK_DEFINITIONS: Record<string, AttackDefinition> = {
     causesKnockdown: false,
     blockstun: 13,
     blockPushback: 240,
-    cancelsInto: ['HEAVY_PUNCH', 'HEAVY_KICK', 'COMMAND_SPECIAL'],
+    cancelsInto: ['HEAVY_PUNCH', 'HEAVY_KICK', 'COMMAND_SPECIAL', 'LAUNCHER', 'SWEEP'],
     hitbox: { x: 35, y: -120, width: 110, height: 65 },
   },
   HEAVY_KICK: {
     name: 'HEAVY_KICK',
+    cancelsInto: ['SPECIAL_ATTACK'],
     startup: 6,
     active: 8,
     recovery: 16,

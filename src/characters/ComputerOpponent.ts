@@ -60,6 +60,12 @@ export class ComputerOpponent extends Fighter {
       this.judgedCombo = this.attackSerial;
       if (this.chance(this.profile.comboChance)) { this.executeAttack('HEAVY_PUNCH'); return; }
     }
+    // Heavy that connected → command special, half as often as light → heavy.
+    if (this.judgedCombo !== this.attackSerial && ['HIT', 'STUNNED'].includes(target.combatState.state)
+      && this.canCancelInto('COMMAND_SPECIAL') && !this.canCancelInto('HEAVY_PUNCH')) {
+      this.judgedCombo = this.attackSerial;
+      if (this.chance(this.profile.comboChance * 0.5)) { this.executeAttack('COMMAND_SPECIAL'); return; }
+    }
     if (!this.combatState.canAct() || this.decisionTimer > 0) return;
     this.decisionTimer = this.profile.reactionMs;
     // Keep the original direction in the air so crossing over does not turn into orbiting.
@@ -105,6 +111,11 @@ export class ComputerOpponent extends Fighter {
       this.velocityX = (this.facingRight ? 1 : -1) * this.walkSpeed;
       this.jump();
       this.jumpCooldown = this.profile.jumpCooldownMs;
+      return;
+    }
+    // A sweep from up close now and then.
+    if (this.attackCooldown <= 0 && !busy && distance < 140 && this.chance(this.profile.sweepChance)) {
+      this.strike('SWEEP');
       return;
     }
     // Close the gap quickly from far away.

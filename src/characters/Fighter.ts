@@ -71,6 +71,12 @@ export class Fighter {
   get energy(): number { return this.energyValue; }
   get superReady(): boolean { return this.energyValue >= 100; }
   get inSuper(): boolean { return this.combatState.state === 'SPECIAL' || this.combatState.state === 'SUPER_CAUGHT'; }
+  /** Air hits taken in the current juggle. */
+  juggleHits = 0;
+  /** A juggle that reached its hit limit cannot be hit again until the fighter lands. */
+  get juggleSpent(): boolean {
+    return this.combatState.state === 'JUGGLED' && this.juggleHits >= GAME_CONFIG.JUGGLE.MAX_HITS;
+  }
   /** Direction of the current dash in screen terms (1 right, −1 left) and whether it goes back. */
   private dashSign = 0;
   dashBack = false;
@@ -79,7 +85,7 @@ export class Fighter {
     return this.combatState.state === 'DASHING' && this.dashBack && this.combatState.stateTimer < GAME_CONFIG.DASH.BACK.INVULN_MS;
   }
   get canReceiveHit(): boolean {
-    return this.currentHealth > 0 && !this.inSuper && !this.dashInvulnerable && !['KNOCKED_DOWN', 'GETTING_UP', 'DEFEAT', 'VICTORY'].includes(this.combatState.state);
+    return this.currentHealth > 0 && !this.inSuper && !this.dashInvulnerable && !this.juggleSpent && !['KNOCKED_DOWN', 'GETTING_UP', 'DEFEAT', 'VICTORY'].includes(this.combatState.state);
   }
   private stunArt!: Phaser.GameObjects.Graphics;
 
@@ -278,6 +284,9 @@ export class Fighter {
    * attacks listed in its `cancelsInto`, which is what lets light hits chain into heavy ones.
    */
   canCancelInto(attackName: string): boolean {
+    // Out of a forward dash, once it has run a little, into a ground attack.
+    if (this.combatState.state === 'DASHING' && !this.dashBack && attackName !== 'DASH'
+      && this.combatState.stateTimer >= GAME_CONFIG.DASH.FORWARD.ATTACK_CANCEL_MS) return true;
     const current = this.currentAttackDef;
     return this.combatState.state === 'ATTACKING' && this.isGrounded && this.hasHitThisSwing
       && !!current?.cancelsInto?.includes(attackName);
@@ -290,13 +299,17 @@ export class Fighter {
     const driveGrab = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'drive';
     const command = attackName === 'COMMAND_SPECIAL';
     if (command && !this.isGrounded) return;
-    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : command ? COMMAND_MOVES[this.stats.commandMove] : ATTACK_DEFINITIONS[attackName];
+    // Punches and kicks in the air use the jump-attack data.
+    const airborne = !this.isGrounded && ['LIGHT_PUNCH', 'HEAVY_PUNCH', 'LIGHT_KICK', 'HEAVY_KICK'].includes(attackName);
+    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : command ? COMMAND_MOVES[this.stats.commandMove]
+      : airborne ? ATTACK_DEFINITIONS[attackName.includes('KICK') ? 'AIR_KICK' : 'AIR_PUNCH'] : ATTACK_DEFINITIONS[attackName];
     if (!baseDef) return;
+    if (baseDef.crouch && !this.isGrounded) return;
     const attackDef = this.scaleAttack(baseDef);
 
     this.currentAttackDef = attackDef;
     this.attackSerial++;
-    this.hurtbox.rect = this.standingHurtbox;
+    this.hurtbox.rect = baseDef.crouch ? this.crouchHurtbox : this.standingHurtbox;
     if (this.isGrounded) this.velocityX = 0;
     this.attackStartup = attackDef.startup;
     this.attackActive = attackDef.active;
@@ -370,7 +383,10 @@ export class Fighter {
 
   /** Starts a forward dash or a back dash from the ground. Returns whether it started. */
   dash(back: boolean): boolean {
-    if (!this.combatState.canAct() || !this.isGrounded) return false;
+    // A forward dash may also cancel an attack that lists DASH in its cancels.
+    const cancel = !back && this.canCancelInto('DASH');
+    if ((!this.combatState.canAct() && !cancel) || !this.isGrounded) return false;
+    if (cancel) this.cancelAttack();
     this.dashBack = back;
     this.dashSign = (this.facingRight ? 1 : -1) * (back ? -1 : 1);
     this.hurtbox.rect = this.standingHurtbox;
@@ -390,8 +406,9 @@ export class Fighter {
   }
 
   receiveHit(damage: number, hitstun: number, knockback: number, causesKnockdown: boolean, fromRight: boolean, sonic = false,
-    blockstun = 0, blockPushback = 0): 'hit' | 'blocked' | 'ignored' {
+    blockstun = 0, blockPushback = 0, launch = false): 'hit' | 'blocked' | 'ignored' {
     if (!this.canReceiveHit) return 'ignored';
+    const wasJuggled = this.combatState.state === 'JUGGLED';
 
     if (this.isGuarding && this.facingRight === fromRight) {
       this.playImpactSound('hit-block');
@@ -426,7 +443,15 @@ export class Fighter {
       return 'hit';
     }
 
-    if (causesKnockdown) {
+    if (launch || wasJuggled) {
+      // Launched, or hit again in the air: up (a smaller pop each time) and still juggled.
+      this.juggleHits = launch && !wasJuggled ? 0 : this.juggleHits + 1;
+      this.isGrounded = false;
+      this.velocityY = -(launch && !wasJuggled ? GAME_CONFIG.JUGGLE.LAUNCH_VELOCITY : GAME_CONFIG.JUGGLE.POP_VELOCITY);
+      this.velocityX = kbDir * GAME_CONFIG.JUGGLE.CARRY_SPEED;
+      this.combatState.setState('JUGGLED');
+      this.playAnimation('HIT_REACTION', true);
+    } else if (causesKnockdown) {
       this.knockdown();
     } else {
       this.combatState.setState(sonic ? 'STUNNED' : 'HIT');
@@ -523,7 +548,9 @@ export class Fighter {
 
   applyGravity(delta: number): void {
     if (!this.isGrounded) {
-      this.velocityY += GAME_CONFIG.GRAVITY * (delta / 1000);
+      // Each air hit of a juggle makes the fall faster, so juggles stay short.
+      const juggle = this.combatState.state === 'JUGGLED' ? 1 + this.juggleHits * GAME_CONFIG.JUGGLE.GRAVITY_STEP : 1;
+      this.velocityY += GAME_CONFIG.GRAVITY * juggle * (delta / 1000);
     }
   }
 
@@ -536,7 +563,14 @@ export class Fighter {
     if (this.y >= GAME_CONFIG.FLOOR_Y) {
       this.y = GAME_CONFIG.FLOOR_Y;
       this.velocityY = 0;
-      if (!this.isGrounded) {
+      if (!this.isGrounded && this.combatState.state === 'JUGGLED') {
+        // A juggle always ends on the floor.
+        this.isGrounded = true;
+        this.jumpsUsed = 0;
+        this.velocityX = 0;
+        this.juggleHits = 0;
+        this.knockdown();
+      } else if (!this.isGrounded) {
         this.isGrounded = true;
         this.jumpsUsed = 0;
         if (this.combatState.state === 'JUMPING' || this.combatState.state === 'ATTACKING') {

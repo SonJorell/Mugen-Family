@@ -6,6 +6,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 ## [Sin publicar]
 
 ### Añadido
+- **Combos más completos**: suave → patada suave → fuerte → especial de comando → súper, solo al
+  conectar; ataques agachado (patada baja, lanzador y barrido que derriba); los ataques en el aire
+  enlazan con un golpe al aterrizar; juggle de hasta 3 golpes tras el lanzador; dash cancel desde
+  el puño fuerte. Escalado de daño y tope: ningún combo sin súper quita más del 45 % de la vida.
 - **Dash y dash atrás**: doble toque adelante o atrás, o la tecla de dash (Espacio para J1,
   Retroceso o Num + para J2, LB en el mando, botón DS en táctil). El dash atrás es invulnerable al
   empezar y castigable al final. La CPU también los usa.

@@ -42,6 +42,20 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] PEL-10 · Sistema de combos completo
+- **Hacer:** rutas de cancelación suave → suave (un paso) → fuerte → especial → súper solo al
+  conectar; ataques agachado (el fuerte como barrido); ataques aéreos que enlazan al aterrizar;
+  lanzador y juggle acotado; escalado de daño y tope; dash cancel; la CPU usa las rutas nuevas.
+- **Terminado cuando:** pruebas verifican cada ruta, que no hay cancelación al fallar ni bucles de
+  golpes suaves, el juggle con su límite, el escalado, el tope del 45 % con un intento de bucle
+  infinito, el dash cancel y la CPU.
+- **Hecho:** `cancelsInto` completo en `AttackDefinition.ts`; nuevos `CROUCH_LIGHT` (↓ + suave),
+  `LAUNCHER` (↓ + puño fuerte), `SWEEP` (↓ + patada fuerte), `AIR_PUNCH` y `AIR_KICK`; estado
+  `JUGGLED`; `GAME_CONFIG.COMBO` (2 golpes enteros, −15 % por golpe hasta 30 %, 8 golpes, 45 %)
+  y `GAME_CONFIG.JUGGLE` (3 golpes en el aire, gravedad +35 % por golpe); dash cancel desde el
+  puño fuerte y ataque desde el dash adelante tras 100 ms; `sweepChance` en la CPU. Pruebas en
+  `tests/combos.spec.ts`.
+
 ### [x] PEL-09 · Dash y dash atrás
 - **Hacer:** doble toque adelante/atrás, tecla de dash reasignable para J1 y J2, botón de mando y
   táctil; el dash atrás con invulnerabilidad inicial y recuperación castigable; la CPU lo usa.

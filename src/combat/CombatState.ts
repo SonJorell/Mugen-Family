@@ -22,6 +22,11 @@ export type FighterState =
   | 'BLOCKSTUN'
   | 'HIT'
   | 'STUNNED'
+  /**
+   * In the air after a launcher. Entered from a launching hit (or another air hit while juggled);
+   * ends knocked down on landing. Only GAME_CONFIG.JUGGLE.MAX_HITS hits land while in it.
+   */
+  | 'JUGGLED'
   | 'LANDING'
   | 'KNOCKED_DOWN'
   | 'GETTING_UP'
@@ -44,6 +49,7 @@ export const STATE_TO_ANIMATION: Record<FighterState, string> = {
   BLOCKSTUN:        'BLOCK',
   HIT:              'HIT_REACTION',
   STUNNED:          'STUN',
+  JUGGLED:          'HIT_REACTION',
   LANDING:          'LANDING',
   KNOCKED_DOWN:     'KNOCKDOWN',
   GETTING_UP:       'GET_UP',
@@ -61,6 +67,7 @@ export const LOCKED_STATES: Set<FighterState> = new Set([
   'BLOCKSTUN',
   'HIT',
   'STUNNED',
+  'JUGGLED',
   'KNOCKED_DOWN',
   'GETTING_UP',
   'TAUNTING',

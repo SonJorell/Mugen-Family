@@ -12,6 +12,8 @@ export interface ImpactEvent {
   defender: Fighter;
   attack: AttackDefinition;
   result: 'hit' | 'blocked';
+  /** Damage actually dealt on a hit, after combo scaling. */
+  damage: number;
   x: number;
   y: number;
 }
@@ -20,6 +22,11 @@ export class FighterController {
   onSuperHit?: (attacker: Fighter, defender: Fighter) => void;
   /** Reports landed or blocked normal attacks so the scene can add hitstop and sparks. */
   onImpact?: (event: ImpactEvent) => void;
+  /**
+   * Combo damage scaling, supplied by the scene: the damage this hit should deal and whether it
+   * must end the combo with a knockdown (hit limit or damage cap reached).
+   */
+  scaleHit?: (attacker: Fighter, defender: Fighter, damage: number) => { damage: number; endCombo: boolean };
   checkCollisions(attacker: Fighter, defender: Fighter): void {
     if (attacker.inSuper || defender.inSuper) return;
     for (const wave of attacker.sonicWaves) {
@@ -57,22 +64,25 @@ export class FighterController {
         }
         return;
       }
+      const scaled = this.scaleHit?.(attacker, defender, attackDef.damage) ?? { damage: attackDef.damage, endCombo: false };
+      const guarding = defender.isGuarding && defender.facingRight === fromRight;
       const result = defender.receiveHit(
-        attackDef.damage,
+        guarding ? attackDef.damage : scaled.damage,
         attackDef.hitstun,
         attackDef.knockback,
-        attackDef.causesKnockdown,
+        attackDef.causesKnockdown || scaled.endCombo,
         fromRight,
         false,
         attackDef.blockstun,
         attackDef.blockPushback,
+        !!attackDef.launches && !scaled.endCombo,
       );
       if (result === 'hit') attacker.gainEnergy(attackDef.damage * 2 + 6);
       else if (result === 'blocked') attacker.gainEnergy(4);
       if (result !== 'ignored') {
         const left = Math.max(hitRect.worldX, hurtRect.worldX), right = Math.min(hitRect.worldX + hitRect.width, hurtRect.worldX + hurtRect.width);
         const top = Math.max(hitRect.worldY, hurtRect.worldY), bottom = Math.min(hitRect.worldY + hitRect.height, hurtRect.worldY + hurtRect.height);
-        this.onImpact?.({ attacker, defender, attack: attackDef, result, x: (left + right) / 2, y: (top + bottom) / 2 });
+        this.onImpact?.({ attacker, defender, attack: attackDef, result, damage: result === 'hit' ? scaled.damage : 0, x: (left + right) / 2, y: (top + bottom) / 2 });
       }
 
       attacker.hasHitThisSwing = true;
