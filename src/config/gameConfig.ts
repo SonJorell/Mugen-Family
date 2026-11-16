@@ -153,6 +153,18 @@ export const GAME_CONFIG = {
     ACTIONS: { x: 1000, y: 560, gap: 104 },
   },
 
+  /**
+   * Menu music. «Cinturão de Elite» (supplied by Jorell, MP3) loads in the background after the
+   * first menu screen; until it arrives the menu stays quiet, and if it fails the original
+   * synthesized track plays. The loop skips the silence at both ends (seconds).
+   */
+  MENU_MUSIC: {
+    KEY: 'music-cinturao',
+    URL: '/assets/audio/cinturao-de-elite.mp3',
+    LOOP_START: 0.09,
+    LOOP_END: 174.9,
+  },
+
   /** Announcer lines play at this level before the announcer volume of Configuración. */
   ANNOUNCER_GAIN: 0.9,
 

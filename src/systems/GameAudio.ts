@@ -1,4 +1,8 @@
 import Phaser from 'phaser';
+import { GAME_CONFIG } from '../config/gameConfig';
+
+/** Which track the menu screens play: the supplied song or the original synthesized one. */
+export type MenuTrack = 'cinturao' | 'original';
 
 const instances = new WeakMap<Phaser.Game, GameAudio>();
 type MusicSound = Phaser.Sound.WebAudioSound | Phaser.Sound.HTML5AudioSound;
@@ -6,6 +10,12 @@ type MusicSound = Phaser.Sound.WebAudioSound | Phaser.Sound.HTML5AudioSound;
 /** One music voice per game, including across scene restarts. Effects remain independent. */
 export class GameAudio {
   private music?: MusicSound;
+  /** Marker the current music loops on, when it does not loop as a whole. */
+  private marker?: string;
+  menuTrack: MenuTrack = 'cinturao';
+  /** The menu asked for music while the song was still loading. */
+  private waitingForMenuSong = false;
+  private menuSongState: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
   muted = false;
   volume = 0.35;
   /** Overall level for music and effects (Phaser's global sound volume), 0–1. */
@@ -27,22 +37,100 @@ export class GameAudio {
       if (Number.isFinite(settings.master)) this.masterVolume = Phaser.Math.Clamp(settings.master, 0, 1);
       if (Number.isFinite(settings.announcer)) this.announcerVolume = Phaser.Math.Clamp(settings.announcer, 0, 1);
       if (Number.isFinite(settings.sfx)) this.sfxVolume = Phaser.Math.Clamp(settings.sfx, 0, 1);
+      if (settings.menuTrack === 'original' || settings.menuTrack === 'cinturao') this.menuTrack = settings.menuTrack;
     } catch { /* Audio still works when browser storage is unavailable. */ }
     game.sound.volume = this.masterVolume;
     this.scaleByCategory(game.sound);
     game.events.once(Phaser.Core.Events.DESTROY, () => this.stop());
   }
   play(key: 'music-menu' | 'music-fight'): void {
+    this.waitingForMenuSong = false;
+    if (key === 'music-menu' && this.menuTrack === 'cinturao' && this.menuSongState !== 'failed') {
+      if (this.menuSongState === 'ready') { this.start(GAME_CONFIG.MENU_MUSIC.KEY); return; }
+      // Not loaded yet: stop the fight music and start the song as soon as it arrives.
+      if (this.music?.key !== GAME_CONFIG.MENU_MUSIC.KEY) this.stop();
+      this.waitingForMenuSong = true;
+      this.loadMenuSong();
+      return;
+    }
+    this.start(key);
+  }
+
+  /** The key the menu screens are playing (or about to play). */
+  get menuMusicKey(): string {
+    return this.menuTrack === 'cinturao' && this.menuSongState !== 'failed' ? GAME_CONFIG.MENU_MUSIC.KEY : 'music-menu';
+  }
+
+  private start(key: string): void {
     if (!this.game.cache.audio.exists(key)) return;
     if (this.music?.key === key && !this.music.pendingRemove) { this.resume(); return; }
     this.stop();
-    this.music = this.game.sound.add(key, { loop: true, volume: this.volume, mute: this.muted }) as MusicSound;
-    this.music.play();
+    const config = { loop: true, volume: this.volume, mute: this.muted };
+    this.music = this.game.sound.add(key, config) as MusicSound;
+    if (key === GAME_CONFIG.MENU_MUSIC.KEY) {
+      // Loop only the audible part, so the silence at both ends never makes a gap.
+      const { LOOP_START, LOOP_END } = GAME_CONFIG.MENU_MUSIC;
+      this.marker = 'loop';
+      this.music.addMarker({ name: 'loop', start: LOOP_START, duration: LOOP_END - LOOP_START, config });
+      this.music.play('loop');
+    } else {
+      this.marker = undefined;
+      this.music.play();
+    }
+  }
+
+  /** Loads the menu song with whichever scene is running; a scene change just retries later. */
+  private loadMenuSong(): void {
+    if (this.menuSongState === 'loading' || this.menuSongState === 'ready') return;
+    // The newest running scene: the loading screen may be on its way out when the menu asks.
+    const scene = [...this.game.scene.getScenes(true)].reverse().find(s => s.load && s.scene.key !== 'PreloadScene' && s.scene.key !== 'BootScene');
+    // A scene still in create() is not running yet: try again on the next step.
+    if (!scene) { this.game.events.once(Phaser.Core.Events.POST_STEP, () => this.loadMenuSong()); return; }
+    const { KEY, URL } = GAME_CONFIG.MENU_MUSIC;
+    if (this.game.cache.audio.exists(KEY)) { this.onMenuSongReady(); return; }
+    this.menuSongState = 'loading';
+    const done = () => { cleanup(); this.onMenuSongReady(); };
+    const failed = (file: Phaser.Loader.File) => {
+      if (file.key !== KEY) return;
+      cleanup();
+      this.menuSongState = 'failed';
+      if (this.waitingForMenuSong) { this.waitingForMenuSong = false; this.start('music-menu'); }
+    };
+    const aborted = () => {
+      cleanup();
+      if (this.menuSongState !== 'loading') return;
+      this.menuSongState = 'idle';
+      // The scene closed mid-download: carry on with whichever scene comes next.
+      if (this.waitingForMenuSong) this.game.events.once(Phaser.Core.Events.POST_STEP, () => this.loadMenuSong());
+    };
+    const cleanup = () => {
+      scene.load.off(`filecomplete-audio-${KEY}`, done);
+      scene.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
+      scene.events.off(Phaser.Scenes.Events.SHUTDOWN, aborted);
+    };
+    scene.load.once(`filecomplete-audio-${KEY}`, done);
+    scene.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, aborted);
+    scene.load.audio(KEY, URL);
+    scene.load.start();
+  }
+
+  private onMenuSongReady(): void {
+    this.menuSongState = 'ready';
+    if (this.waitingForMenuSong) { this.waitingForMenuSong = false; this.start(GAME_CONFIG.MENU_MUSIC.KEY); }
+  }
+
+  /** Switches the menu track and, if a menu track is playing, changes it right away. */
+  toggleMenuTrack(): void {
+    const playingMenu = this.music?.key === 'music-menu' || this.music?.key === GAME_CONFIG.MENU_MUSIC.KEY || this.waitingForMenuSong;
+    this.menuTrack = this.menuTrack === 'cinturao' ? 'original' : 'cinturao';
+    this.applySettings();
+    if (playingMenu) this.play('music-menu');
   }
   pause(): void { this.music?.pause(); }
   resume(): void {
     if (this.music?.isPaused) this.music.resume();
-    else if (this.music && !this.music.isPlaying) this.music.play();
+    else if (this.music && !this.music.isPlaying) this.music.play(this.marker ?? '');
   }
   stop(): void { this.music?.destroy(); this.music = undefined; }
   toggle(): void { this.muted = !this.muted; this.applySettings(); }
@@ -87,7 +175,7 @@ export class GameAudio {
     this.music?.setVolume(this.volume);
     this.game.sound.volume = this.masterVolume;
     try {
-      localStorage.setItem('tilin-audio', JSON.stringify({ muted: this.muted, volume: this.volume, master: this.masterVolume, announcer: this.announcerVolume, sfx: this.sfxVolume }));
+      localStorage.setItem('tilin-audio', JSON.stringify({ muted: this.muted, volume: this.volume, master: this.masterVolume, announcer: this.announcerVolume, sfx: this.sfxVolume, menuTrack: this.menuTrack }));
     } catch { /* Optional persistence. */ }
     this.game.events.emit('music-settings');
   }

@@ -6,6 +6,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 ## [Sin publicar]
 
 ### Añadido
+- **Música del menú**: «Cinturão de Elite», aportada por Jorell, en bucle en el menú y sus
+  pantallas; «Música del menú: Cinturão de Elite / Original» en Configuración. El combate conserva
+  su música.
 - **Locutor**: voz sintetizada que anuncia el round, «¡Pelea!», «K.O.», «¡Tiempo!» y el veredicto
   («¡Victoria!», «Derrota», «Empate», «Gana jugador uno/dos»), con su propio volumen en
   Configuración.

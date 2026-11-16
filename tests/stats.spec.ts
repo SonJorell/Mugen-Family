@@ -13,13 +13,14 @@ test('the effects volume scales hits and interface sounds, not the music, and is
   })).toBe('Volumen de efectos');
   for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowLeft');
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('tilin-audio') ?? '{}').sfx)).toBeCloseTo(0.5, 2);
+  await page.waitForFunction(() => (window as any).__game.sound.getAllPlaying().some((s: any) => s.key.startsWith('music-')), null, { timeout: 15000 });
   const volumes = await page.evaluate(() => {
     const g = (window as any).__game, sound = g.sound;
     sound.play('hit-light', { volume: 0.8 });
     sound.play('menu-move', { volume: 0.4 });
     const playing = sound.getAllPlaying();
     const of = (key: string) => playing.filter((s: any) => s.key === key).pop()?.currentConfig.volume;
-    const music = playing.find((s: any) => s.key === 'music-menu');
+    const music = playing.find((s: any) => s.key === 'music-menu' || s.key === 'music-cinturao');
     return { hit: of('hit-light'), ui: of('menu-move'), music: music?.currentConfig.volume };
   });
   expect(volumes.hit).toBeCloseTo(0.4, 2);

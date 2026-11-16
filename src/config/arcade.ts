@@ -66,7 +66,8 @@ export const CREDITS: readonly { heading: string; lines: string[] }[] = [
     'Arena Urbana, Templo Antiguo y Azotea: escenarios originales del proyecto',
   ] },
   { heading: 'Música y sonido', lines: [
-    'Música, golpes, voces y efectos sintetizados por código, sin grabaciones externas',
+    'Música del menú: «Cinturão de Elite», aportada por Jorell (licencia por confirmar antes de publicar)',
+    'Música del combate, golpes, voces y efectos sintetizados por código, sin grabaciones externas',
     'scripts/generate-music.mjs · generate-sounds.mjs · generate-menu-sounds.mjs',
     'generate-super-sound.mjs · generate-drive-sound.mjs',
   ] },

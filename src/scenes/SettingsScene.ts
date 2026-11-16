@@ -74,6 +74,12 @@ export class SettingsScene extends Phaser.Scene {
         adjust: direction => { audio.changeAnnouncerVolume(direction * 0.1); this.sound.play('announcer-fight'); },
       },
       {
+        label: 'Música del menú',
+        value: () => audio.menuTrack === 'cinturao' ? 'Cinturão de Elite' : 'Original',
+        activate: () => audio.toggleMenuTrack(),
+        adjust: () => audio.toggleMenuTrack(),
+      },
+      {
         label: 'Teclas de J1 y J2',
         value: () => 'Cambiar ›',
         activate: () => this.scene.start('ControlsScene', this.returnData),
@@ -89,9 +95,9 @@ export class SettingsScene extends Phaser.Scene {
     });
     this.add.text(100, 160, 'PANTALLA', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
     this.add.text(100, 236, 'AUDIO', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
-    this.add.text(100, 520, 'CONTROLES', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 562, 'CONTROLES', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
 
-    const ys = [200, 276, 326, 376, 426, 476, 558, 620];
+    const ys = [200, 276, 326, 376, 426, 476, 526, 600, 654];
     this.rows.forEach((row, i) => {
       const y = ys[i], back = i === this.rows.length - 1;
       const bg = this.add.rectangle(96, y, back ? 240 : 760, 44, 0x143a51, 0.4).setOrigin(0, 0.5)

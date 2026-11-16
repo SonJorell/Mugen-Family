@@ -176,3 +176,16 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
 - **Motivo:** dan a cada luchador una herramienta propia sin arte nuevo, y siguen su estilo: Tilin
   entra rápido desde lejos y César castiga de cerca a costa de quedar muy expuesto.
 - **Tiempo:** la detección usa un reloj sumado con `delta`, no la hora del sistema ni los cuadros.
+
+## 2026-11-15 · Música del menú aportada por Jorell (AUD-01)
+- **Contexto:** Jorell aportó «Cinturão de Elite» (MP3, 2:56, 192 kb/s, estéreo) y pidió usarla como
+  música del menú.
+- **Decisión:** se copia como `public/assets/audio/cinturao-de-elite.mp3` (su archivo original queda
+  sin tocar) y suena en el menú principal y las pantallas que comparten su música; el combate
+  conserva su pista sintetizada y la pista original del menú queda como alternativa en
+  Configuración. Se carga en segundo plano al abrir el menú (no alarga la pantalla de carga) y
+  hasta que llega el menú queda en silencio; si la descarga falla, suena la pista original. El
+  bucle usa un marcador de 0,09 s a 174,9 s para saltar el silencio inicial y el de después del
+  desvanecimiento final.
+- **Licencia:** la canción no es un recurso generado por el proyecto. **Hay que confirmar su
+  licencia antes de publicar el juego**; los créditos lo indican.

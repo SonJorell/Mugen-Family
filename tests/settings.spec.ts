@@ -22,9 +22,12 @@ test('settings adjust music, overall volume and mute, persist them, and return t
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SettingsScene'));
   const state = () => page.evaluate(() => {
     const g = (window as any).__game;
-    const music = g.sound.sounds.find((s: any) => s.key === 'music-menu' && !s.pendingRemove);
+    // The menu plays «Cinturão de Elite» (or the original track): whichever menu music is on.
+    const music = g.sound.sounds.find((s: any) => (s.key === 'music-menu' || s.key === 'music-cinturao') && !s.pendingRemove);
     return { master: g.sound.volume, musicVolume: music?.volume, mute: music?.mute, saved: JSON.parse(localStorage.getItem('tilin-audio') ?? '{}') };
   });
+  // The menu song loads in the background: wait until it is on.
+  await expect.poll(async () => (await state()).musicVolume, { timeout: 15000 }).toBeDefined();
   const before = await state();
   // Música → apagar
   await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');

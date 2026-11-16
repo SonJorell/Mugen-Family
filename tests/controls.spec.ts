@@ -11,7 +11,7 @@ async function openControls(page: Page) {
   for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SettingsScene'));
-  for (let i = 0; i < 6; i++) await page.keyboard.press('ArrowDown');
+  for (let i = 0; i < 7; i++) await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('ControlsScene'));
 }

@@ -113,6 +113,18 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
   `scripts/measure-load.mjs` mide peso y tiempo. Resultado: 95,4 → 37,1 MB y 45,5 → 21,0 s hasta el
   menú a 20 Mbit/s. Pruebas en `tests/loading.spec.ts`.
 
+## Audio
+
+### [x] AUD-01 · Música del menú aportada
+- **Hacer:** «Cinturão de Elite» (MP3 aportado por Jorell) como música del menú en bucle; el
+  combate conserva su pista; selector «Música del menú» en Configuración; carga en segundo plano.
+- **Terminado cuando:** pruebas verifican que suena en el menú en bucle, respeta volumen y M, el
+  combate usa su pista y el selector cambia y se recuerda.
+- **Hecho:** `GAME_CONFIG.MENU_MUSIC` (bucle 0,09–174,9 s, sin los silencios de los extremos);
+  `GameAudio` la carga tras abrir el menú y la reproduce con un marcador en bucle; si falla, suena
+  la pista original. Créditos con la nota de licencia. Pruebas en `tests/menu-music.spec.ts`.
+- **Pendiente:** confirmar la licencia de la canción antes de publicar el juego.
+
 ## Funcionalidades nuevas
 
 ### [x] FUN-01 · Dificultad de la CPU
