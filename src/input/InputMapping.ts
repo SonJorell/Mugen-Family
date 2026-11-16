@@ -53,7 +53,7 @@ export const TEST_SCENE_BININGS: Record<string, string> = {
 };
 
 /** Rows of the pause move list, in display order. Keys always come from the bindings. */
-export const MOVE_LIST: readonly { binding: keyof KeyBindings; label: string; note?: string }[] = [
+export const MOVE_LIST: readonly { binding: keyof KeyBindings; with?: keyof KeyBindings; label: string; note?: string }[] = [
   { binding: 'MOVE_LEFT', label: 'Moverse' },
   { binding: 'JUMP', label: 'Saltar', note: 'otra vez en el aire: doble salto' },
   { binding: 'CROUCH', label: 'Agacharse' },
@@ -63,6 +63,8 @@ export const MOVE_LIST: readonly { binding: keyof KeyBindings; label: string; no
   { binding: 'HEAVY_KICK', label: 'Patada fuerte', note: 'derriba' },
   { binding: 'BLOCK', label: 'Bloquear', note: 'solo de frente' },
   { binding: 'DASH', label: 'Dash', note: 'o doble toque → / ←' },
+  { binding: 'LIGHT_PUNCH', with: 'LIGHT_KICK', label: 'Agarre', note: 'de cerca; rompe la guardia' },
+  { binding: 'CROUCH', label: 'Ataques bajos', note: '+ suave, + puño fuerte lanza, + patada fuerte barre' },
   { binding: 'TAUNT', label: 'Provocar' },
 ];
 

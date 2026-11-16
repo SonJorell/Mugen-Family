@@ -42,6 +42,21 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
 - **Hecho:** `FighterController.onImpact` → `FightScene` (hitstop) y `ui/ImpactEffects.ts`.
   Pruebas en `tests/hitfeel.spec.ts`.
 
+### [x] PEL-12 · Lista de movimientos con técnicas y combos
+- **Hacer:** la lista de la pausa muestra dash, agarre, ataques bajos y 3 o 4 combos de ejemplo
+  por luchador.
+- **Terminado cuando:** una prueba cambia de página con ← → y comprueba los combos con las teclas
+  del jugador, y otra verifica que cada combo de ejemplo usa solo cancelaciones permitidas.
+- **Hecho:** filas «Dash», «Agarre» y «Ataques bajos»; segunda página «Combos» con
+  `config/combos.ts` (4 por luchador, genéricos para luchadores sin lista propia). Pruebas en
+  `tests/movelist.spec.ts`.
+
+### [ ] FUN-09 · Combos de prueba en el modo práctica
+- **Hacer:** lista corta de retos por luchador (los combos de `config/combos.ts`) en la pausa del
+  modo práctica, que se marcan al lograrlos y se recuerdan en el navegador.
+- **Terminado cuando:** una prueba completa un reto con entradas reales y lo ve marcado.
+- **Nota:** quedó fuera de la tanda 4 por tamaño; los combos de ejemplo ya existen como datos.
+
 ### [x] PEL-11 · Agarre
 - **Hacer:** puño suave + patada suave de cerca, rompe la guardia, se escapa pulsando lo mismo en
   una ventana corta; animaciones existentes.

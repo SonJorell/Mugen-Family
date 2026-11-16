@@ -6,6 +6,8 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 ## [Sin publicar]
 
 ### Añadido
+- **Lista de movimientos ampliada**: dash, agarre y ataques bajos, y una segunda página con 4 combos
+  de ejemplo por luchador escritos con tus teclas (← → en la lista de la pausa).
 - **Agarre**: J + U de cerca rompe la guardia y derriba; quien es agarrado escapa pulsando J + U a
   tiempo. La CPU agarra a quien se queda bloqueando y en Difícil escapa a menudo.
 - **Combos más completos**: suave → patada suave → fuerte → especial de comando → súper, solo al
