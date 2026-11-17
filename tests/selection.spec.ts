@@ -102,3 +102,33 @@ test('cancelling the versus screen prevents the pending fight from starting', as
   }));
   expect(state).toEqual({ phase: 'stage', selection: true, fight: false });
 });
+
+test('each corner shows the chosen fighter large and the centre grid has one face per fighter', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await openSelection(page);
+  const screen = () => page.evaluate(() => {
+    const game = (window as any).__game, s = game.scene.getScene('SelectionScene');
+    const named = (prefix: string) => s.content.list.filter((o: any) => o.name?.startsWith(prefix));
+    return {
+      roster: named('selection-face-').map((o: any) => o.name.replace('selection-face-', '')),
+      faces: named('selection-face-').map((o: any) => ({ x: o.x, size: o.displayWidth })),
+      portraits: named('selection-portrait-').map((o: any) => ({ name: o.name, key: o.texture.key, x: o.x, height: o.displayHeight, flipX: o.flipX })),
+      player: s.playerChoice.characterId, opponent: s.opponentChoice.characterId,
+    };
+  });
+  const first = await screen();
+  expect(first.roster.length).toBeGreaterThanOrEqual(2);
+  expect(first.roster).toContain('tilin'); expect(first.roster).toContain('cesar');
+  // Faces sit between the two corners; the portraits are several times larger and face each other.
+  for (const face of first.faces) { expect(face.x).toBeGreaterThan(440); expect(face.x).toBeLessThan(840); }
+  expect(first.portraits.map(p => p.name)).toEqual(['selection-portrait-player', 'selection-portrait-opponent']);
+  expect(first.portraits[0].x).toBeLessThan(440); expect(first.portraits[1].x).toBeGreaterThan(840);
+  expect(first.portraits[0].height).toBeGreaterThan(first.faces[0].size * 4);
+  expect(first.portraits.map(p => p.flipX)).toEqual([false, true]);
+  // Clicking a face picks that fighter for the active side and swaps the large art.
+  const cesar = first.faces[first.roster.indexOf('cesar')];
+  await page.mouse.click(cesar.x, 262);
+  const second = await screen();
+  expect(second.player).toBe('cesar'); expect(second.opponent).toBe('tilin');
+  expect(second.portraits[0].key).toBe('menu_cesar_3d'); expect(second.portraits[1].key).toBe('menu_tilin_3d');
+});

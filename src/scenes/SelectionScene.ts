@@ -3,8 +3,9 @@ import { CPU_DIFFICULTIES, CpuDifficulty, GAME_CONFIG, GAME_MODES, GameMode, nor
 import { FighterChoice, FIGHTER_PALETTES, FIGHTER_ROSTER, fighterPalette, normalizeChoice, rosterEntry } from '../config/roster';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader, SpriteSheetOptions } from '../animation/SpriteSheetLoader';
-import { animationUrls, getManifest, playUiSound } from '../config/characters';
+import { animationUrls, getManifest, menuArtKey, playUiSound } from '../config/characters';
 import { SelectionBackdrop } from '../ui/selection/SelectionBackdrop';
+import { ensureFaceTexture } from '../ui/selection/fighterFaces';
 import { ensureGlowTexture, Title3D } from '../ui/menu/MenuEffects';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
@@ -234,23 +235,36 @@ export class SelectionScene extends Phaser.Scene {
     this.clock += dt;
     for (const animate of this.live) animate(this.clock / 1000);
   }
+  /** Full-body art of a choice, standing in its corner; falls back to the sprite when a fighter has no art. */
+  private portrait(x: number, foot: number, height: number, choice: FighterChoice, flip: boolean): Animatable {
+    const key = menuArtKey(choice.characterId);
+    if (!this.textures.exists(key)) return this.preview(x, foot, 0.43, choice, flip);
+    const source = this.textures.get(key).getSourceImage();
+    return this.place(this.add.image(x, foot, key).setOrigin(0.5, 1).setDisplaySize(height * source.width / source.height, height)
+      .setTint(fighterPalette(choice).tint).setFlipX(flip).setName(`selection-portrait-${flip ? 'opponent' : 'player'}`));
+  }
   private renderFighters(fresh: boolean, changed: { player: boolean; opponent: boolean }): void {
     this.title.setText('ELIGE TU LUCHADOR');
     this.steps.setText('Luchadores   /   Escenario');
     this.help.setText('Q E  Luchador     ← → / A D  Color     Tab / ↑ ↓  Lado     X  Dificultad     Enter  Confirmar     Esc  Volver');
+    const rivalTag = this.mode === 'cpu' ? 'CPU' : this.mode === 'versus' ? '2P' : 'PRÁCTICA';
+    // Each side owns a corner: tag and name on top, the fighter's large art below, colours at its feet.
     for (const side of ['player', 'opponent'] as const) {
       const player = side === 'player', x = player ? 275 : 1000;
       const choice = player ? this.playerChoice : this.opponentChoice;
       const accent = player ? 0xef709d : 0xa1ece5, active = this.activeSide === side;
+      const edge = player ? 48 : 1232, origin = player ? 0 : 1;
       let figure: Animatable[] = [];
       const card = this.collect(() => {
-      const panel = this.rectangle(x, 322, 420, 360, 0x14101e, 0.65).setStrokeStyle(active ? 3 : 1, accent, active ? 1 : 0.35);
+      const panel = this.rectangle(x, 322, 420, 360, 0x14101e, active ? 0.28 : 0.12).setStrokeStyle(active ? 3 : 1, accent, active ? 1 : 0.25);
       this.clickable(panel, () => { this.activeSide = side; this.render(); });
       if (active) this.pulseBorder(panel, 3, accent);
-      this.text(x - 186, 155, player ? '1P · Tu personaje' : this.mode === 'cpu' ? 'CPU · Rival' : this.mode === 'versus' ? '2P · Jugador 2' : 'Práctica · Rival', 19, player ? '#ef9dbb' : '#a1ece5');
-      const name = this.text(x - 186, 185, rosterEntry(choice.characterId).name.toUpperCase(), 45, '#fae8cb', false, true);
-      this.pedestal(x + 30, 492, 250, accent, active);
-      figure = [this.preview(x + 30, 495, 0.43, choice, !player), name];
+      this.text(edge, 150, player ? '1P · Tu personaje' : rivalTag + ' · Rival', 19, player ? '#ef9dbb' : '#a1ece5').setOrigin(origin, 0);
+      this.pedestal(x + (player ? 25 : -25), 490, 270, accent, active);
+      const art = this.portrait(x + (player ? 25 : -25), 498, 384, choice, !player);
+      // The name sits over the art, outlined so it reads on any fighter.
+      const name = this.text(edge, 176, rosterEntry(choice.characterId).name.toUpperCase(), 50, '#fae8cb', false, true).setOrigin(origin, 0).setStroke('#14101e', 8);
+      figure = [art, name];
       this.text(x, 506, 'Color · ' + fighterPalette(choice).name, 18, '#fae8cb', true);
       FIGHTER_PALETTES.forEach((palette, index) => {
         const cx = (player ? 140 : 866) + index * 90;
@@ -260,29 +274,44 @@ export class SelectionScene extends Phaser.Scene {
         this.text(cx, 574, palette.name, 13, choice.paletteId === palette.id ? '#ffffff' : '#b6a6c7', true);
       });
       });
-      // Cards glide in from their side; a changed fighter or colour pops on its pedestal.
+      // Corners glide in from their side; a changed fighter or colour pops on its pedestal.
       if (fresh) this.enter(card, { x: player ? -90 : 90, alpha: 0 }, { duration: 460, delay: 60 });
       else if (changed[side]) this.enter([figure[0]], { scaleX: 0.8, scaleY: 0.8, alpha: 0.2 }, { duration: 300, ease: 'Back.easeOut' });
     }
-    this.slamTitle(640, 148, 'VS', 62, { side: [0x3d0f27, 0xb0406c], face: [0xffd9e6, 0xef709d] },
+    this.slamTitle(640, 128, 'VS', 62, { side: [0x3d0f27, 0xb0406c], face: [0xffd9e6, 0xef709d] },
       fresh ? { from: 2.8, delay: 260, shake: 0.004, volume: 0.35 } : null);
     const activeChoice = this.activeSide === 'player' ? this.playerChoice : this.opponentChoice;
     const activeFighter = rosterEntry(activeChoice.characterId);
-    this.text(640, 235, activeFighter.power, 24, '#a1ece5', true);
-    this.text(640, 270, activeFighter.description, 17, '#c9b8da', true).setAlign('center').setWordWrapWidth(240);
-    // One portrait tile per roster entry, centred as a row under the VS.
+    // Faces of the whole roster in a compact grid between the corners, with each side's cursor.
+    const TILE = 78, STEP = 86, cols = Math.min(4, FIGHTER_ROSTER.length), rows = Math.ceil(FIGHTER_ROSTER.length / cols);
     FIGHTER_ROSTER.forEach((fighter, index) => {
-      const x = 640 + (index - (FIGHTER_ROSTER.length - 1) / 2) * 150;
-      const selected = activeChoice.characterId === fighter.id;
+      const row = Math.floor(index / cols), inRow = row === rows - 1 ? FIGHTER_ROSTER.length - row * cols : cols;
+      const x = 640 + (index % cols - (inRow - 1) / 2) * STEP, y = 262 + row * STEP;
+      const p1 = this.playerChoice.characterId === fighter.id, p2 = this.opponentChoice.characterId === fighter.id;
       const tile = this.collect(() => {
-        const frame = this.rectangle(x, 399, FIGHTER_ROSTER.length > 1 ? 140 : 174, 164, 0x473b72).setStrokeStyle(selected ? 2 : 1, selected ? 0xfae8cb : 0x726182);
+        const frame = this.rectangle(x, y, TILE, TILE, 0x241a35).setStrokeStyle(1, 0x726182);
         this.clickable(frame, () => { activeChoice.characterId = fighter.id; this.render(); });
-        if (selected) this.pulseBorder(frame, 3, 0xfae8cb);
-        this.preview(x, 466, 0.2, { ...activeChoice, characterId: fighter.id });
-        this.text(x, 486, fighter.name, 18, selected ? '#fae8cb' : '#b6a6c7', true);
+        const face = ensureFaceTexture(this, fighter.id);
+        if (face) this.place(this.add.image(x, y, face).setDisplaySize(TILE - 4, TILE - 4).setName(`selection-face-${fighter.id}`));
+        this.rectangle(x, y + TILE / 2 - 10, TILE - 4, 18, 0x14101e, 0.85);
+        this.text(x, y + TILE / 2 - 19, fighter.name.toUpperCase(), 14, p1 || p2 ? '#fae8cb' : '#b6a6c7', true).setFontStyle('bold');
+        // Cursors: 1P outside in pink, the rival just inside in aqua, so both show on the same face.
+        if (p1) {
+          const cursor = this.rectangle(x, y, TILE + 4, TILE + 4, 0x000000, 0).setStrokeStyle(3, 0xef709d);
+          if (this.activeSide === 'player') this.pulseBorder(cursor, 3, 0xef709d);
+          this.text(x - TILE / 2 - 2, y - TILE / 2 - 9, '1P', 13, '#241a35').setFontStyle('bold').setBackgroundColor('#ef709d').setPadding(4, 0);
+        }
+        if (p2) {
+          const cursor = this.rectangle(x, y, TILE - 4, TILE - 4, 0x000000, 0).setStrokeStyle(3, 0xa1ece5);
+          if (this.activeSide === 'opponent') this.pulseBorder(cursor, 3, 0xa1ece5);
+          this.text(x + TILE / 2 + 2, y - TILE / 2 - 9, rivalTag === 'PRÁCTICA' ? 'PR' : rivalTag, 13, '#241a35').setFontStyle('bold').setBackgroundColor('#a1ece5').setPadding(4, 0).setOrigin(1, 0);
+        }
       });
-      if (fresh) this.enter(tile, { y: 34, alpha: 0 }, { duration: 380, delay: 300 + index * 90, ease: 'Back.easeOut' });
+      if (fresh) this.enter(tile, { y: 34, alpha: 0 }, { duration: 380, delay: 300 + index * 70, ease: 'Back.easeOut' });
     });
+    const infoY = 262 + (rows - 1) * STEP + TILE / 2 + 22;
+    this.text(640, infoY, activeFighter.power, 24, '#a1ece5', true).setFontStyle('bold');
+    this.text(640, infoY + 34, activeFighter.description, 17, '#c9b8da', true).setAlign('center').setWordWrapWidth(300);
     // CPU → Práctica → Jugador 2 → CPU.
     this.button(640, 565, 220, 'Rival: ' + MODE_LABELS[this.mode], () => {
       this.mode = GAME_MODES[(GAME_MODES.indexOf(this.mode) + 1) % GAME_MODES.length]; this.render();
