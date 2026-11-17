@@ -157,6 +157,18 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
 - **Volumen por categoría:** `GameAudio` envuelve una sola vez `play` y `add` del gestor de sonido
   global y aplica el volumen según la clave (`announcer-*`, efectos), sin tocar cada llamada.
 
+## 2026-11-17 · Locutor con la voz «koku» de Voicebox
+- **Contexto:** Jorell pidió que el locutor use su voz clonada «koku» con el efecto «Deep Voice»
+  de Voicebox, que corre en su PC, en lugar de la voz de formantes.
+- **Decisión:** `scripts/generate-announcer-koku.py` llama a la API local de Voicebox
+  (127.0.0.1:17493): por línea genera hasta cuatro tomas en seco, las transcribe con el Whisper de
+  Voicebox, se queda con la que mejor coincide (la más corta si empatan), le aplica la cadena
+  Deep Voice (tono −3 semitonos, paso bajo 6 kHz, compresor), recorta silencios y normaliza a
+  −1 dBFS. Los nombres de archivo no cambian, así que el código del juego no se toca.
+- **Consecuencia:** «K.O.» se dice «¡Nocaut!» porque el modelo nunca pronunció bien las letras.
+  Regenerar requiere Voicebox abierto con el perfil «koku»; cada corrida da tomas distintas.
+  `generate-announcer.mjs` queda como respaldo sin dependencias.
+
 ## 2026-11-13 · Controles táctiles por posición de los dedos (FUN-07)
 - **Decisión:** en vez de eventos por botón, cada cuadro se mira dónde está cada dedo
   (`input.manager.pointers`) y qué botón tiene debajo, con un 25 % de margen. Los golpes, el salto

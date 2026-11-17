@@ -132,6 +132,8 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` terminado.
   genera 13 WAV; `systems/Announcer.ts`; `RoundSystem` y `FightMessages` llaman al locutor;
   `victoryQuote` en `roster.ts`; «Volumen del locutor» en Configuración (`GameAudio` aplica el
   volumen por categoría en un solo lugar). Pruebas en `tests/announcer.spec.ts`.
+  Desde el 2026-11-17 los WAV usan la voz «koku» con Deep Voice de Voicebox
+  (`scripts/generate-announcer-koku.py`).
 
 ### [x] PEL-06 · Contador de combos y cancelación de golpes suaves
 - **Hoy:** un golpe suave deja al atacante en −2: no existen combos.

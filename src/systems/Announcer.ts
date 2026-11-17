@@ -1,11 +1,11 @@
 // ============================================================
-// Announcer — Synthesized voice lines for rounds, K.O., time and verdicts
+// Announcer — Voice lines (koku, Deep Voice) for rounds, K.O., time and verdicts
 // ============================================================
 
 import type Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 
-/** Every line has a WAV made by scripts/generate-announcer.mjs: announcer-<line>.wav. */
+/** Every line has a WAV made by scripts/generate-announcer-koku.py (Voicebox): announcer-<line>.wav. */
 export const ANNOUNCER_LINES = [
   'round-1', 'round-2', 'round-3', 'round-4', 'round-5',
   'fight', 'ko', 'time', 'victory', 'defeat', 'draw', 'p1-wins', 'p2-wins',
