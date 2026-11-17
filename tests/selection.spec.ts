@@ -11,11 +11,12 @@ async function openSelection(page: Page) {
   await expect.poll(() => page.evaluate(() => (window as any).__game.scene.isActive('SelectionScene'))).toBe(true);
 }
 
-test('keyboard selects both fighter colors and a stage before starting the match', async ({ page }) => {
+test('keyboard selects both fighters and a stage before starting the match', async ({ page }) => {
   await openSelection(page);
-  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight');
+  // Arrows move the active side's cursor over the faces; Tab hands the cursor to the rival.
+  await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Tab');
-  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('Enter');
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('Enter');
@@ -24,26 +25,26 @@ test('keyboard selects both fighter colors and a stage before starting the match
     const s = (window as any).__game.scene.getScene('FightScene');
     return { data: s.getMatchData(), playerTint: s.player.sprite.tintTopLeft, opponentTint: s.opponent.sprite.tintTopLeft };
   });
-  expect(match.data.playerChoice).toEqual({ characterId: 'tilin', paletteId: 'mint' });
-  expect(match.data.opponentChoice).toEqual({ characterId: 'tilin', paletteId: 'coral' });
+  // Different fighters need no tint to be told apart.
+  expect(match.data.playerChoice).toEqual({ characterId: 'cesar', paletteId: 'original' });
+  expect(match.data.opponentChoice).toEqual({ characterId: 'tilin', paletteId: 'original' });
   expect(match.data.stageIndex).toBe(5);
-  expect(match.playerTint).toBe(0xa5e0d4); expect(match.opponentTint).toBe(0xf2b8ad);
+  expect(match.playerTint).toBe(0xffffff); expect(match.opponentTint).toBe(0xffffff);
 });
 
-test('mouse selection and back navigation retain colors, arena and practice mode', async ({ page }) => {
+test('mouse selection and back navigation retain arena and practice mode, and a mirror match tints the rival', async ({ page }) => {
   await openSelection(page);
-  await page.mouse.click(230, 550);
-  await page.mouse.click(1046, 550);
   await page.mouse.click(640, 565);
-  await page.mouse.click(1080, 630);
+  await page.mouse.click(826, 630);
   await page.mouse.click(640, 370);
   await page.keyboard.press('Escape');
-  await page.mouse.click(1080, 630);
+  await page.mouse.click(826, 630);
   await page.mouse.click(1080, 630);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
   const data = await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').getMatchData());
   expect(data.mode).toBe('training'); expect(data.stageIndex).toBe(1);
-  expect(data.playerChoice.paletteId).toBe('amethyst'); expect(data.opponentChoice.paletteId).toBe('mint');
+  expect(data.playerChoice).toEqual({ characterId: 'tilin', paletteId: 'original' });
+  expect(data.opponentChoice).toEqual({ characterId: 'tilin', paletteId: 'amethyst' });
 });
 
 test('returning to menu preserves the selection and holding Enter does not skip screens', async ({ page }) => {
@@ -57,7 +58,7 @@ test('returning to menu preserves the selection and holding Enter does not skip 
     return (window as any).__game.scene.isActive('SelectionScene') && s.phase;
   })).toBe('fighters');
   await page.keyboard.up('Enter');
-  expect(await page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').playerChoice.paletteId)).toBe('amethyst');
+  expect(await page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').playerChoice.characterId)).toBe('cesar');
 });
 
 test('restart and changing selection preserve the selected matchup', async ({ page }) => {
@@ -71,7 +72,7 @@ test('restart and changing selection preserve the selected matchup', async ({ pa
   await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('PauseScene').selectedIndex)).toBe(1);
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('FightScene') && (window as any).__game.scene.getScene('FightScene').roundSystem?.phase === 'FIGHT');
-  expect(await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').getMatchData().playerChoice.paletteId)).toBe('amethyst');
+  expect(await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').getMatchData().playerChoice.characterId)).toBe('cesar');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('PauseScene'));
   for (let i = 0; i < 3; i++) {
@@ -82,9 +83,9 @@ test('restart and changing selection preserve the selected matchup', async ({ pa
   await expect.poll(() => page.evaluate(() => (window as any).__game.scene.isActive('SelectionScene'))).toBe(true);
   const selection = await page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('SelectionScene');
-    return [s.playerChoice.paletteId, s.stageIndex];
+    return [s.playerChoice.characterId, s.stageIndex];
   });
-  expect(selection).toEqual(['amethyst', 1]);
+  expect(selection).toEqual(['cesar', 1]);
 });
 
 test('cancelling the versus screen prevents the pending fight from starting', async ({ page }) => {
@@ -103,7 +104,7 @@ test('cancelling the versus screen prevents the pending fight from starting', as
   expect(state).toEqual({ phase: 'stage', selection: true, fight: false });
 });
 
-test('each corner shows the chosen fighter large and the centre grid has one face per fighter', async ({ page }) => {
+test('each fighter rises large from a bottom corner and the centre grid has one face per fighter', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openSelection(page);
   const screen = () => page.evaluate(() => {
@@ -111,9 +112,10 @@ test('each corner shows the chosen fighter large and the centre grid has one fac
     const named = (prefix: string) => s.content.list.filter((o: any) => o.name?.startsWith(prefix));
     return {
       roster: named('selection-face-').map((o: any) => o.name.replace('selection-face-', '')),
-      faces: named('selection-face-').map((o: any) => ({ x: o.x, size: o.displayWidth })),
+      faces: named('selection-face-').map((o: any) => ({ x: o.x, y: o.y, size: o.displayWidth })),
       portraits: named('selection-portrait-').map((o: any) => ({ name: o.name, key: o.texture.key, x: o.x, height: o.displayHeight, flipX: o.flipX })),
       player: s.playerChoice.characterId, opponent: s.opponentChoice.characterId,
+      labels: s.content.list.map((o: any) => o.text).filter(Boolean),
     };
   });
   const first = await screen();
@@ -123,11 +125,13 @@ test('each corner shows the chosen fighter large and the centre grid has one fac
   for (const face of first.faces) { expect(face.x).toBeGreaterThan(440); expect(face.x).toBeLessThan(840); }
   expect(first.portraits.map(p => p.name)).toEqual(['selection-portrait-player', 'selection-portrait-opponent']);
   expect(first.portraits[0].x).toBeLessThan(440); expect(first.portraits[1].x).toBeGreaterThan(840);
-  expect(first.portraits[0].height).toBeGreaterThan(first.faces[0].size * 4);
+  expect(first.portraits[0].height).toBeGreaterThan(first.faces[0].size * 6);
+  // No colour picker: nothing on the screen offers a palette.
+  expect(first.labels.some((label: string) => /Color|Amatista|Menta|Coral/.test(label))).toBe(false);
   expect(first.portraits.map(p => p.flipX)).toEqual([false, true]);
   // Clicking a face picks that fighter for the active side and swaps the large art.
   const cesar = first.faces[first.roster.indexOf('cesar')];
-  await page.mouse.click(cesar.x, 262);
+  await page.mouse.click(cesar.x, cesar.y);
   const second = await screen();
   expect(second.player).toBe('cesar'); expect(second.opponent).toBe('tilin');
   expect(second.portraits[0].key).toBe('menu_cesar_3d'); expect(second.portraits[1].key).toBe('menu_tilin_3d');

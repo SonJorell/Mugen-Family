@@ -50,7 +50,6 @@ test('choices made in the middle of an entrance are not lost', async ({ page }) 
   await openSelection(page);
   // No waiting: every key lands while the previous screen is still animating.
   await page.keyboard.press('e');
-  await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Enter');
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('ArrowDown');
@@ -58,7 +57,7 @@ test('choices made in the middle of an entrance are not lost', async ({ page }) 
     const scene = (window as any).__game.scene.getScene('SelectionScene');
     return { phase: scene.phase, player: scene.playerChoice, stage: scene.stageIndex };
   });
-  expect(s).toEqual({ phase: 'stage', player: { characterId: 'cesar', paletteId: 'amethyst' }, stage: 4 });
+  expect(s).toEqual({ phase: 'stage', player: { characterId: 'cesar', paletteId: 'original' }, stage: 4 });
 });
 
 test('the versus screen shows a 3D VS and leaves nothing behind when cancelled', async ({ page }) => {
