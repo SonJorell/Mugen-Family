@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio } from '../systems/GameAudio';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 type Row = {
   label: string;
@@ -89,13 +90,13 @@ export class SettingsScene extends Phaser.Scene {
 
     this.add.image(640, 360, 'menu_arica_coast').setDisplaySize(1324, 745).setAlpha(0.55);
     this.add.rectangle(640, 360, 1280, 720, 0x06111b, 0.82);
-    this.add.text(96, 40, 'CONFIGURACIÓN', { fontFamily: 'Impact, Arial Black', fontSize: '60px', color: '#fff3d8' });
+    this.add.text(96, 40, 'CONFIGURACIÓN', { fontFamily: FONT_IMPACT, fontSize: '60px', color: '#fff3d8' });
     this.add.text(100, 112, 'Pantalla, audio y teclas. Los cambios se guardan solos.', {
-      fontFamily: 'Trebuchet MS', fontSize: '20px', color: '#9fe8e1',
+      fontFamily: FONT_UI, fontSize: '20px', color: '#9fe8e1',
     });
-    this.add.text(100, 160, 'PANTALLA', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
-    this.add.text(100, 236, 'AUDIO', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
-    this.add.text(100, 562, 'CONTROLES', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 160, 'PANTALLA', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 236, 'AUDIO', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 562, 'CONTROLES', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
 
     const ys = [200, 276, 326, 376, 426, 476, 526, 600, 654];
     this.rows.forEach((row, i) => {
@@ -103,10 +104,10 @@ export class SettingsScene extends Phaser.Scene {
       const bg = this.add.rectangle(96, y, back ? 240 : 760, 44, 0x143a51, 0.4).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
       const label = this.add.text(back ? 216 : 120, y, row.label, {
-        fontFamily: back ? 'Impact, Arial Black' : 'Trebuchet MS', fontSize: back ? '24px' : '22px', color: '#fff3d8',
+        fontFamily: back ? FONT_IMPACT : FONT_UI, fontSize: back ? '24px' : '22px', color: '#fff3d8',
       }).setOrigin(back ? 0.5 : 0, 0.5);
       const value = this.add.text(row.level ? 612 : 830, y, '', {
-        fontFamily: 'Trebuchet MS', fontSize: '22px', fontStyle: 'bold', color: '#9fe8e1',
+        fontFamily: FONT_UI, fontSize: '22px', fontStyle: 'bold', color: '#9fe8e1',
       }).setOrigin(1, 0.5);
       const objects: (typeof this.rowObjects)[number] = { bg, label, value };
       if (row.level) {
@@ -126,7 +127,7 @@ export class SettingsScene extends Phaser.Scene {
     });
 
     this.add.text(96, 690, '↑ ↓  Elegir     ← →  Ajustar     Enter  Cambiar     Esc  Volver', {
-      fontFamily: 'Trebuchet MS', fontSize: '16px', color: '#d3dce2',
+      fontFamily: FONT_UI, fontSize: '16px', color: '#d3dce2',
     });
 
     const key = (name: string, action: () => void) => this.input.keyboard!.on('keydown-' + name, (event: KeyboardEvent) => {
@@ -154,7 +155,7 @@ export class SettingsScene extends Phaser.Scene {
 
   private smallButton(x: number, y: number, text: string, action: () => void): void {
     this.add.text(x, y, text, {
-      fontFamily: 'Trebuchet MS', fontSize: '22px', color: '#fae8cb', backgroundColor: '#241a35', padding: { x: 9, y: 2 },
+      fontFamily: FONT_UI, fontSize: '22px', color: '#fae8cb', backgroundColor: '#241a35', padding: { x: 9, y: 2 },
     }).setOrigin(0.5).setDepth(5).setInteractive({ useHandCursor: true }).on('pointerdown', action);
   }
 

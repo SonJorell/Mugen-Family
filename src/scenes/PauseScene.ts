@@ -13,6 +13,7 @@ import { rosterEntry } from '../config/roster';
 import { COMMAND_MOVES } from '../combat/AttackDefinition';
 import { comboExamples, describeCombo } from '../config/combos';
 import type { TrainingOptions } from '../ui/TrainingOverlay';
+import { FONT_UI, FONT_NAME, FONT_IMPACT } from '../ui/fonts';
 
 export class PauseScene extends Phaser.Scene {
   private selectedIndex: number = 0;
@@ -71,7 +72,7 @@ export class PauseScene extends Phaser.Scene {
 
     // Pause title
     this.title = this.add.text(W / 2, training ? 110 : H / 2 - 140, 'PAUSA', {
-      fontFamily: 'Arial Black',
+      fontFamily: FONT_IMPACT,
       fontSize: '60px',
       color: '#ffffff',
       stroke: '#000000',
@@ -81,8 +82,9 @@ export class PauseScene extends Phaser.Scene {
     // Options
     this.items.forEach((opt, i) => {
       const t = this.add.text(W / 2, top + i * step, opt.label, {
-        fontFamily: 'Arial Black',
-        fontSize: '30px',
+        fontFamily: FONT_UI,
+        fontStyle: 'bold',
+        fontSize: '32px',
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 5,
@@ -138,9 +140,9 @@ export class PauseScene extends Phaser.Scene {
     frame.add([box, combos]);
     this.movePages = [box, combos];
     box.add(this.add.text(W / 2, 228, 'MOVIMIENTOS', {
-      fontFamily: 'Arial Black', fontSize: '36px', color: '#ffdd77', stroke: '#000000', strokeThickness: 6,
+      fontFamily: FONT_IMPACT, fontSize: '36px', color: '#ffdd77', stroke: '#000000', strokeThickness: 6,
     }).setOrigin(0.5));
-    const row = { fontFamily: 'Arial', fontSize: '20px', color: '#eee8d9' };
+    const row = { fontFamily: FONT_UI, fontSize: '20px', color: '#eee8d9' };
     const versus = data.mode === 'versus', set = loadBindings();
     const p1 = activeKeys(set, 'p1', versus), p2 = activeKeys(set, 'p2', true);
     if (versus) {
@@ -160,7 +162,7 @@ export class PauseScene extends Phaser.Scene {
     const superKeys = versus ? `J1 ${describeKeys('SPECIAL', p1)} · J2 ${describeKeys('SPECIAL', p2)}` : describeKeys('SPECIAL', p1);
     fighters.forEach((f, i) => {
       const x = 820, y = 282 + i * 140;
-      box.add(this.add.text(x, y, f.name.toUpperCase(), { fontFamily: 'Arial Black', fontSize: '22px', color: '#ffffff' }));
+      box.add(this.add.text(x, y, f.name.toUpperCase(), { fontFamily: FONT_NAME, fontSize: '30px', color: '#ffffff' }));
       box.add(this.add.text(x, y + 34, `${f.power}  ·  ${superKeys}`, { ...row, color: '#ffdd77' }));
       box.add(this.add.text(x, y + 64, 'Súper con la energía al 100 %', { ...row, fontSize: '16px', color: '#9aa4b2' }));
       box.add(this.add.text(x, y + 92, `${COMMAND_MOVES[f.stats.commandMove].label}  ·  ↓ ↘ → + Puño`, { ...row, fontSize: '17px', color: '#a1ece5' }));
@@ -169,12 +171,12 @@ export class PauseScene extends Phaser.Scene {
 
     // Page 2: example combos for each fighter, written with player 1's keys.
     combos.add(this.add.text(W / 2, 228, 'COMBOS', {
-      fontFamily: 'Arial Black', fontSize: '36px', color: '#ffdd77', stroke: '#000000', strokeThickness: 6,
+      fontFamily: FONT_IMPACT, fontSize: '36px', color: '#ffdd77', stroke: '#000000', strokeThickness: 6,
     }).setOrigin(0.5));
     const first = (b: Parameters<typeof describeKeys>[0]) => keyLabel(p1[b][0] ?? '?');
     fighters.forEach((f, i) => {
       const x = 160 + i * 500;
-      combos.add(this.add.text(x, 268, f.name.toUpperCase(), { fontFamily: 'Arial Black', fontSize: '22px', color: '#ffffff' }));
+      combos.add(this.add.text(x, 268, f.name.toUpperCase(), { fontFamily: FONT_NAME, fontSize: '30px', color: '#ffffff' }));
       comboExamples(f.id).forEach((combo, j) => {
         const y = 306 + j * 82;
         combos.add(this.add.text(x, y, combo.title, { ...row, fontSize: '18px', fontStyle: 'bold', color: '#a1ece5' }));

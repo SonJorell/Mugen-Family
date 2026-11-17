@@ -4,6 +4,7 @@
 
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { FONT_UI, FONT_IMPACT } from './fonts';
 
 const TIPS = [
   'Un golpe suave que conecta se puede cancelar en uno fuerte: prueba J y luego K.',
@@ -32,22 +33,22 @@ export class LoadingScreen {
     const W = GAME_CONFIG.WIDTH, H = GAME_CONFIG.HEIGHT, x = W / 2 - this.width / 2;
     scene.add.rectangle(W / 2, H / 2, W, H, 0x0b0814);
     scene.add.text(W / 2, H / 2 - 150, 'FIGHTER\nFAMILY', {
-      fontFamily: 'Impact, Arial Black', fontSize: '74px', color: '#f5bd75', align: 'center',
+      fontFamily: FONT_IMPACT, fontSize: '74px', color: '#f5bd75', align: 'center',
       stroke: '#3d1f0f', strokeThickness: 10, lineSpacing: -12,
     }).setOrigin(0.5).setName('loading-title');
-    scene.add.text(W / 2, H / 2 - 24, 'Arica es tu escenario.', { fontFamily: 'Trebuchet MS', fontSize: '20px', color: '#a1ece5' })
+    scene.add.text(W / 2, H / 2 - 24, 'Arica es tu escenario.', { fontFamily: FONT_UI, fontSize: '20px', color: '#a1ece5' })
       .setOrigin(0.5);
     scene.add.rectangle(W / 2, H / 2 + 40, this.width + 8, 26, 0x14101e).setStrokeStyle(2, 0xf5bd75, 0.8);
     this.fill = scene.add.rectangle(x, H / 2 + 40, 1, 18, 0xef709d).setOrigin(0, 0.5);
     this.glow = scene.add.rectangle(x, H / 2 + 40, 1, 6, 0xffffff, 0.45).setOrigin(0, 1).setBlendMode(Phaser.BlendModes.ADD);
     this.percent = scene.add.text(W / 2 + this.width / 2, H / 2 + 62, '0 %', {
-      fontFamily: 'Impact, Arial Black', fontSize: '22px', color: '#fae8cb',
+      fontFamily: FONT_IMPACT, fontSize: '22px', color: '#fae8cb',
     }).setOrigin(1, 0).setName('loading-percent');
     this.status = scene.add.text(W / 2 - this.width / 2, H / 2 + 66, 'Preparando…', {
-      fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#c9b8da',
+      fontFamily: FONT_UI, fontSize: '17px', color: '#c9b8da',
     }).setName('loading-status');
     scene.add.text(W / 2, H - 70, TIPS[Math.floor(Math.random() * TIPS.length)], {
-      fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#9aa4b2', align: 'center', wordWrap: { width: 900 },
+      fontFamily: FONT_UI, fontSize: '17px', color: '#9aa4b2', align: 'center', wordWrap: { width: 900 },
     }).setOrigin(0.5);
 
     scene.load.on(Phaser.Loader.Events.PROGRESS, (value: number) => this.setProgress(this.phaseStart + value * (this.phaseEnd - this.phaseStart)));

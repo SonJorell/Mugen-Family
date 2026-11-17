@@ -11,6 +11,7 @@ import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { Fighter } from '../characters/Fighter';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 
 export class CharacterTestScene extends Phaser.Scene {
@@ -129,7 +130,7 @@ export class CharacterTestScene extends Phaser.Scene {
 
     // Title
     this.add.text(W / 2, 20, 'GALERÍA DE MOVIMIENTOS', {
-      fontFamily: 'Arial Black',
+      fontFamily: FONT_IMPACT,
       fontSize: '20px',
       color: '#00ff88',
       stroke: '#003322',
@@ -159,7 +160,7 @@ export class CharacterTestScene extends Phaser.Scene {
     // Controls legend
     this.add.text(W / 2, GAME_CONFIG.HEIGHT - 30, 
       '1–0  Animaciones   |   ← →  Elegir   |   A  Girar   |   F2  Escenario   |   F1  Colisiones   |   Esc  Menú',
-      { fontFamily: 'Arial', fontSize: '13px', color: '#8888cc' }
+      { fontFamily: FONT_UI, fontSize: '13px', color: '#8888cc' }
     ).setOrigin(0.5).setDepth(50);
 
     this.updateAnimList();

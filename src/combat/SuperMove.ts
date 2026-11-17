@@ -5,6 +5,7 @@ import { superPortraitKey } from '../config/characters';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { CesarDriveSequence } from './CesarDriveSequence';
 import { DRIVE_BEATS, DRIVE_DURATION } from './driveAssets';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 const BEATS = [
   { at: 0, damage: 4 }, { at: 900, damage: 7 }, { at: 1200, damage: 7 },
@@ -92,18 +93,18 @@ export class SuperMove {
       .setDisplaySize(780, 520).setFlipX(this.fromRight).setTint(this.attacker!.sprite.tintTopLeft);
     this.layer.add(this.portrait);
     this.title = s.add.text(this.fromRight ? 360 : 900, 220, caster.superName, {
-      fontFamily: 'Impact, Arial Black', fontSize: '66px', color: '#fff3d8', align: 'center',
+      fontFamily: FONT_IMPACT, fontSize: '66px', color: '#fff3d8', align: 'center',
       stroke: '#143a51', strokeThickness: 4, lineSpacing: -6,
     }).setOrigin(0.5, 0);
     this.counter = s.add.text(this.fromRight ? 360 : 900, 402, `El poder de ${caster.name}`, {
-      fontFamily: 'Trebuchet MS', fontSize: '22px', color: '#f5bd75',
+      fontFamily: FONT_UI, fontSize: '22px', color: '#f5bd75',
     }).setOrigin(0.5, 0);
     this.layer.add([this.title, this.counter]);
     this.layer.add(s.add.rectangle(280, 653, 720, 4, 0x263c51).setOrigin(0, 0.5));
     this.progress = s.add.rectangle(280, 653, 1, 4, 0x9fe8e1).setOrigin(0, 0.5);
     this.layer.add(this.progress);
     this.layer.add(s.add.text(640, 677, 'Súper confirmado · Esc para pausar', {
-      fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#c7d6dd',
+      fontFamily: FONT_UI, fontSize: '17px', color: '#c7d6dd',
     }).setOrigin(0.5, 0));
   }
 

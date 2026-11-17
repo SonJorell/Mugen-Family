@@ -7,6 +7,7 @@ import { HealthBar } from './HealthBar';
 import { Timer } from './Timer';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { Fighter } from '../characters/Fighter';
+import { FONT_UI } from './fonts';
 
 export class HUD {
   private scene: Phaser.Scene;
@@ -77,7 +78,7 @@ export class HUD {
       const quarters = scene.add.graphics().setDepth(57).setScrollFactor(0).lineStyle(2, 0x07090f, 0.6);
       for (let q = 1; q < 4; q++) quarters.lineBetween(x + 65 * q, 91, x + 65 * q, 101);
       this.decor.push(quarters);
-      this.chantLabels.push(scene.add.text(x, 108, '', { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#fae8cb',
+      this.chantLabels.push(scene.add.text(x, 108, '', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#fae8cb',
         backgroundColor: '#0b0d16', padding: { x: 6, y: 3 } }).setDepth(56).setScrollFactor(0));
     }
 

@@ -8,6 +8,7 @@ import { GameAudio } from '../systems/GameAudio';
 import {
   ACTION_LABELS, BindingSet, PlayerSlot, REMAPPABLE, assignKey, keyLabel, keyNameFromCode, loadBindings, resetBindings, saveBindings,
 } from '../input/Bindings';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 const INK = '#fff3d8', AQUA = '#9fe8e1', GOLD = '#f5bd75', RED = '#ff8f8f', MUTED = '#d3dce2';
 
@@ -37,7 +38,7 @@ export class ControlsScene extends Phaser.Scene {
     GameAudio.for(this).play('music-menu');
     this.add.image(640, 360, 'menu_arica_coast').setDisplaySize(1324, 745).setAlpha(0.55);
     this.add.rectangle(640, 360, 1280, 720, 0x06111b, 0.86);
-    this.add.text(96, 40, 'CONTROLES', { fontFamily: 'Impact, Arial Black', fontSize: '56px', color: INK });
+    this.add.text(96, 40, 'CONTROLES', { fontFamily: FONT_IMPACT, fontSize: '56px', color: INK });
     this.content = this.add.container(0, 0);
 
     // A single listener so a key being assigned is never also read as navigation.
@@ -105,7 +106,7 @@ export class ControlsScene extends Phaser.Scene {
   // ── View ─────────────────────────────────────────────────
 
   private text(x: number, y: number, value: string, size: number, color = INK, bold = false) {
-    const t = this.add.text(x, y, value, { fontFamily: 'Trebuchet MS', fontSize: size + 'px', color, fontStyle: bold ? 'bold' : 'normal' })
+    const t = this.add.text(x, y, value, { fontFamily: FONT_UI, fontSize: size + 'px', color, fontStyle: bold ? 'bold' : 'normal' })
       .setOrigin(0, 0.5);
     this.content.add(t);
     return t;

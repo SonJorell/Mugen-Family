@@ -6,6 +6,7 @@ import Phaser from 'phaser';
 import { CREDITS } from '../config/arcade';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio } from '../systems/GameAudio';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 /** Scroll speed of the credits (px/s). */
 const SCROLL_SPEED = 46;
@@ -28,11 +29,11 @@ export class CreditsScene extends Phaser.Scene {
     let y = 0;
     for (const block of CREDITS) {
       this.roll.add(this.add.text(640, y, block.heading.toUpperCase(), {
-        fontFamily: 'Impact, Arial Black', fontSize: '30px', color: '#f5bd75',
+        fontFamily: FONT_IMPACT, fontSize: '30px', color: '#f5bd75',
       }).setOrigin(0.5, 0));
       y += 44;
       for (const line of block.lines) {
-        this.roll.add(this.add.text(640, y, line, { fontFamily: 'Trebuchet MS', fontSize: '20px', color: '#fae8cb' }).setOrigin(0.5, 0));
+        this.roll.add(this.add.text(640, y, line, { fontFamily: FONT_UI, fontSize: '20px', color: '#fae8cb' }).setOrigin(0.5, 0));
         y += 30;
       }
       y += 34;
@@ -45,7 +46,7 @@ export class CreditsScene extends Phaser.Scene {
     } else {
       this.roll.setY(720);
     }
-    this.add.text(640, 694, 'Enter o Esc · Menú principal', { fontFamily: 'Trebuchet MS', fontSize: '15px', color: '#c9b8da' })
+    this.add.text(640, 694, 'Enter o Esc · Menú principal', { fontFamily: FONT_UI, fontSize: '15px', color: '#c9b8da' })
       .setOrigin(0.5).setName('credits-help');
     for (const k of ['ENTER', 'SPACE', 'ESC']) this.input.keyboard!.on('keydown-' + k, () => this.finish());
   }

@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { InputState } from '../input/InputManager';
+import { FONT_UI } from './fonts';
 
 type HeldAction = 'moveLeft' | 'moveRight' | 'jump' | 'crouch' | 'lightPunch' | 'heavyPunch' | 'lightKick' | 'heavyKick' | 'block' | 'special' | 'dash';
 /** Actions that fire once per touch, like a key's JustDown; the rest act while held. */
@@ -34,7 +35,7 @@ export class TouchControls {
     const make = (action: HeldAction, x: number, y: number, label: string, color: number, r: number = layout.BUTTON_RADIUS) => {
       const shape = scene.add.circle(x, y, r, color, layout.ALPHA).setStrokeStyle(3, 0xffffff, 0.55)
         .setScrollFactor(0).setDepth(70).setName(`touch-${action}`);
-      const text = scene.add.text(x, y, label, { fontFamily: 'Impact, Arial Black', fontSize: r > 40 ? '26px' : '22px', color: '#ffffff' })
+      const text = scene.add.text(x, y, label, { fontFamily: FONT_UI, fontStyle: 'bold', fontSize: r > 40 ? '26px' : '22px', color: '#ffffff' })
         .setOrigin(0.5).setScrollFactor(0).setDepth(71);
       this.buttons.push({ action, x, y, r, label, color, shape, text });
     };

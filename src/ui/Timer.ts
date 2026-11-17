@@ -4,6 +4,7 @@
 
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { FONT_NUMBER } from './fonts';
 
 const CX = GAME_CONFIG.WIDTH / 2, CY = 45, RADIUS = 37;
 
@@ -20,7 +21,7 @@ export class Timer {
     this.plate.lineStyle(6, 0x2b3142, 1).strokeCircle(CX, CY, RADIUS - 3);
     this.ring = scene.add.graphics().setDepth(51).setScrollFactor(0);
     this.text = scene.add.text(CX, CY, '99', {
-      fontFamily: 'Impact, Arial Black', fontSize: '38px', color: '#ffffff', stroke: '#07090f', strokeThickness: 5,
+      fontFamily: FONT_NUMBER, fontSize: '40px', color: '#ffffff', stroke: '#07090f', strokeThickness: 5,
     }).setOrigin(0.5).setDepth(52).setScrollFactor(0);
   }
 

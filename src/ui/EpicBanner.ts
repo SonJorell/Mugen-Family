@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { playUiSound } from '../config/characters';
 import { ensureGlowTexture, ensureRaysTexture, Title3D } from './menu/MenuEffects';
+import { FONT_UI } from './fonts';
 
 const CX = GAME_CONFIG.WIDTH / 2, CY = GAME_CONFIG.HEIGHT / 2;
 
@@ -63,7 +64,7 @@ export function showBanner(scene: Phaser.Scene, text: string, style: BannerStyle
   parts.push(title);
   const line = title.lines[0];
   const caption = style.caption ? pin(scene.add.text(CX, CY + (style.fontSize ?? 150) * 0.36, style.caption, {
-    fontFamily: 'Impact, Arial Black', fontSize: '40px', color: '#fff3d8', stroke: '#07090f', strokeThickness: 6,
+    fontFamily: FONT_UI, fontStyle: 'bold', fontSize: '42px', color: '#fff3d8', stroke: '#07090f', strokeThickness: 6,
   }).setOrigin(0.5), 3) : null;
 
   const leave = () => {

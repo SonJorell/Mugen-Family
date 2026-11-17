@@ -8,6 +8,7 @@ import { SelectionBackdrop } from '../ui/selection/SelectionBackdrop';
 import { ensureGlowTexture, Title3D } from '../ui/menu/MenuEffects';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 interface SelectionData {
   manifest?: { assetPath: string; animations: Record<string, string[]>; spriteSheet?: SpriteSheetOptions };
@@ -83,9 +84,9 @@ export class SelectionScene extends Phaser.Scene {
     });
     this.input.on('gameout', () => { this.pointerX = 0; this.pointerY = 0; });
     this.add.rectangle(640, 677, 1280, 86, 0x14101e).setDepth(20);
-    this.title = this.add.text(48, 30, '', { fontFamily: 'Impact, Arial Black', fontSize: '43px', color: '#fae8cb' }).setDepth(30);
-    this.steps = this.add.text(50, 88, '', { fontFamily: 'Trebuchet MS', fontSize: '18px', color: '#a1ece5' }).setDepth(30);
-    this.help = this.add.text(48, 683, '', { fontFamily: 'Trebuchet MS', fontSize: '15px', color: '#c9b8da' }).setDepth(30);
+    this.title = this.add.text(48, 30, '', { fontFamily: FONT_IMPACT, fontSize: '43px', color: '#fae8cb' }).setDepth(30);
+    this.steps = this.add.text(50, 88, '', { fontFamily: FONT_UI, fontSize: '18px', color: '#a1ece5' }).setDepth(30);
+    this.help = this.add.text(48, 683, '', { fontFamily: FONT_UI, fontSize: '15px', color: '#c9b8da' }).setDepth(30);
     this.content = this.add.container(0, 0).setDepth(25);
     // Rendering replaces the preview objects. Resolve clicks against current bounds
     // immediately, without waiting for Phaser's next interactive-object queue flush.
@@ -117,7 +118,7 @@ export class SelectionScene extends Phaser.Scene {
     this.render();
   }
   private text(x: number, y: number, value: string, size = 20, color = '#fae8cb', centered = false, headline = false) {
-    const text = this.add.text(x, y, value, { fontFamily: headline ? 'Impact, Arial Black' : 'Trebuchet MS', fontSize: size + 'px', color });
+    const text = this.add.text(x, y, value, { fontFamily: headline ? FONT_IMPACT : FONT_UI, fontSize: size + 'px', color });
     if (centered) text.setOrigin(0.5, 0);
     this.content.add(text); this.bucket?.push(text); return text;
   }

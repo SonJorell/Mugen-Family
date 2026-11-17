@@ -9,6 +9,7 @@ import { ANNOUNCER_LINES, announcerKey } from '../systems/Announcer';
 import { FIGHTER_ROSTER } from '../config/roster';
 import { DRIVE_ASSETS } from '../combat/driveAssets';
 import { CharacterManifest, isValidManifest, manifestKey, menuArtKey, sortAnimationFiles, superPortraitKey, UI_SOUNDS } from '../config/characters';
+import { FONT_UI } from '../ui/fonts';
 
 export class PreloadScene extends Phaser.Scene {
   private manifests: CharacterManifest[] = [];
@@ -84,10 +85,10 @@ export class PreloadScene extends Phaser.Scene {
   private showLoadError(): void {
     this.add.rectangle(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, 800, 250, 0x12121c).setDepth(10);
     this.add.text(GAME_CONFIG.WIDTH / 2, 320, 'No se pudieron cargar los archivos del juego.\nComprueba la conexión y vuelve a intentarlo.', {
-      fontFamily: 'Arial', fontSize: '24px', color: '#ffffff', align: 'center',
+      fontFamily: FONT_UI, fontSize: '24px', color: '#ffffff', align: 'center',
     }).setOrigin(0.5).setDepth(11);
     this.add.text(GAME_CONFIG.WIDTH / 2, 410, 'Reintentar · Enter', {
-      fontFamily: 'Arial Black', fontSize: '26px', color: '#ffdd00',
+      fontFamily: FONT_UI, fontStyle: 'bold', fontSize: '28px', color: '#ffdd00',
     }).setOrigin(0.5).setDepth(11).setInteractive({ useHandCursor: true }).on('pointerdown', () => window.location.reload());
     this.input.keyboard?.once('keydown-ENTER', () => window.location.reload());
   }

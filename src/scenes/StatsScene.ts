@@ -7,6 +7,7 @@ import { FIGHTER_ROSTER, rosterEntry } from '../config/roster';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio } from '../systems/GameAudio';
 import { PlayerStats, loadStats, resetStats } from '../systems/Stats';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 const INK = '#fff3d8', AQUA = '#9fe8e1', GOLD = '#f5bd75', MUTED = '#d3dce2', RED = '#ff8f8f';
 
@@ -34,8 +35,8 @@ export class StatsScene extends Phaser.Scene {
     GameAudio.for(this).play('music-menu');
     this.add.image(640, 360, 'menu_arica_coast').setDisplaySize(1324, 745).setAlpha(0.55);
     this.add.rectangle(640, 360, 1280, 720, 0x06111b, 0.86);
-    this.add.text(96, 40, 'ESTADÍSTICAS', { fontFamily: 'Impact, Arial Black', fontSize: '56px', color: INK });
-    this.add.text(100, 110, 'Se guardan en este navegador.', { fontFamily: 'Trebuchet MS', fontSize: '18px', color: AQUA });
+    this.add.text(96, 40, 'ESTADÍSTICAS', { fontFamily: FONT_IMPACT, fontSize: '56px', color: INK });
+    this.add.text(100, 110, 'Se guardan en este navegador.', { fontFamily: FONT_UI, fontSize: '18px', color: AQUA });
     this.content = this.add.container(0, 0);
     this.input.keyboard!.on('keydown-ESC', () => {
       if (this.confirmingReset) { this.confirmingReset = false; this.render(); } else this.back();
@@ -56,7 +57,7 @@ export class StatsScene extends Phaser.Scene {
   private back(): void { this.scene.start('MenuScene', this.returnData); }
 
   private text(x: number, y: number, value: string, size = 20, color = INK, bold = false) {
-    const t = this.add.text(x, y, value, { fontFamily: 'Trebuchet MS', fontSize: size + 'px', color, fontStyle: bold ? 'bold' : 'normal' });
+    const t = this.add.text(x, y, value, { fontFamily: FONT_UI, fontSize: size + 'px', color, fontStyle: bold ? 'bold' : 'normal' });
     this.content.add(t);
     return t;
   }

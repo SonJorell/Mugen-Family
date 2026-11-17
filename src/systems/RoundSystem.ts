@@ -6,6 +6,7 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { BANNER_STYLES, showBanner } from '../ui/EpicBanner';
 import { announce, roundLine } from './Announcer';
+import { FONT_IMPACT } from '../ui/fonts';
 
 export type RoundPhase = 'INTRO' | 'FIGHT' | 'END';
 export type RoundWinner = 'player' | 'opponent' | 'draw';
@@ -31,12 +32,12 @@ export class RoundSystem {
 
     this.roundText = scene.add.text(
       GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2,
-      '', { fontFamily: 'Arial Black', fontSize: '64px', color: '#ffffff', stroke: '#000', strokeThickness: 8 }
+      '', { fontFamily: FONT_IMPACT, fontSize: '64px', color: '#ffffff', stroke: '#000', strokeThickness: 8 }
     ).setOrigin(0.5).setDepth(200).setAlpha(0).setScrollFactor(0).setVisible(false);
 
     this.fightText = scene.add.text(
       GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2,
-      '', { fontFamily: 'Arial Black', fontSize: '80px', color: '#ffdd00', stroke: '#c00000', strokeThickness: 10 }
+      '', { fontFamily: FONT_IMPACT, fontSize: '80px', color: '#ffdd00', stroke: '#c00000', strokeThickness: 10 }
     ).setOrigin(0.5).setDepth(200).setAlpha(0).setScrollFactor(0).setVisible(false);
   }
 

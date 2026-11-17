@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { FONT_IMPACT } from '../fonts';
 
 /*
  * Visual building blocks for the animated title screen. Each piece owns its game objects and
@@ -170,7 +171,7 @@ export class Title3D {
   } = {}) {
     const fontSize = options.fontSize ?? 98, [far, near] = options.side ?? [0x24150e, 0x9a5a33];
     const [faceTop, faceBottom] = options.face ?? [0xfff3d8, 0xd99b58];
-    const style: Phaser.Types.GameObjects.Text.TextStyle = { fontFamily: 'Impact, Arial Black', fontSize: fontSize + 'px' };
+    const style: Phaser.Types.GameObjects.Text.TextStyle = { fontFamily: FONT_IMPACT, fontSize: fontSize + 'px' };
     const back = Phaser.Display.Color.ValueToColor(far), front = Phaser.Display.Color.ValueToColor(near);
     let top = y;
     for (const word of words) {

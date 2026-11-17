@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Fighter } from '../characters/Fighter';
 import { menuArtKey } from '../config/characters';
 import { DRIVE_DURATION } from './driveAssets';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 const clamp = (v: number) => Phaser.Math.Clamp(v, 0, 1);
 const span = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
@@ -44,15 +45,15 @@ export class CesarDriveSequence {
     this.layer.add(s.add.rectangle(640, 103, 1320, 75, 0x061019, 0.96));
     this.layer.add(s.add.rectangle(640, 686, 1320, 90, 0x061019, 0.96));
     this.layer.add(s.add.text(56, 153, 'FURIA DEL i30', {
-      fontFamily: 'Impact, Arial Black', fontSize: '43px', color: '#f8db99',
+      fontFamily: FONT_IMPACT, fontSize: '43px', color: '#f8db99',
       stroke: '#08121b', strokeThickness: 5,
     }));
     this.phase = s.add.text(58, 204, '', {
-      fontFamily: 'Trebuchet MS', fontSize: '19px', fontStyle: 'bold', color: '#bcff66',
+      fontFamily: FONT_UI, fontSize: '19px', fontStyle: 'bold', color: '#bcff66',
       stroke: '#08121b', strokeThickness: 4,
     }).setName('drive-phase');
     this.counter = s.add.text(1218, 160, '', {
-      fontFamily: 'Trebuchet MS', fontSize: '24px', color: '#fff4d8',
+      fontFamily: FONT_UI, fontSize: '24px', color: '#fff4d8',
       stroke: '#08121b', strokeThickness: 4,
     }).setOrigin(1, 0);
     this.layer.add([this.phase, this.counter]);
@@ -60,7 +61,7 @@ export class CesarDriveSequence {
     this.progress = s.add.rectangle(280, 668, 1, 4, 0xa9ed52).setOrigin(0, 0.5);
     this.layer.add(this.progress);
     this.layer.add(s.add.text(640, 687, 'Agarre confirmado · Esc para pausar', {
-      fontFamily: 'Trebuchet MS', fontSize: '16px', color: '#d2dfdf',
+      fontFamily: FONT_UI, fontSize: '16px', color: '#d2dfdf',
     }).setOrigin(0.5, 0));
   }
 

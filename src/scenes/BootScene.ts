@@ -3,6 +3,7 @@
 // ============================================================
 
 import Phaser from 'phaser';
+import { loadGameFonts } from '../ui/fonts';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -14,6 +15,8 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.scene.start('PreloadScene');
+    // Canvas text needs its faces loaded first; a slow or failed font never blocks the game.
+    const timeout = new Promise<void>(resolve => setTimeout(resolve, 4000));
+    void Promise.race([loadGameFonts(), timeout]).then(() => this.scene.start('PreloadScene'));
   }
 }

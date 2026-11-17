@@ -10,6 +10,7 @@ import { menuArtKey, playUiSound } from '../config/characters';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { recordArcadeClear } from '../systems/Stats';
 import { GameAudio, musicControls } from '../systems/GameAudio';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 export type ArcadeView = 'pick' | 'ladder' | 'continue' | 'ending';
 export type ArcadeResult = 'player' | 'opponent' | 'draw';
@@ -114,7 +115,7 @@ export class ArcadeScene extends Phaser.Scene {
 
   private text(x: number, y: number, value: string, size: number, color = INK, headline = false, origin = 0) {
     const t = this.add.text(x, y, value, {
-      fontFamily: headline ? 'Impact, Arial Black' : 'Trebuchet MS', fontSize: size + 'px', color,
+      fontFamily: headline ? FONT_IMPACT : FONT_UI, fontSize: size + 'px', color,
       stroke: '#0b0814', strokeThickness: color === '#241a35' ? 0 : headline ? 6 : 3, lineSpacing: 6,
     }).setOrigin(origin, 0);
     this.content.add(t);

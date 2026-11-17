@@ -6,6 +6,7 @@ import { GameAudio, musicControls } from '../systems/GameAudio';
 import { FighterChoice, FIGHTER_ROSTER, normalizeChoice, RosterEntry } from '../config/roster';
 import { manifestKey, menuArtKey, playUiSound } from '../config/characters';
 import { EmberField, GodRays, GroundPulse, Title3D } from '../ui/menu/MenuEffects';
+import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 interface MenuManifest {
   assetPath: string;
@@ -97,19 +98,19 @@ export class MenuScene extends Phaser.Scene {
     if (video) { video.pause(); video.style.display = 'none'; }
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.drawBackground();
-    const credit = this.add.text(68, 35, 'Creado por Jorell', { fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#d3dce2' }).setDepth(10);
+    const credit = this.add.text(68, 35, 'Creado por Jorell', { fontFamily: FONT_UI, fontSize: '17px', color: '#d3dce2' }).setDepth(10);
     this.title = new Title3D(this, 62, 69, ['FIGHTER', 'FAMILY'], 10);
     const tagline = this.add.text(67, 278, 'Arica es tu escenario.', {
-      fontFamily: 'Trebuchet MS', fontSize: '22px', color: '#f5bd75',
+      fontFamily: FONT_UI, fontSize: '22px', color: '#f5bd75',
     }).setDepth(10);
     const heroTexts = this.createHero();
     this.buildMenu();
     const hints = [
       this.add.text(64, 682, '↑ ↓  Elegir    Enter  Confirmar', {
-        fontFamily: 'Trebuchet MS', fontSize: '15px', color: '#d3dce2',
+        fontFamily: FONT_UI, fontSize: '15px', color: '#d3dce2',
       }).setDepth(10),
       this.add.text(1214, 682, 'W / ↑ ×2  Doble salto     O  Poder especial', {
-        fontFamily: 'Trebuchet MS', fontSize: '15px', color: '#d3dce2',
+        fontFamily: FONT_UI, fontSize: '15px', color: '#d3dce2',
       }).setOrigin(1, 0).setDepth(10),
     ];
     this.embersBack = new EmberField(this, 70, 3, 1.4, 3.2);
@@ -177,14 +178,14 @@ export class MenuScene extends Phaser.Scene {
     this.hero.setName('menu-fighter').setDepth(4);
     this.heroTexts = [
       this.add.text(650, 123, '', {
-        fontFamily: 'Impact, Arial Black', fontSize: '66px', color: '#fff3d8', stroke: '#143a51', strokeThickness: 2,
+        fontFamily: FONT_IMPACT, fontSize: '66px', color: '#fff3d8', stroke: '#143a51', strokeThickness: 2,
       }).setDepth(12),
       this.add.text(654, 207, '', {
-        fontFamily: 'Trebuchet MS', fontSize: '23px', color: '#fff3d8', lineSpacing: 3,
+        fontFamily: FONT_UI, fontSize: '23px', color: '#fff3d8', lineSpacing: 3,
         shadow: { offsetX: 1, offsetY: 2, color: '#08121b', blur: 6, fill: true },
       }).setDepth(12),
-      this.add.text(654, 583, '', { fontFamily: 'Trebuchet MS', fontSize: '23px', fontStyle: 'bold', color: '#9fe8e1' }).setDepth(13),
-      this.add.text(654, 617, '', { fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#fff3d8', wordWrap: { width: 230 } }).setDepth(13),
+      this.add.text(654, 583, '', { fontFamily: FONT_UI, fontSize: '23px', fontStyle: 'bold', color: '#9fe8e1' }).setDepth(13),
+      this.add.text(654, 617, '', { fontFamily: FONT_UI, fontSize: '17px', color: '#fff3d8', wordWrap: { width: 230 } }).setDepth(13),
     ];
     this.describeFeatured();
     return this.heroTexts;
@@ -314,7 +315,7 @@ export class MenuScene extends Phaser.Scene {
       const bg = this.add.rectangle(0, 0, 516, i === 0 ? 64 : 48, 0x143a51, 0.2).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
       const text = this.add.text(20, 0, option.label, {
-        fontFamily: i === 0 ? 'Impact, Arial Black' : 'Trebuchet MS',
+        fontFamily: i === 0 ? FONT_IMPACT : FONT_UI,
         fontSize: i === 0 ? '36px' : '23px', color: '#fae8cb',
       }).setOrigin(0, 0.5);
       row.add([bg, text]);

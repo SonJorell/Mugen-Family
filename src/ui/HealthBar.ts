@@ -3,6 +3,7 @@
 // ============================================================
 
 import Phaser from 'phaser';
+import { FONT_NAME, FONT_NUMBER } from './fonts';
 
 const H = 24;
 /** How long the pale trail waits before it starts catching up with the real health. */
@@ -52,10 +53,10 @@ export class HealthBar {
     for (let i = 1; i < 10; i++) notches.lineBetween(x + width * i / 10, y, x + width * i / 10, y + H);
 
     this.nameText = add(scene.add.text(flipped ? x + width : x, y - 25, name.toUpperCase(), {
-      fontFamily: 'Impact, Arial Black', fontSize: '19px', color: '#fff3d8', stroke: '#07090f', strokeThickness: 4,
+      fontFamily: FONT_NAME, fontSize: '26px', color: '#fff3d8', stroke: '#07090f', strokeThickness: 4,
     }).setOrigin(flipped ? 1 : 0, 0), 55);
     this.valueText = add(scene.add.text(flipped ? x + 8 : x + width - 8, y + H / 2, '', {
-      fontFamily: 'Impact, Arial Black', fontSize: '17px', color: '#ffffff', stroke: '#07090f', strokeThickness: 4,
+      fontFamily: FONT_NUMBER, fontSize: '17px', color: '#ffffff', stroke: '#07090f', strokeThickness: 4,
     }).setOrigin(flipped ? 0 : 1, 0.5), 55);
     this.setHealth(maxHealth);
     this.layout();
