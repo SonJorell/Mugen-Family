@@ -232,3 +232,13 @@ Formato: fecha · contexto · decisión · motivo. Las más recientes van al fin
   un golpe, en un juggle ni en el suelo, y escapar empuja a ambos.
 - **Animaciones:** quien agarra usa HEAVY_PUNCH y quien es agarrado HIT_REACTION; no hay animación
   de lanzamiento propia (no se genera arte nuevo).
+
+## 2026-11-16 · Tipografías
+- **Decisión:** Rajdhani para interfaz y menús, Teko para los nombres sobre las barras de vida, Anton
+  para reloj, salud y combos, y Edo SZ para los anuncios (ROUND, ¡PELEA!, K.O.) y títulos. Viven en
+  `public/assets/fonts` y se usan solo a través de las constantes de `src/ui/fonts.ts`.
+- **Pendiente antes de publicar:** Edo SZ (Vic Fieger) es freeware sin términos escritos de
+  redistribución. Hay que confirmar su licencia antes de subir el juego a un sitio público; mientras
+  tanto Black Ops One (OFL) queda en la carpeta como reemplazo abierto.
+- **Selección sin colores:** la pantalla de selección ya no ofrece paletas porque vendrán skins por
+  personaje; en un combate espejo el rival se tiñe solo para distinguirlo.

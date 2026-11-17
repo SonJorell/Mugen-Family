@@ -271,12 +271,12 @@ export class SelectionScene extends Phaser.Scene {
         this.place(this.add.circle(corner, 720, 468).setStrokeStyle(1, accent, active ? 0.55 : 0.2)).isFilled = false;
         if (active) this.live.push(t => arc.setStrokeStyle(4, accent, 0.62 + Math.sin(t * 4) * 0.38));
         art = this.portrait(corner + out * 222, 770, 650, choice, !player);
-        this.text(edge, 532, player ? '1P · Tu personaje' : rivalTag + ' · Rival', 19, player ? '#ef9dbb' : '#a1ece5')
+        this.text(edge, 514, player ? '1P · Tu personaje' : rivalTag + ' · Rival', 19, player ? '#ef9dbb' : '#a1ece5')
           .setOrigin(origin, 0).setFontStyle('bold').setStroke('#14101e', 5);
         // The name sits over the art, outlined so it reads on any fighter, and shrinks to stay in its corner.
-        const name = this.text(edge, 552, rosterEntry(choice.characterId).name.toUpperCase(), 66, '#fae8cb', false, true)
+        const name = this.text(edge, 534, rosterEntry(choice.characterId).name.toUpperCase(), 86, '#fae8cb', false, true)
           .setOrigin(origin, 0).setStroke('#14101e', 10);
-        if (name.width > 350) name.setFontSize(Math.floor(66 * 350 / name.width));
+        if (name.width > 350) name.setFontSize(Math.floor(86 * 350 / name.width));
       });
       // Corners rise in from off-screen; a changed fighter pops up from its corner.
       if (fresh) this.enter(card, { x: -out * 140, y: 90, alpha: 0 }, { duration: 460, delay: 60 });
