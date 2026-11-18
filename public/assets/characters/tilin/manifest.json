@@ -1,195 +1,354 @@
 {
   "characterId": "tilin",
   "name": "Tilin",
-  "assetPath": "/assets/characters/tilin-v2/",
-  "version": 3,
+  "assetPath": "/assets/characters/tilin-unified/",
+  "version": 4,
   "spriteSheet": {
-    "columns": 4,
-    "rows": 3,
-    "frameCount": 12,
+    "columns": 6,
+    "rows": 1,
+    "frameCount": 6,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
     "animations": {
       "IDLE": {
         "frameRate": 14,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 252,
+        "alignFeet": true,
+        "sourceAnchorX": 139.5
       },
       "WALK_FORWARD": {
         "frameRate": 18,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 253,
+        "alignFeet": true,
+        "sourceAnchorX": 131
       },
       "WALK_BACKWARD": {
         "frameRate": 16,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": true,
+        "sourceAnchorX": 135
       },
       "DASH": {
         "frameRate": 28,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 253,
+        "alignFeet": true,
+        "sourceAnchorX": 131
       },
       "CROUCH": {
         "frameRate": 36,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 147.5
       },
       "JUMP": {
         "frameRate": 14,
         "repeat": 0,
-        "alignFeet": false
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 255,
+        "alignFeet": false,
+        "sourceAnchorX": 144
       },
       "LIGHT_PUNCH": {
         "frameRate": 30,
         "repeat": 0,
         "impactStart": 3,
-        "impactEnd": 6
+        "impactEnd": 6,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 251,
+        "alignFeet": true,
+        "sourceAnchorX": 139
       },
       "HEAVY_PUNCH": {
         "frameRate": 28,
         "repeat": 0,
         "impactStart": 4,
-        "impactEnd": 7
+        "impactEnd": 7,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 253,
+        "alignFeet": true,
+        "sourceAnchorX": 140
       },
       "LIGHT_KICK": {
         "frameRate": 30,
         "repeat": 0,
         "impactStart": 4,
-        "impactEnd": 7
+        "impactEnd": 7,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 249,
+        "alignFeet": true,
+        "sourceAnchorX": 128.5
       },
       "HEAVY_KICK": {
         "frameRate": 26,
         "repeat": 0,
         "impactStart": 4,
-        "impactEnd": 7
+        "impactEnd": 7,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": true,
+        "sourceAnchorX": 130
       },
       "BLOCK": {
         "frameRate": 48,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 134.5
       },
       "HIT_REACTION": {
         "frameRate": 30,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 134.5
       },
       "KNOCKDOWN": {
         "frameRate": 24,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 132
       },
       "GET_UP": {
         "frameRate": 24,
         "repeat": 0,
-        "referenceFrame": 11
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 253,
+        "alignFeet": true,
+        "sourceAnchorX": 128.5
       },
       "TAUNT": {
         "frameRate": 16,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 249,
+        "alignFeet": false,
+        "sourceAnchorX": 154.5
       },
       "VICTORY": {
         "frameRate": 12,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": false,
+        "sourceAnchorX": 155
       },
       "DEFEAT": {
         "frameRate": 18,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 253,
+        "alignFeet": true,
+        "sourceAnchorX": 131
       },
       "SPECIAL_ATTACK": {
         "frameRate": 24,
         "repeat": 0,
         "impactStart": 3,
-        "impactEnd": 8
+        "impactEnd": 8,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 254,
+        "alignFeet": false,
+        "sourceAnchorX": 130.5
       },
       "STUN": {
         "frameRate": 16,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 254,
+        "alignFeet": true,
+        "sourceAnchorX": 148.5
       },
       "AIR_PUNCH": {
         "frameRate": 30,
         "repeat": 0,
         "impactStart": 5,
         "impactEnd": 8,
-        "alignFeet": false
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 253,
+        "alignFeet": false,
+        "sourceAnchorX": 144.5
       },
       "AIR_KICK": {
         "frameRate": 30,
         "repeat": 0,
         "impactStart": 3,
         "impactEnd": 7,
-        "alignFeet": false
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 252,
+        "alignFeet": false,
+        "sourceAnchorX": 132.5
       },
       "DOUBLE_JUMP": {
         "frameRate": 18,
         "repeat": 0,
-        "alignFeet": false
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 252,
+        "alignFeet": false,
+        "sourceAnchorX": 130.5
       },
       "LANDING": {
         "frameRate": 48,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 4,
+        "rows": 3,
+        "frameCount": 12,
+        "sourceBodyHeight": 324.68067226890753,
+        "groundY": 341,
+        "alignFeet": true,
+        "sourceAnchorX": 202
       }
     }
   },
   "animations": {
     "IDLE": [
-      "IDLE.webp"
+      "/assets/characters/tilin-unified/IDLE.webp"
     ],
     "WALK_FORWARD": [
-      "WALK_FORWARD.webp"
+      "/assets/characters/tilin-unified/WALK_FORWARD.webp"
     ],
     "WALK_BACKWARD": [
-      "WALK_BACKWARD.webp"
+      "/assets/characters/tilin-unified/WALK_BACKWARD.webp"
     ],
     "DASH": [
-      "DASH.webp"
+      "/assets/characters/tilin-unified/DASH.webp"
     ],
     "CROUCH": [
-      "CROUCH.webp"
+      "/assets/characters/tilin-unified/CROUCH.webp"
     ],
     "JUMP": [
-      "JUMP.webp"
+      "/assets/characters/tilin-unified/JUMP.webp"
     ],
     "LIGHT_PUNCH": [
-      "LIGHT_PUNCH.webp"
+      "/assets/characters/tilin-unified/LIGHT_PUNCH.webp"
     ],
     "HEAVY_PUNCH": [
-      "HEAVY_PUNCH.webp"
+      "/assets/characters/tilin-unified/HEAVY_PUNCH.webp"
     ],
     "LIGHT_KICK": [
-      "LIGHT_KICK.webp"
+      "/assets/characters/tilin-unified/LIGHT_KICK.webp"
     ],
     "HEAVY_KICK": [
-      "HEAVY_KICK.webp"
+      "/assets/characters/tilin-unified/HEAVY_KICK.webp"
     ],
     "BLOCK": [
-      "BLOCK.webp"
+      "/assets/characters/tilin-unified/BLOCK.webp"
     ],
     "HIT_REACTION": [
-      "HIT_REACTION.webp"
+      "/assets/characters/tilin-unified/HIT_REACTION.webp"
     ],
     "KNOCKDOWN": [
-      "KNOCKDOWN.webp"
+      "/assets/characters/tilin-unified/KNOCKDOWN.webp"
     ],
     "GET_UP": [
-      "GET_UP.webp"
+      "/assets/characters/tilin-unified/GET_UP.webp"
     ],
     "TAUNT": [
-      "TAUNT.webp"
+      "/assets/characters/tilin-unified/TAUNT.webp"
     ],
     "VICTORY": [
-      "VICTORY.webp"
+      "/assets/characters/tilin-unified/VICTORY.webp"
     ],
     "DEFEAT": [
-      "DEFEAT.webp"
+      "/assets/characters/tilin-unified/DEFEAT.webp"
     ],
     "SPECIAL_ATTACK": [
-      "/assets/characters/tilin-v3/SPECIAL_ATTACK/SPECIAL_ATTACK.webp"
+      "/assets/characters/tilin-unified/SPECIAL_ATTACK.webp"
     ],
     "STUN": [
-      "/assets/characters/tilin-v3/STUN/STUN.webp"
+      "/assets/characters/tilin-unified/STUN.webp"
     ],
     "AIR_PUNCH": [
-      "/assets/characters/tilin-v3/AIR_PUNCH/AIR_PUNCH.webp"
+      "/assets/characters/tilin-unified/AIR_PUNCH.webp"
     ],
     "AIR_KICK": [
-      "/assets/characters/tilin-v3/AIR_KICK/AIR_KICK.webp"
+      "/assets/characters/tilin-unified/AIR_KICK.webp"
     ],
     "DOUBLE_JUMP": [
-      "/assets/characters/tilin-v3/DOUBLE_JUMP/DOUBLE_JUMP.webp"
+      "/assets/characters/tilin-unified/DOUBLE_JUMP.webp"
     ],
     "LANDING": [
-      "/assets/characters/tilin-v3/LANDING/LANDING.webp"
+      "/assets/characters/tilin-unified/LANDING.webp"
     ]
-  }
+  },
+  "visualStyle": "painted-arcade-2026"
 }

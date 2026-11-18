@@ -57,6 +57,7 @@ async function blocksOutOf(page: Page, difficulty: string, trials: number) {
 }
 
 test('with the same seed, Hard blocks clearly more than Easy and Normal sits between them', async ({ page }) => {
+  test.setTimeout(90000); // Three complete browser loads, one for each difficulty.
   const easy = await blocksOutOf(page, 'easy', 40);
   const normal = await blocksOutOf(page, 'normal', 40);
   const hard = await blocksOutOf(page, 'hard', 40);

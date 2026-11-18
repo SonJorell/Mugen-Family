@@ -1,0 +1,358 @@
+{
+  "characterId": "joako",
+  "name": "Joako",
+  "assetPath": "/assets/characters/joako-unified/",
+  "spriteSheet": {
+    "columns": 6,
+    "rows": 1,
+    "frameCount": 6,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "animations": {
+      "IDLE": {
+        "frameRate": 8,
+        "repeat": -1,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 249,
+        "alignFeet": true
+      },
+      "WALK_FORWARD": {
+        "frameRate": 14,
+        "repeat": -1,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 249,
+        "alignFeet": true
+      },
+      "WALK_BACKWARD": {
+        "frameRate": 12,
+        "repeat": -1,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": true
+      },
+      "DASH": {
+        "frameRate": 20,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 248,
+        "alignFeet": true
+      },
+      "CROUCH": {
+        "frameRate": 32,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 248,
+        "alignFeet": true
+      },
+      "JUMP": {
+        "frameRate": 10,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 248,
+        "alignFeet": false
+      },
+      "AIR_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 248,
+        "alignFeet": false
+      },
+      "AIR_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 248,
+        "alignFeet": false
+      },
+      "LIGHT_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 249,
+        "alignFeet": true
+      },
+      "HEAVY_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": true
+      },
+      "LIGHT_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 249,
+        "alignFeet": true
+      },
+      "HEAVY_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 248,
+        "alignFeet": true
+      },
+      "BLOCK": {
+        "frameRate": 30,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 252,
+        "alignFeet": true
+      },
+      "HIT_REACTION": {
+        "frameRate": 22,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 251,
+        "alignFeet": true
+      },
+      "STUN": {
+        "frameRate": 10,
+        "repeat": -1,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 252,
+        "alignFeet": true
+      },
+      "GET_UP": {
+        "frameRate": 12,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 248,
+        "alignFeet": true
+      },
+      "KNOCKDOWN": {
+        "frameRate": 14,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 249,
+        "alignFeet": true
+      },
+      "DEFEAT": {
+        "frameRate": 12,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 248,
+        "alignFeet": true
+      },
+      "VICTORY": {
+        "columns": 6,
+        "rows": 4,
+        "frameCount": 24,
+        "sourceBodyHeight": 206.24369747899158,
+        "groundY": 254,
+        "canvasHeight": 448,
+        "frameRate": 18,
+        "repeat": -1,
+        "alignFeet": false
+      },
+      "TAUNT": {
+        "frameRate": 10,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": false
+      },
+      "SPECIAL_ATTACK": {
+        "frameRate": 15,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": false
+      },
+      "BUILD": {
+        "frameRate": 12,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": false
+      },
+      "FIRE": {
+        "frameRate": 16,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 250,
+        "alignFeet": false
+      },
+      "LANDING": {
+        "frameRate": 24,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242.99999999999997,
+        "groundY": 249,
+        "alignFeet": true
+      },
+      "DOUBLE_JUMP": {
+        "columns": 4,
+        "rows": 3,
+        "frameCount": 12,
+        "sourceBodyHeight": 324.68067226890753,
+        "groundY": 341,
+        "frameRate": 22,
+        "repeat": 0,
+        "alignFeet": false
+      }
+    }
+  },
+  "animations": {
+    "IDLE": [
+      "/assets/characters/joako-unified/IDLE.webp"
+    ],
+    "WALK_FORWARD": [
+      "/assets/characters/joako-unified/WALK_FORWARD.webp"
+    ],
+    "WALK_BACKWARD": [
+      "/assets/characters/joako-unified/WALK_BACKWARD.webp"
+    ],
+    "DASH": [
+      "/assets/characters/joako-unified/DASH.webp"
+    ],
+    "CROUCH": [
+      "/assets/characters/joako-unified/CROUCH.webp"
+    ],
+    "JUMP": [
+      "/assets/characters/joako-unified/JUMP.webp"
+    ],
+    "AIR_PUNCH": [
+      "/assets/characters/joako-unified/AIR_PUNCH.webp"
+    ],
+    "AIR_KICK": [
+      "/assets/characters/joako-unified/AIR_KICK.webp"
+    ],
+    "LIGHT_PUNCH": [
+      "/assets/characters/joako-unified/LIGHT_PUNCH.webp"
+    ],
+    "HEAVY_PUNCH": [
+      "/assets/characters/joako-unified/HEAVY_PUNCH.webp"
+    ],
+    "LIGHT_KICK": [
+      "/assets/characters/joako-unified/LIGHT_KICK.webp"
+    ],
+    "HEAVY_KICK": [
+      "/assets/characters/joako-unified/HEAVY_KICK.webp"
+    ],
+    "BLOCK": [
+      "/assets/characters/joako-unified/BLOCK.webp"
+    ],
+    "HIT_REACTION": [
+      "/assets/characters/joako-unified/HIT_REACTION.webp"
+    ],
+    "STUN": [
+      "/assets/characters/joako-unified/STUN.webp"
+    ],
+    "GET_UP": [
+      "/assets/characters/joako-unified/GET_UP.webp"
+    ],
+    "KNOCKDOWN": [
+      "/assets/characters/joako-unified/KNOCKDOWN.webp"
+    ],
+    "DEFEAT": [
+      "/assets/characters/joako-unified/DEFEAT.webp"
+    ],
+    "VICTORY": [
+      "/assets/characters/joako-unified/VICTORY.webp"
+    ],
+    "TAUNT": [
+      "/assets/characters/joako-unified/TAUNT.webp"
+    ],
+    "SPECIAL_ATTACK": [
+      "/assets/characters/joako-unified/SPECIAL_ATTACK.webp"
+    ],
+    "BUILD": [
+      "/assets/characters/joako-unified/BUILD.webp"
+    ],
+    "FIRE": [
+      "/assets/characters/joako-unified/FIRE.webp"
+    ],
+    "LANDING": [
+      "/assets/characters/joako-unified/LANDING.webp"
+    ],
+    "DOUBLE_JUMP": [
+      "/assets/characters/joako-unified/DOUBLE_JUMP.webp"
+    ]
+  },
+  "visualStyle": "painted-arcade-2026",
+  "version": 4
+}

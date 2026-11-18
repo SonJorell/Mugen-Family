@@ -2,7 +2,7 @@ import { chromium } from '@playwright/test';
 import { mkdir, copyFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 
-const output = 'artifacts/cesar-drive';
+const output = process.env.OUTPUT_DIR ?? 'artifacts/cesar-drive';
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, recordVideo: { dir: output, size: { width: 1280, height: 720 } } });

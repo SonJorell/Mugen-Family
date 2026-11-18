@@ -21,8 +21,8 @@ test('selection cycles CPU → Práctica → Jugador 2 and starts a two-player m
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
   const mode = () => page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').mode);
-  await page.mouse.click(640, 565); await expect.poll(mode).toBe('training');
-  await page.mouse.click(640, 565); await expect.poll(mode).toBe('versus');
+  await page.mouse.click(524, 528); await expect.poll(mode).toBe('training');
+  await page.mouse.click(524, 528); await expect.poll(mode).toBe('versus');
   const labels = await page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').content.list.map((c: any) => c.text).filter(Boolean));
   expect(labels).toContain('Rival: Jugador 2');
   expect(labels).not.toContain('CPU: Normal');

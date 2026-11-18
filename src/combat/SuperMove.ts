@@ -5,6 +5,9 @@ import { superPortraitKey } from '../config/characters';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { CesarDriveSequence } from './CesarDriveSequence';
 import { DRIVE_BEATS, DRIVE_DURATION } from './driveAssets';
+import { BUILD_BEATS, BUILD_DURATION, JoakoBuildSequence } from './JoakoBuildSequence';
+import { KAME_BEATS, KAME_DURATION, JorellKameSequence } from './JorellKameSequence';
+import { BIKE_BEATS, BIKE_DURATION, TataBikeSequence } from './TataBikeSequence';
 import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 const BEATS = [
@@ -37,6 +40,9 @@ export class SuperMove {
   private expanded = false;
   private controls?: Phaser.GameObjects.Text;
   private drive?: CesarDriveSequence;
+  private build?: JoakoBuildSequence;
+  private kame?: JorellKameSequence;
+  private bike?: TataBikeSequence;
   private casterOrigin = { x: 0, y: 0 };
   private readonly motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   private pauseAudio = () => this.sound?.pause();
@@ -68,8 +74,17 @@ export class SuperMove {
     if (attacker.stats.special === 'drive') {
       this.drive = new CesarDriveSequence(this.scene, attacker, defender, this.identify(defender).id, this.stageTexture(), this.fromRight);
       this.layer = this.drive.layer;
+    } else if (attacker.stats.special === 'build') {
+      this.build = new JoakoBuildSequence(this.scene, attacker, defender, this.stageTexture(), this.fromRight);
+      this.layer = this.build.layer;
+    } else if (attacker.stats.special === 'kame') {
+      this.kame = new JorellKameSequence(this.scene, attacker, defender, this.identify(defender).id, this.stageTexture(), this.fromRight);
+      this.layer = this.kame.layer;
+    } else if (attacker.stats.special === 'bike') {
+      this.bike = new TataBikeSequence(this.scene, attacker, defender, this.identify(defender).id, this.stageTexture(), this.fromRight);
+      this.layer = this.bike.layer;
     } else this.createArt();
-    const soundKey = this.drive ? 'super-drive' : 'super-canto';
+    const soundKey = this.drive ? 'super-drive' : this.build ? 'super-build' : this.kame ? 'super-kame' : this.bike ? 'super-bike' : 'super-canto';
     if (this.scene.cache.audio.exists(soundKey)) {
       this.sound = this.scene.sound.add(soundKey, { volume: 0.72 }) as SuperSound;
       this.sound.play();
@@ -84,9 +99,9 @@ export class SuperMove {
     this.layer.add(s.add.rectangle(640, 360, 1280, 720, 0x071321, 0.95));
     this.art = s.add.graphics(); this.layer.add(this.art);
     this.caster = s.add.image(this.casterX, 605, this.attacker!.sprite.texture.key).setOrigin(0.5, 0.975)
-      .setScale(1.06).setFlipX(this.fromRight).setTint(this.attacker!.sprite.tintTopLeft);
+      .setScale(1.06 * this.attacker!.stats.size).setFlipX(this.fromRight).setTint(this.attacker!.sprite.tintTopLeft);
     this.victim = s.add.image(this.victimX, 605, this.defender!.sprite.texture.key).setOrigin(0.5, 0.975)
-      .setScale(1.06).setFlipX(!this.fromRight).setTint(this.defender!.sprite.tintTopLeft);
+      .setScale(1.06 * this.defender!.stats.size).setFlipX(!this.fromRight).setTint(this.defender!.sprite.tintTopLeft);
     this.layer.add([this.caster, this.victim]);
     const caster = this.identify(this.attacker!);
     this.portrait = s.add.image(this.fromRight ? 890 : 390, 399, superPortraitKey(caster.id))
@@ -110,7 +125,8 @@ export class SuperMove {
 
   update(delta: number): void {
     if (!this.active || !this.attacker || !this.defender) return;
-    const beats = this.drive ? DRIVE_BEATS : BEATS, duration = this.drive ? DRIVE_DURATION : DURATION;
+    const beats = this.drive ? DRIVE_BEATS : this.build ? BUILD_BEATS : this.kame ? KAME_BEATS : this.bike ? BIKE_BEATS : BEATS;
+    const duration = this.drive ? DRIVE_DURATION : this.build ? BUILD_DURATION : this.kame ? KAME_DURATION : this.bike ? BIKE_DURATION : DURATION;
     this.elapsed = Math.min(duration, this.elapsed + Math.max(0, delta));
     while (this.beat < beats.length && this.elapsed + 0.001 >= beats[this.beat].at) {
       this.damage += this.defender.takeSuperDamage(beats[this.beat].damage);
@@ -119,14 +135,21 @@ export class SuperMove {
     }
     this.attacker.updatePresentation(delta); this.defender.updatePresentation(delta);
     if (this.drive) this.drive.render(this.elapsed, this.damage, this.motion.matches);
+    else if (this.build) this.build.render(this.elapsed, this.damage, this.motion.matches);
+    else if (this.kame) this.kame.render(this.elapsed, this.damage, this.motion.matches);
+    else if (this.bike) this.bike.render(this.elapsed, this.damage, this.motion.matches);
     else this.render();
     if (this.elapsed >= duration) {
-      if (this.drive) {
-        // Commit the throw only on completion; cancelling never teleports either fighter.
-        this.attacker.x = this.casterOrigin.x; this.attacker.y = this.casterOrigin.y;
-        this.defender.x = this.fromRight ? 180 : GAME_CONFIG.STAGE_WIDTH - 180;
+      if (this.drive || this.kame) {
+        // Commit cinematic positions only on completion; cancelling leaves fighters in place.
+        this.attacker.x = this.kame ? Phaser.Math.Clamp(this.defender.x + (this.fromRight ? 650 : -650), 80, GAME_CONFIG.STAGE_WIDTH - 80) : this.casterOrigin.x;
+        this.attacker.y = this.casterOrigin.y;
+        if (this.drive) this.defender.x = this.fromRight ? 180 : GAME_CONFIG.STAGE_WIDTH - 180;
         this.defender.y = GAME_CONFIG.FLOOR_Y;
         this.defender.isGrounded = true; this.defender.velocityY = 0;
+        // Stun and defeat lock normal turning: commit the cinematic's facing with its landing.
+        this.defender.facingRight = this.attacker.x > this.defender.x;
+        this.defender.sprite.setFlipX(!this.defender.facingRight);
         this.attacker.sprite.setPosition(this.attacker.x, this.attacker.y);
         this.defender.sprite.setPosition(this.defender.x, this.defender.y);
         this.scene.cameras.main.scrollX = Phaser.Math.Clamp(
@@ -202,6 +225,9 @@ export class SuperMove {
     this.controls = undefined;
     this.layer?.destroy(); this.layer = undefined;
     this.drive = undefined;
+    this.build = undefined;
+    this.kame = undefined;
+    this.bike = undefined;
     this.sound?.destroy(); this.sound = undefined;
     this.attacker = undefined; this.defender = undefined;
   }

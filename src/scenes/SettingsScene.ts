@@ -89,30 +89,30 @@ export class SettingsScene extends Phaser.Scene {
     ];
 
     this.add.image(640, 360, 'menu_arica_coast').setDisplaySize(1324, 745).setAlpha(0.55);
-    this.add.rectangle(640, 360, 1280, 720, 0x06111b, 0.82);
-    this.add.text(96, 40, 'CONFIGURACIÓN', { fontFamily: FONT_IMPACT, fontSize: '60px', color: '#fff3d8' });
+    this.add.rectangle(640, 360, 1280, 720, 0x1257c4, 0.82);
+    this.add.text(96, 40, 'CONFIGURACIÓN', { fontFamily: FONT_IMPACT, fontSize: '60px', color: '#fff7ec' });
     this.add.text(100, 112, 'Pantalla, audio y teclas. Los cambios se guardan solos.', {
-      fontFamily: FONT_UI, fontSize: '20px', color: '#9fe8e1',
+      fontFamily: FONT_UI, fontSize: '20px', color: '#7fd4ff',
     });
-    this.add.text(100, 160, 'PANTALLA', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
-    this.add.text(100, 236, 'AUDIO', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
-    this.add.text(100, 562, 'CONTROLES', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#f5bd75' });
+    this.add.text(100, 160, 'PANTALLA', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#ffb02e' });
+    this.add.text(100, 236, 'AUDIO', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#ffb02e' });
+    this.add.text(100, 562, 'CONTROLES', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#ffb02e' });
 
     const ys = [200, 276, 326, 376, 426, 476, 526, 600, 654];
     this.rows.forEach((row, i) => {
       const y = ys[i], back = i === this.rows.length - 1;
-      const bg = this.add.rectangle(96, y, back ? 240 : 760, 44, 0x143a51, 0.4).setOrigin(0, 0.5)
+      const bg = this.add.rectangle(96, y, back ? 240 : 760, 44, 0x1f6fd6, 0.4).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
       const label = this.add.text(back ? 216 : 120, y, row.label, {
-        fontFamily: back ? FONT_IMPACT : FONT_UI, fontSize: back ? '24px' : '22px', color: '#fff3d8',
+        fontFamily: back ? FONT_IMPACT : FONT_UI, fontSize: back ? '24px' : '22px', color: '#fff7ec',
       }).setOrigin(back ? 0.5 : 0, 0.5);
       const value = this.add.text(row.level ? 612 : 830, y, '', {
-        fontFamily: FONT_UI, fontSize: '22px', fontStyle: 'bold', color: '#9fe8e1',
+        fontFamily: FONT_UI, fontSize: '22px', fontStyle: 'bold', color: '#7fd4ff',
       }).setOrigin(1, 0.5);
       const objects: (typeof this.rowObjects)[number] = { bg, label, value };
       if (row.level) {
-        objects.barBack = this.add.rectangle(632, y, 150, 10, 0x263c51).setOrigin(0, 0.5);
-        objects.bar = this.add.rectangle(632, y, 150, 10, 0x9fe8e1).setOrigin(0, 0.5);
+        objects.barBack = this.add.rectangle(632, y, 150, 10, 0x2f86f0).setOrigin(0, 0.5);
+        objects.bar = this.add.rectangle(632, y, 150, 10, 0x7fd4ff).setOrigin(0, 0.5);
         this.smallButton(800, y, '−', () => { this.selectedIndex = i; row.adjust!(-1); this.refresh(); });
         this.smallButton(838, y, '+', () => { this.selectedIndex = i; row.adjust!(1); this.refresh(); });
       }
@@ -155,7 +155,7 @@ export class SettingsScene extends Phaser.Scene {
 
   private smallButton(x: number, y: number, text: string, action: () => void): void {
     this.add.text(x, y, text, {
-      fontFamily: FONT_UI, fontSize: '22px', color: '#fae8cb', backgroundColor: '#241a35', padding: { x: 9, y: 2 },
+      fontFamily: FONT_UI, fontSize: '22px', color: '#fff7ec', backgroundColor: '#0e3a80', padding: { x: 9, y: 2 },
     }).setOrigin(0.5).setDepth(5).setInteractive({ useHandCursor: true }).on('pointerdown', action);
   }
 
@@ -168,9 +168,9 @@ export class SettingsScene extends Phaser.Scene {
     this.rows.forEach((row, i) => {
       const o = this.rowObjects[i]; if (!o) return;
       const selected = i === this.selectedIndex;
-      o.bg.setFillStyle(selected ? 0x143a51 : 0x143a51, selected ? 0.95 : 0.4);
-      if (selected) o.bg.setStrokeStyle(2, 0x9fe8e1); else o.bg.setStrokeStyle();
-      o.label.setColor(selected ? '#9fe8e1' : '#fff3d8');
+      o.bg.setFillStyle(selected ? 0x1f6fd6 : 0x1f6fd6, selected ? 0.95 : 0.4);
+      if (selected) o.bg.setStrokeStyle(2, 0x7fd4ff); else o.bg.setStrokeStyle();
+      o.label.setColor(selected ? '#7fd4ff' : '#fff7ec');
       o.value.setText(row.value());
       if (o.bar && row.level) o.bar.setDisplaySize(Math.max(1, 150 * Phaser.Math.Clamp(row.level(), 0, 1)), 10);
     });

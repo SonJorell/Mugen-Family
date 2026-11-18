@@ -9,6 +9,7 @@ import { ensureFaceTexture } from '../ui/selection/fighterFaces';
 import { ensureGlowTexture, Title3D } from '../ui/menu/MenuEffects';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
+import { announce } from '../systems/Announcer';
 import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 interface SelectionData {
@@ -20,6 +21,9 @@ interface SelectionData {
   opponentChoice?: FighterChoice;
   selectionPhase?: 'fighters' | 'stage';
 }
+
+/** Fire colours of the VS, matching the fighters' names: extrusion (far, near) and face (top, bottom). */
+const VS_FIRE = { side: [0x3a0a05, 0xb3260f] as [number, number], face: [0xffd24a, 0xe8401c] as [number, number] };
 
 const MODE_LABELS: Record<GameMode, string> = { cpu: 'CPU', training: 'Práctica', versus: 'Jugador 2' };
 
@@ -44,6 +48,7 @@ export class SelectionScene extends Phaser.Scene {
   private title!: Phaser.GameObjects.Text;
   private steps!: Phaser.GameObjects.Text;
   private help!: Phaser.GameObjects.Text;
+  private helpBar!: Phaser.GameObjects.Rectangle;
   private transition?: Phaser.Time.TimerEvent;
   /** IDLE animation key per character id. */
   private idleKeys = new Map<string, string>();
@@ -51,6 +56,8 @@ export class SelectionScene extends Phaser.Scene {
   private backdrop!: SelectionBackdrop;
   /** Objects outside `content` that belong to the current render (3D titles, flashes). */
   private extras: { destroy(): void }[] = [];
+  /** Burst played over the next screen when the matchup is accepted; cleared by any later render. */
+  private flourish: { destroy(): void }[] = [];
   /** Per-frame ambient animation of the current render; receives seconds. */
   private live: ((t: number) => void)[] = [];
   private bucket?: Animatable[];
@@ -72,23 +79,24 @@ export class SelectionScene extends Phaser.Scene {
     this.phase = data?.selectionPhase === 'stage' ? 'stage' : 'fighters';
     this.activeSide = 'player'; this.transition = undefined;
     this.syncPalettes();
-    this.extras = []; this.live = []; this.shown = {}; this.clock = 0; this.pointerX = 0; this.pointerY = 0;
+    this.extras = []; this.flourish = []; this.live = []; this.shown = {}; this.clock = 0; this.pointerX = 0; this.pointerY = 0;
   }
   create(): void {
     isolateSceneKeyboard(this);
     const video = document.getElementById('menu-video-bg') as HTMLVideoElement | null;
     if (video) { video.pause(); video.style.display = 'none'; }
     GameAudio.for(this).play('music-menu');
+    if (this.phase === 'fighters') announce(this, 'select');
     this.backdrop = new SelectionBackdrop(this);
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
       this.pointerX = Phaser.Math.Clamp((pointer.x - 640) / 640, -1, 1);
       this.pointerY = Phaser.Math.Clamp((pointer.y - 360) / 360, -1, 1);
     });
     this.input.on('gameout', () => { this.pointerX = 0; this.pointerY = 0; });
-    this.add.rectangle(640, 677, 1280, 86, 0x14101e).setDepth(20);
-    this.title = this.add.text(48, 30, '', { fontFamily: FONT_IMPACT, fontSize: '43px', color: '#fae8cb' }).setDepth(30);
-    this.steps = this.add.text(50, 88, '', { fontFamily: FONT_UI, fontSize: '18px', color: '#a1ece5' }).setDepth(30);
-    this.help = this.add.text(48, 683, '', { fontFamily: FONT_UI, fontSize: '15px', color: '#c9b8da' }).setDepth(30);
+    this.helpBar = this.add.rectangle(640, 677, 1280, 86, 0x1757c2).setDepth(20);
+    this.title = this.add.text(48, 30, '', { fontFamily: FONT_IMPACT, fontSize: '43px', color: '#fff7ec' }).setStroke('#0e3a80', 6).setDepth(30);
+    this.steps = this.add.text(50, 88, '', { fontFamily: FONT_UI, fontSize: '18px', color: '#7fd4ff' }).setStroke('#0e3a80', 4).setDepth(30);
+    this.help = this.add.text(48, 683, '', { fontFamily: FONT_UI, fontSize: '15px', color: '#e3f1ff' }).setDepth(30);
     this.content = this.add.container(0, 0).setDepth(25);
     // Rendering replaces the preview objects. Resolve clicks against current bounds
     // immediately, without waiting for Phaser's next interactive-object queue flush.
@@ -116,10 +124,10 @@ export class SelectionScene extends Phaser.Scene {
     for (const k of ['DOWN', 'S']) key(k, () => this.phase === 'stage' ? this.navigate(3) : this.changeSide());
     for (const k of ['ENTER', 'SPACE']) key(k, () => this.confirm());
     key('ESC', () => this.back());
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.transition?.remove());
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.transition?.remove(); this.showVideo(false); });
     this.render();
   }
-  private text(x: number, y: number, value: string, size = 20, color = '#fae8cb', centered = false, headline = false) {
+  private text(x: number, y: number, value: string, size = 20, color = '#fff7ec', centered = false, headline = false) {
     const text = this.add.text(x, y, value, { fontFamily: headline ? FONT_IMPACT : FONT_UI, fontSize: size + 'px', color });
     if (centered) text.setOrigin(0.5, 0);
     this.content.add(text); this.bucket?.push(text); return text;
@@ -129,17 +137,17 @@ export class SelectionScene extends Phaser.Scene {
     this.content.add(rect); this.bucket?.push(rect); return rect;
   }
   private button(x: number, y: number, width: number, label: string, action: () => void, primary = false) {
-    const rect = this.clickable(this.rectangle(x, y, width, 46, primary ? 0xef709d : 0x473b72), action);
-    rect.on('pointerover', () => rect.setStrokeStyle(2, 0xa1ece5));
+    const rect = this.clickable(this.rectangle(x, y, width, 46, primary ? 0xff6a1f : 0x2f86f0), action);
+    rect.on('pointerover', () => rect.setStrokeStyle(2, 0x7fd4ff));
     rect.on('pointerout', () => rect.setStrokeStyle());
-    this.text(x, y - 14, label, 22, primary ? '#241a35' : '#fae8cb', true, primary);
+    this.text(x, y - 14, label, 22, primary ? '#0e3a80' : '#fff7ec', true, primary);
   }
   private clickable(rect: Phaser.GameObjects.Rectangle, action: () => void) {
     this.hitTargets.push({ bounds: rect.getBounds(), action });
     return rect.setInteractive({ useHandCursor: true });
   }
   private preview(x: number, y: number, scale: number, choice: FighterChoice, flip = false) {
-    const sprite = this.add.sprite(x, y, `${choice.characterId}_IDLE_0`).setOrigin(0.5, 0.975).setScale(scale * 2)
+    const sprite = this.add.sprite(x, y, `${choice.characterId}_IDLE_0`).setOrigin(0.5, 0.975).setScale(scale * 2 * rosterEntry(choice.characterId).stats.size)
       .setTint(fighterPalette(choice).tint).setFlipX(flip).play(this.idleKeys.get(choice.characterId) ?? '');
     this.content.add(sprite); this.bucket?.push(sprite); return sprite;
   }
@@ -215,10 +223,15 @@ export class SelectionScene extends Phaser.Scene {
     this.tweens.killAll();
     this.live = [];
     this.extras.forEach(extra => extra.destroy()); this.extras = [];
+    this.flourish.forEach(item => item.destroy()); this.flourish = [];
     this.content.removeAll(true);
     this.title.setPosition(48, 30).setAlpha(1); this.steps.setPosition(50, 88).setAlpha(1);
     this.help.setOrigin(0, 0).setPosition(48, 683);
     this.syncPalettes();
+    this.showVideo(this.phase === 'fighters');
+    // Over the video the controls float on the picture, without the dark bar.
+    this.helpBar.setVisible(this.phase !== 'fighters');
+    this.help.setStroke('#0e3a80', this.phase === 'fighters' ? 4 : 0).setColor(this.phase === 'fighters' ? '#fff7ec' : '#e3f1ff');
     const fresh = this.shown.phase !== this.phase;
     const now = { phase: this.phase, player: this.playerChoice.characterId + this.playerChoice.paletteId,
       opponent: this.opponentChoice.characterId + this.opponentChoice.paletteId, stage: this.stageIndex };
@@ -231,6 +244,16 @@ export class SelectionScene extends Phaser.Scene {
     }
     this.shown = now;
   }
+  /** The fighter screen plays its own looping, muted video behind the (transparent) canvas. */
+  private showVideo(on: boolean): void {
+    const video = document.getElementById('selection-video-bg') as HTMLVideoElement | null;
+    this.backdrop.setVisible(!on || !video);
+    if (!video) return;
+    video.muted = true;
+    video.style.display = on ? 'block' : 'none';
+    if (on && this.motion) void video.play().catch(() => undefined);
+    else video.pause();
+  }
   update(_time: number, delta: number): void {
     const dt = Math.min(delta, 50), motion = this.motion;
     this.backdrop.update(dt, this.pointerX, this.pointerY, motion);
@@ -240,6 +263,7 @@ export class SelectionScene extends Phaser.Scene {
   }
   /** Full-body art of a choice, rising from its corner; falls back to the sprite when a fighter has no art. */
   private portrait(x: number, foot: number, height: number, choice: FighterChoice, flip: boolean): Animatable {
+    height *= rosterEntry(choice.characterId).heightCm / 183;
     const key = menuArtKey(choice.characterId);
     if (!this.textures.exists(key)) return this.preview(x, Math.min(foot, 630), 0.5, choice, flip);
     const source = this.textures.get(key).getSourceImage();
@@ -258,72 +282,86 @@ export class SelectionScene extends Phaser.Scene {
     this.help.setText('Q E / ← →  Luchador     Tab / ↑ ↓  Lado     X  Dificultad     Enter  Confirmar     Esc  Volver')
       .setOrigin(0.5, 0).setX(640);
     const rivalTag = this.mode === 'cpu' ? 'CPU' : this.mode === 'versus' ? '2P' : 'PRÁCTICA';
-    // Each fighter rises out of a bottom corner inside a big arc, with the name written over the art.
+    // Each chosen fighter stands large on its side, cut by the bottom edge, with a big name in the corner.
     for (const side of ['player', 'opponent'] as const) {
-      const player = side === 'player', corner = player ? 0 : 1280, out = player ? 1 : -1;
+      const player = side === 'player', x = player ? 205 : 1075, out = player ? 1 : -1;
+      const edge = player ? 34 : 1246, origin = player ? 0 : 1;
       const choice = player ? this.playerChoice : this.opponentChoice;
-      const accent = player ? 0xef709d : 0xa1ece5, active = this.activeSide === side;
-      const edge = corner + out * 36, origin = player ? 0 : 1;
+      const accent = player ? 0xff6a1f : 0x7fd4ff, active = this.activeSide === side;
       let art!: Animatable;
       const card = this.collect(() => {
-        this.clickable(this.rectangle(corner + out * 220, 385, 440, 500, 0x000000, 0), () => { this.activeSide = side; this.render(); });
-        const arc = this.place(this.add.circle(corner, 720, 500, accent, active ? 0.2 : 0.08).setStrokeStyle(active ? 4 : 2, accent, active ? 1 : 0.4));
-        this.place(this.add.circle(corner, 720, 468).setStrokeStyle(1, accent, active ? 0.55 : 0.2)).isFilled = false;
-        if (active) this.live.push(t => arc.setStrokeStyle(4, accent, 0.62 + Math.sin(t * 4) * 0.38));
-        art = this.portrait(corner + out * 222, 770, 650, choice, !player);
-        this.text(edge, 514, player ? '1P · Tu personaje' : rivalTag + ' · Rival', 19, player ? '#ef9dbb' : '#a1ece5')
-          .setOrigin(origin, 0).setFontStyle('bold').setStroke('#14101e', 5);
-        // The name sits over the art, outlined so it reads on any fighter, and shrinks to stay in its corner.
-        const name = this.text(edge, 534, rosterEntry(choice.characterId).name.toUpperCase(), 86, '#fae8cb', false, true)
-          .setOrigin(origin, 0).setStroke('#14101e', 10);
-        if (name.width > 350) name.setFontSize(Math.floor(86 * 350 / name.width));
+        this.clickable(this.rectangle(x, 400, 400, 600, 0x000000, 0), () => { this.activeSide = side; this.render(); });
+        const glow = this.place(this.add.image(x, 380, ensureGlowTexture(this)).setDisplaySize(520, 640)
+          .setTint(accent).setBlendMode(Phaser.BlendModes.ADD).setAlpha(active ? 0.3 : 0));
+        if (active) this.live.push(t => glow.setAlpha(0.26 + Math.sin(t * 2.2) * 0.06));
+        art = this.portrait(x, 790, 700, choice, !player);
+        const label = this.text(edge, 564, player ? '1P · Tu personaje' : rivalTag + ' · Rival', 18, '#fff7ec')
+          .setOrigin(origin, 0).setFontStyle('bold').setStroke('#0e3a80', 5);
+        this.text(edge + out * (label.width + 12), 566, `${rosterEntry(choice.characterId).heightCm} cm`, 15, '#ffd27a')
+          .setOrigin(origin, 0).setStroke('#0e3a80', 4).setName(`selection-height-${side}`);
+        // Fire-coloured name, outlined so it reads over the art, shrinking to stay in its corner.
+        const name = this.text(edge, 584, rosterEntry(choice.characterId).name.toUpperCase(), 84, '#ffb02e', false, true)
+          .setOrigin(origin, 0).setStroke('#1a0d08', 10).setShadow(0, 5, '#000000', 6, true, true);
+        if (name.width > 380) name.setFontSize(Math.floor(84 * 380 / name.width));
+        const fill = name.context.createLinearGradient(0, 0, 0, name.height);
+        fill.addColorStop(0.15, '#ffd24a'); fill.addColorStop(0.6, '#f56a1f'); fill.addColorStop(0.95, '#c8231a');
+        name.setFill(fill);
       });
-      // Corners rise in from off-screen; a changed fighter pops up from its corner.
-      if (fresh) this.enter(card, { x: -out * 140, y: 90, alpha: 0 }, { duration: 460, delay: 60 });
-      else if (changed[side]) this.enter([art], { x: -out * 70, y: 60, alpha: 0.2 }, { duration: 300, ease: 'Back.easeOut' });
+      // Sides slide in from off-screen; a changed fighter pops up in place.
+      if (fresh) this.enter(card, { x: -out * 160, alpha: 0 }, { duration: 460, delay: 60 });
+      else if (changed[side]) this.enter([art], { x: -out * 70, y: 40, alpha: 0.2 }, { duration: 300, ease: 'Back.easeOut' });
     }
     const activeChoice = this.activeSide === 'player' ? this.playerChoice : this.opponentChoice;
-    const activeFighter = rosterEntry(activeChoice.characterId);
-    // Faces of the whole roster in a compact grid between the corners, with each side's cursor.
-    const TILE = 78, STEP = 86, TOP = 196, cols = Math.min(4, FIGHTER_ROSTER.length), rows = Math.ceil(FIGHTER_ROSTER.length / cols);
+    // Small faces of the whole roster in one row at the top centre, with each side's cursor.
+    const TILE = 70, STEP = 80, TOP = 132;
     FIGHTER_ROSTER.forEach((fighter, index) => {
-      const row = Math.floor(index / cols), inRow = row === rows - 1 ? FIGHTER_ROSTER.length - row * cols : cols;
-      const x = 640 + (index % cols - (inRow - 1) / 2) * STEP, y = TOP + row * STEP;
+      const x = 640 + (index - (FIGHTER_ROSTER.length - 1) / 2) * STEP, y = TOP;
       const p1 = this.playerChoice.characterId === fighter.id, p2 = this.opponentChoice.characterId === fighter.id;
       const tile = this.collect(() => {
-        const frame = this.rectangle(x, y, TILE, TILE, 0x241a35).setStrokeStyle(1, 0x726182);
+        const frame = this.rectangle(x, y, TILE, TILE, 0x2a74d9, 0.9).setStrokeStyle(1, 0xbfe2ff);
         this.clickable(frame, () => { activeChoice.characterId = fighter.id; this.render(); });
         const face = ensureFaceTexture(this, fighter.id);
         if (face) this.place(this.add.image(x, y, face).setDisplaySize(TILE - 4, TILE - 4).setName(`selection-face-${fighter.id}`));
-        this.rectangle(x, y + TILE / 2 - 10, TILE - 4, 18, 0x14101e, 0.85);
-        this.text(x, y + TILE / 2 - 19, fighter.name.toUpperCase(), 14, p1 || p2 ? '#fae8cb' : '#b6a6c7', true).setFontStyle('bold');
+        this.rectangle(x, y + TILE / 2 - 9, TILE - 4, 16, 0x1757c2, 0.85);
+        this.text(x, y + TILE / 2 - 17, fighter.name.toUpperCase(), 13, p1 || p2 ? '#fff7ec' : '#cfe6ff', true).setFontStyle('bold');
         // Cursors: 1P outside in pink, the rival just inside in aqua, so both show on the same face.
         if (p1) {
-          const cursor = this.rectangle(x, y, TILE + 4, TILE + 4, 0x000000, 0).setStrokeStyle(3, 0xef709d);
-          if (this.activeSide === 'player') this.pulseBorder(cursor, 3, 0xef709d);
-          this.text(x - TILE / 2 - 2, y - TILE / 2 - 9, '1P', 13, '#241a35').setFontStyle('bold').setBackgroundColor('#ef709d').setPadding(4, 0);
+          const cursor = this.rectangle(x, y, TILE + 4, TILE + 4, 0x000000, 0).setStrokeStyle(3, 0xff6a1f);
+          if (this.activeSide === 'player') this.pulseBorder(cursor, 3, 0xff6a1f);
+          this.text(x - TILE / 2 - 2, y - TILE / 2 - 9, '1P', 13, '#0e3a80').setFontStyle('bold').setBackgroundColor('#ff6a1f').setPadding(4, 0);
         }
         if (p2) {
-          const cursor = this.rectangle(x, y, TILE - 4, TILE - 4, 0x000000, 0).setStrokeStyle(3, 0xa1ece5);
-          if (this.activeSide === 'opponent') this.pulseBorder(cursor, 3, 0xa1ece5);
-          this.text(x + TILE / 2 + 2, y - TILE / 2 - 9, rivalTag === 'PRÁCTICA' ? 'PR' : rivalTag, 13, '#241a35').setFontStyle('bold').setBackgroundColor('#a1ece5').setPadding(4, 0).setOrigin(1, 0);
+          const cursor = this.rectangle(x, y, TILE - 4, TILE - 4, 0x000000, 0).setStrokeStyle(3, 0x7fd4ff);
+          if (this.activeSide === 'opponent') this.pulseBorder(cursor, 3, 0x7fd4ff);
+          this.text(x + TILE / 2 + 2, y - TILE / 2 - 9, rivalTag === 'PRÁCTICA' ? 'PR' : rivalTag, 13, '#0e3a80').setFontStyle('bold').setBackgroundColor('#7fd4ff').setPadding(4, 0).setOrigin(1, 0);
         }
       });
-      if (fresh) this.enter(tile, { y: 34, alpha: 0 }, { duration: 380, delay: 300 + index * 70, ease: 'Back.easeOut' });
+      if (fresh) this.enter(tile, { y: -34, alpha: 0 }, { duration: 380, delay: 300 + index * 70, ease: 'Back.easeOut' });
     });
-    // VS under the faces, then what the highlighted fighter does.
-    const below = TOP + (rows - 1) * STEP + TILE / 2;
-    this.slamTitle(640, below + 16, 'VS', 62, { side: [0x3d0f27, 0xb0406c], face: [0xffd9e6, 0xef709d] },
+    // A big VS alone in the middle.
+    this.slamTitle(640, 236, 'VS', 120, VS_FIRE,
       fresh ? { from: 2.8, delay: 260, shake: 0.004, volume: 0.35 } : null);
-    this.text(640, below + 108, activeFighter.power, 24, '#a1ece5', true).setFontStyle('bold');
-    this.text(640, below + 142, activeFighter.description, 17, '#c9b8da', true).setAlign('center').setWordWrapWidth(300);
-    // CPU → Práctica → Jugador 2 → CPU.
-    this.button(640, 565, 220, 'Rival: ' + MODE_LABELS[this.mode], () => {
-      this.mode = GAME_MODES[(GAME_MODES.indexOf(this.mode) + 1) % GAME_MODES.length]; this.render();
+    // 2×2 grid of equal buttons: match settings on top (Rival · CPU), navigation below (Volver · Continuar).
+    // Without a CPU the Rival button spans the whole top row.
+    const COL = 232, W = 220, left = 640 - COL / 2, right = 640 + COL / 2;
+    const row = this.collect(() => {
+      const cycleMode = () => { this.mode = GAME_MODES[(GAME_MODES.indexOf(this.mode) + 1) % GAME_MODES.length]; this.render(); };
+      if (this.mode === 'cpu') {
+        this.arcadeButton(left, 528, W, 'Rival: ' + MODE_LABELS[this.mode], cycleMode);
+        this.arcadeButton(right, 528, W, 'CPU: ' + GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label, () => this.cycleDifficulty());
+      } else this.arcadeButton(640, 528, COL + W, 'Rival: ' + MODE_LABELS[this.mode], cycleMode);
+      this.arcadeButton(left, 584, W, 'Volver', () => this.back());
+      this.arcadeButton(right, 584, W, 'Continuar', () => this.confirm(), true);
     });
-    if (this.mode === 'cpu') this.button(640, 630, 200, 'CPU: ' + GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label, () => this.cycleDifficulty());
-    this.button(468, 630, 116, 'Volver', () => this.back());
-    this.button(826, 630, 156, 'Continuar', () => this.confirm(), true);
+    if (fresh) this.enter(row, { y: 40, alpha: 0 }, { duration: 340, delay: 420 });
+  }
+  /** Dark plate with a cream outline; the primary one is a cream plate with dark lettering. */
+  private arcadeButton(x: number, y: number, width: number, label: string, action: () => void, primary = false): void {
+    const rect = this.clickable(this.rectangle(x, y, width, 44, primary ? 0xfff7ec : 0x1c1626, primary ? 1 : 0.88), action)
+      .setStrokeStyle(2, primary ? 0xffffff : 0xb9a98f, primary ? 0.9 : 0.7);
+    rect.on('pointerover', () => rect.setStrokeStyle(2, 0xffb02e, 1));
+    rect.on('pointerout', () => rect.setStrokeStyle(2, primary ? 0xffffff : 0xb9a98f, primary ? 0.9 : 0.7));
+    this.text(x, y - 13, label, 20, primary ? '#0e3a80' : '#fff7ec', true, primary);
   }
   private renderStages(fresh: boolean, changed: boolean): void {
     this.title.setText('ELIGE EL ESCENARIO');
@@ -333,7 +371,7 @@ export class SelectionScene extends Phaser.Scene {
     // Wide window onto the arena: the camera pans slowly inside it instead of squashing the image.
     const source = this.textures.get(stage.textureKey).getSourceImage(), fit = 650 / source.width, band = 174 / fit;
     const image = this.place(this.add.image(890, 218, stage.textureKey));
-    const window = this.rectangle(890, 218, 650, 174, 0x000000, 0).setStrokeStyle(2, 0xa1ece5);
+    const window = this.rectangle(890, 218, 650, 174, 0x000000, 0).setStrokeStyle(2, 0x7fd4ff);
     if (band < source.height) {
       const pan = (f: number) => {
         const top = (source.height - band) * f;
@@ -343,27 +381,27 @@ export class SelectionScene extends Phaser.Scene {
       image.setScale(fit); pan(0.5);
       this.live.push(t => pan(0.5 + Math.sin(t * 0.35) * 0.3));
     } else image.setDisplaySize(650, 174);
-    const name = this.text(58, 137, stage.name, 35, '#fae8cb', false, true).setWordWrapWidth(450);
+    const name = this.text(58, 137, stage.name, 35, '#fff7ec', false, true).setWordWrapWidth(450);
     // A new arena swings open like a door, around its vertical axis.
     if (fresh || changed) {
       this.enter([image, window], { scaleX: 0.04 }, { duration: 340, ease: 'Back.easeOut', delay: fresh ? 120 : 0 });
       this.enter([name], { x: -28, alpha: 0 }, { duration: 300, delay: fresh ? 120 : 0 });
     }
-    this.text(60, 214, rosterEntry(this.playerChoice.characterId).name, 20, '#ef9dbb');
-    this.text(60, 245, 'vs. ' + rosterEntry(this.opponentChoice.characterId).name, 20, '#a1ece5');
-    this.text(60, 280, this.mode === 'cpu' ? 'Combate contra CPU · ' + GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label : this.mode === 'versus' ? 'Dos jugadores' : 'Muñeco de práctica', 17, '#c9b8da');
+    this.text(60, 214, rosterEntry(this.playerChoice.characterId).name, 22, '#ffb02e').setFontStyle('bold').setStroke('#0e3a80', 4);
+    this.text(60, 245, 'vs. ' + rosterEntry(this.opponentChoice.characterId).name, 22, '#ffffff').setFontStyle('bold').setStroke('#0e3a80', 4);
+    this.text(60, 280, this.mode === 'cpu' ? 'Combate contra CPU · ' + GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label : this.mode === 'versus' ? 'Dos jugadores' : 'Muñeco de práctica', 17, '#e3f1ff');
     GAME_CONFIG.STAGES.forEach((entry, i) => {
       const x = 230 + (i % 3) * 410, y = 386 + Math.floor(i / 3) * 142, selected = this.stageIndex === i;
       let thumb!: Phaser.GameObjects.Image, border!: Phaser.GameObjects.Rectangle;
       const tile = this.collect(() => {
         thumb = this.place(this.add.image(x, y - 13, entry.textureKey).setDisplaySize(360, 102));
-        this.rectangle(x, y + 45, 360, 32, 0x14101e, 0.96);
-        this.text(x, y + 33, entry.name, 18, selected ? '#a1ece5' : '#fae8cb', true);
-        border = this.rectangle(x, y, 360, 124, 0x000000, 0).setStrokeStyle(selected ? 4 : 1, selected ? 0xa1ece5 : 0x726182);
+        this.rectangle(x, y + 45, 360, 32, 0x1757c2, 0.96);
+        this.text(x, y + 33, entry.name, 18, selected ? '#ffb02e' : '#fff7ec', true);
+        border = this.rectangle(x, y, 360, 124, 0x000000, 0).setStrokeStyle(selected ? 4 : 1, selected ? 0x7fd4ff : 0xbfe2ff);
         this.clickable(border, () => { this.stageIndex = i; this.render(); });
         if (selected) {
-          this.pulseBorder(border, 4, 0xa1ece5);
-          this.text(x - 172, y - 54, 'Elegido', 14, '#241a35').setBackgroundColor('#a1ece5').setPadding(7, 3);
+          this.pulseBorder(border, 4, 0x7fd4ff);
+          this.text(x - 172, y - 54, 'Elegido', 14, '#0e3a80').setBackgroundColor('#ffb02e').setPadding(7, 3);
         }
       });
       // Tiles flip up one after another; the newly chosen one pops forward.
@@ -383,19 +421,19 @@ export class SelectionScene extends Phaser.Scene {
     for (const player of [true, false]) {
       const choice = player ? this.playerChoice : this.opponentChoice, x = player ? 330 : 950;
       const fighter = this.collect(() => {
-        this.pedestal(x, 568, 300, player ? 0xef709d : 0xa1ece5, true);
+        this.pedestal(x, 568, 300, player ? 0xff6a1f : 0x7fd4ff, true);
         this.preview(x, 570, 0.5, choice, !player);
       });
       this.enter(fighter, { x: player ? -560 : 560 }, { duration: 420, ease: 'Back.easeOut' });
     }
     const names = this.collect(() => {
-      this.text(310, 145, rosterEntry(this.playerChoice.characterId).name.toUpperCase(), 52, '#ef9dbb', true, true);
-      this.text(970, 145, rosterEntry(this.opponentChoice.characterId).name.toUpperCase(), 52, '#a1ece5', true, true);
-      this.text(310, 207, '1P', 21, '#fae8cb', true);
-      this.text(970, 207, MODE_LABELS[this.mode], 21, '#fae8cb', true);
+      this.text(310, 145, rosterEntry(this.playerChoice.characterId).name.toUpperCase(), 52, '#ffb07a', true, true);
+      this.text(970, 145, rosterEntry(this.opponentChoice.characterId).name.toUpperCase(), 52, '#7fd4ff', true, true);
+      this.text(310, 207, '1P', 21, '#fff7ec', true);
+      this.text(970, 207, MODE_LABELS[this.mode], 21, '#fff7ec', true);
     });
     this.enter(names, { y: -46, alpha: 0 }, { duration: 340, delay: 140 });
-    this.slamTitle(640, 270, 'VS', 112, {}, { from: 3.4, delay: 240, shake: 0.011, volume: 0.85 });
+    this.slamTitle(640, 270, 'VS', 112, VS_FIRE, { from: 3.4, delay: 240, shake: 0.011, volume: 0.85 });
     if (this.motion) {
       // A blade of light crosses the screen as the VS lands.
       const slash = this.add.rectangle(-300, 360, 150, 1200, 0xffffff, 0.22).setAngle(24).setDepth(27).setBlendMode(Phaser.BlendModes.ADD);
@@ -403,8 +441,8 @@ export class SelectionScene extends Phaser.Scene {
       this.tweens.add({ targets: slash, x: 1600, duration: 460, delay: 300, ease: 'Cubic.easeIn' });
     }
     const banner = this.collect(() => {
-      this.rectangle(640, 622, 680, 50, 0x14101e, 0.95);
-      this.text(640, 606, stage.name, 26, '#fae8cb', true);
+      this.rectangle(640, 622, 680, 50, 0x1757c2, 0.95);
+      this.text(640, 606, stage.name, 26, '#fff7ec', true);
     });
     this.enter(banner, { y: 50, alpha: 0 }, { duration: 320, delay: 320 });
   }
@@ -429,12 +467,40 @@ export class SelectionScene extends Phaser.Scene {
   }
   private confirm(): void {
     if (this.phase === 'versus') return;
-    if (this.phase === 'fighters') this.phase = 'stage';
+    if (this.phase === 'fighters') {
+      this.phase = 'stage';
+      this.render();
+      this.acceptBurst();
+      return;
+    }
     else {
       this.phase = 'versus';
       this.transition = this.time.delayedCall(1000, () => this.scene.start('FightScene', this.matchData()));
     }
     this.render();
+  }
+  /**
+   * Accepting the matchup: a fire VS grows out of the centre and fades, with a ring, a flash and a
+   * hit. It plays on top of the arena screen, which is already interactive underneath.
+   */
+  private acceptBurst(): void {
+    playUiSound(this, 'menu-impact', 0.7);
+    if (!this.motion) return;
+    const title = new Title3D(this, 640, 236, ['VS'], 40, { fontSize: 120, centered: true, shine: false, ...VS_FIRE });
+    const line = title.lines[0];
+    const glow = this.add.image(640, line.y, ensureGlowTexture(this)).setDepth(39).setTint(0xff7a1f)
+      .setBlendMode(Phaser.BlendModes.ADD).setScale(0.6).setAlpha(0.9);
+    const ring = this.add.circle(640, line.y, 70).setStrokeStyle(10, 0xffb02e, 1).setDepth(39).setBlendMode(Phaser.BlendModes.ADD);
+    ring.isFilled = false;
+    this.flourish.push(title, glow, ring);
+    this.cameras.main.flash(220, 255, 120, 40).shake(240, 0.008);
+    // Punch up, then swell past the screen while fading out.
+    this.tweens.chain({ targets: line, tweens: [
+      { scale: 1.35, duration: 110, ease: 'Back.easeOut' },
+      { scale: 4.2, alpha: 0, duration: 520, ease: 'Cubic.easeIn' },
+    ], onComplete: () => title.destroy() });
+    this.tweens.add({ targets: glow, scaleX: 5, scaleY: 2.4, alpha: 0, duration: 560, ease: 'Cubic.easeOut', onComplete: () => glow.destroy() });
+    this.tweens.add({ targets: ring, scale: 9, alpha: 0, duration: 520, ease: 'Cubic.easeOut', onComplete: () => ring.destroy() });
   }
   /** Easy → Normal → Hard → Easy. Only on the fighter screen and against the CPU. */
   private cycleDifficulty(): void {

@@ -31,6 +31,7 @@ LINES = {
     'draw': (['¡Empate!'], 'empate'),
     'p1-wins': (['¡Gana el jugador uno!', '¡Gana jugador uno!'], 'gana el jugador uno'),
     'p2-wins': (['¡Gana el jugador dos!', '¡Gana jugador dos!'], 'gana el jugador dos'),
+    'select': (['¡Selecciona a tu luchador!', 'Selecciona a tu luchador.'], 'selecciona a tu luchador'),
 }
 OUT = os.path.join(os.path.dirname(__file__), '..', 'public', 'assets', 'audio')
 

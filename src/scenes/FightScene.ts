@@ -17,7 +17,6 @@ import { InputManager } from '../input/InputManager';
 import { FacingSystem } from '../systems/FacingSystem';
 import { FighterController, ImpactEvent } from '../systems/FighterController';
 import { ImpactEffects } from '../ui/ImpactEffects';
-import { HitEffects } from '../systems/HitEffects';
 import { TouchControls, isTouchDevice } from '../ui/TouchControls';
 import { ComboTracker } from '../systems/ComboTracker';
 import { ComboDisplay } from '../ui/ComboDisplay';
@@ -70,7 +69,7 @@ export class FightScene extends Phaser.Scene {
   private facingSystem = new FacingSystem();
   private fighterController = new FighterController();
   private superMove!: SuperMove;
-  private impacts!: ImpactEffects | HitEffects;
+  private impacts!: ImpactEffects;
   private combos = new ComboTracker();
   private comboDisplay!: ComboDisplay;
   /** Remaining freeze after a hit connects (ms). Fighters stand still; the clock runs. */
@@ -139,7 +138,7 @@ export class FightScene extends Phaser.Scene {
       this.add.ellipse(fighter.x, GAME_CONFIG.FLOOR_Y + 2, 150, 16, 0x09121a, 0.26).setDepth(1));
     this.createSystems();
     this.add.text(GAME_CONFIG.WIDTH / 2, 682, this.controlsHint(),
-      { fontFamily: FONT_UI, fontSize: '16px', color: '#eee8d9', backgroundColor: '#12151c', padding: { x: 16, y: 10 } }
+      { fontFamily: FONT_UI, fontSize: '16px', color: '#fff7ec', backgroundColor: '#1757c2', padding: { x: 16, y: 10 } }
     ).setOrigin(0.5).setDepth(60).setScrollFactor(0).setName('fight-controls');
     // The keyboard footer would sit under the touch buttons: show one or the other.
     const footer = this.children.getByName('fight-controls') as Phaser.GameObjects.Text;
@@ -147,7 +146,7 @@ export class FightScene extends Phaser.Scene {
     this.events.on('touch-controls-visible', (visible: boolean) => footer.setVisible(!visible));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('touch-controls-visible'));
     this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
-      fontFamily: FONT_UI, fontSize: '18px', color: '#ffdd77', backgroundColor: '#12151c', padding: { x: 12, y: 8 },
+      fontFamily: FONT_UI, fontSize: '18px', color: '#fff7ec', backgroundColor: '#ff6a1f', padding: { x: 12, y: 8 },
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(60).setInteractive({ useHandCursor: true })
       .on('pointerdown', () => this.pauseFight());
 
@@ -169,6 +168,10 @@ export class FightScene extends Phaser.Scene {
       this.inputManager2?.destroy();
       this.touchControls?.destroy();
       this.touchControls = null;
+      this.roundSystem = undefined!;
+      this.player = undefined!;
+      this.opponent = undefined!;
+      this.arcade = undefined;
     });
   }
 
@@ -361,7 +364,7 @@ export class FightScene extends Phaser.Scene {
     this.trainingOverlay = this.mode === 'training' ? new TrainingOverlay(this, this.training) : null;
     this.seenAttackSerial = this.player.attackSerial;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.trainingOverlay?.destroy(); this.trainingOverlay = null; });
-    this.impacts = GAME_CONFIG.HIT_EFFECTS ? new HitEffects(this) : new ImpactEffects(this);
+    this.impacts = new ImpactEffects(this);
     this.fighterController.onImpact = event => this.onImpact(event);
     this.fighterController.scaleHit = (attacker, defender, damage) => this.scaleComboHit(attacker, defender, damage);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.impacts.destroy());
@@ -534,8 +537,6 @@ export class FightScene extends Phaser.Scene {
   update(_time: number, delta: number): void {
     if (!this.roundSystem || !this.player || !this.opponent) return;
     delta = Math.min(Math.max(delta, 0), 50);
-    // Pixel sparks keep playing through hitstop, supers and the round end.
-    if (this.impacts instanceof HitEffects) this.impacts.update(delta);
     if (this.superMove.active) {
       this.superMove.update(delta);
       this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);

@@ -45,7 +45,8 @@ test('settings adjust music, overall volume and mute, persist them, and return t
   await page.waitForFunction(() => (window as any).__game.scene.isActive('MenuScene'));
   await page.reload();
   await page.waitForFunction(() => (window as any).__game?.scene.isActive('MenuScene'));
-  expect(await page.evaluate(() => (window as any).__game.sound.volume)).toBeCloseTo(0.8, 2);
+  // The audio thread applies the saved gain after the menu has become active.
+  await expect.poll(() => page.evaluate(() => (window as any).__game.sound.volume)).toBeCloseTo(0.8, 2);
 });
 
 test('fullscreen fills a large screen keeping 16:9', async ({ page }) => {

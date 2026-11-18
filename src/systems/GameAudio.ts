@@ -7,6 +7,9 @@ export type MenuTrack = 'cinturao' | 'original';
 
 const instances = new WeakMap<Phaser.Game, GameAudio>();
 type MusicSound = Phaser.Sound.WebAudioSound | Phaser.Sound.HTML5AudioSound;
+type SongState = 'idle' | 'loading' | 'ready' | 'failed';
+/** A supplied MP3 that loads in the background; LOOP_START/LOOP_END skip silence at its ends. */
+interface Song { KEY: string; URL: string; LOOP_START?: number; LOOP_END?: number }
 
 /** One music voice per game, including across scene restarts. Effects remain independent. */
 export class GameAudio {
@@ -14,9 +17,9 @@ export class GameAudio {
   /** Marker the current music loops on, when it does not loop as a whole. */
   private marker?: string;
   menuTrack: MenuTrack = 'cinturao';
-  /** The menu asked for music while the song was still loading. */
-  private waitingForMenuSong = false;
-  private menuSongState: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
+  /** The song a screen asked for while it was still loading. */
+  private waitingFor?: Song;
+  private songState = new Map<string, SongState>();
   muted = false;
   volume = 0.35;
   /** Overall level for music and effects (Phaser's global sound volume), 0–1. */
@@ -44,23 +47,30 @@ export class GameAudio {
     this.scaleByCategory(game.sound);
     game.events.once(Phaser.Core.Events.DESTROY, () => this.stop());
   }
+  /**
+   * Menus play «Cinturão de Elite» (unless Configuración picks the original track) and fights play
+   * «Hardline Beatdown»; each falls back to its synthesized track if the MP3 fails to load.
+   */
   play(key: 'music-menu' | 'music-fight'): void {
-    this.waitingForMenuSong = false;
-    if (key === 'music-menu' && this.menuTrack === 'cinturao' && this.menuSongState !== 'failed') {
-      if (this.menuSongState === 'ready') { this.start(GAME_CONFIG.MENU_MUSIC.KEY); return; }
-      // Not loaded yet: stop the fight music and start the song as soon as it arrives.
-      if (this.music?.key !== GAME_CONFIG.MENU_MUSIC.KEY) this.stop();
-      this.waitingForMenuSong = true;
-      this.loadMenuSong();
-      return;
-    }
-    this.start(key);
+    this.waitingFor = undefined;
+    const song = key === 'music-fight' ? GAME_CONFIG.FIGHT_MUSIC : this.menuTrack === 'cinturao' ? GAME_CONFIG.MENU_MUSIC : undefined;
+    const state = song ? this.state(song) : 'failed';
+    if (!song || state === 'failed') { this.start(key); return; }
+    if (state === 'ready') { this.start(song.KEY); return; }
+    // Not loaded yet: stop the previous music and start the song as soon as it arrives.
+    if (this.music?.key !== song.KEY) this.stop();
+    this.waitingFor = song;
+    this.loadSong(song);
   }
 
   /** The key the menu screens are playing (or about to play). */
   get menuMusicKey(): string {
-    return this.menuTrack === 'cinturao' && this.menuSongState !== 'failed' ? GAME_CONFIG.MENU_MUSIC.KEY : 'music-menu';
+    return this.menuTrack === 'cinturao' && this.state(GAME_CONFIG.MENU_MUSIC) !== 'failed' ? GAME_CONFIG.MENU_MUSIC.KEY : 'music-menu';
   }
+
+  private state(song: Song): SongState { return this.songState.get(song.KEY) ?? 'idle'; }
+
+  private fallbackFor(song: Song): string { return song.KEY === GAME_CONFIG.FIGHT_MUSIC.KEY ? 'music-fight' : 'music-menu'; }
 
   private start(key: string): void {
     if (!this.game.cache.audio.exists(key)) return;
@@ -68,9 +78,10 @@ export class GameAudio {
     this.stop();
     const config = { loop: true, volume: this.volume, mute: this.muted };
     this.music = this.game.sound.add(key, config) as MusicSound;
-    if (key === GAME_CONFIG.MENU_MUSIC.KEY) {
+    const song: Song | undefined = [GAME_CONFIG.MENU_MUSIC, GAME_CONFIG.FIGHT_MUSIC].find(s => s.KEY === key);
+    if (song?.LOOP_START !== undefined && song.LOOP_END !== undefined) {
       // Loop only the audible part, so the silence at both ends never makes a gap.
-      const { LOOP_START, LOOP_END } = GAME_CONFIG.MENU_MUSIC;
+      const { LOOP_START, LOOP_END } = song;
       this.marker = 'loop';
       this.music.addMarker({ name: 'loop', start: LOOP_START, duration: LOOP_END - LOOP_START, config });
       this.music.play('loop');
@@ -80,29 +91,30 @@ export class GameAudio {
     }
   }
 
-  /** Loads the menu song with whichever scene is running; a scene change just retries later. */
-  private loadMenuSong(): void {
-    if (this.menuSongState === 'loading' || this.menuSongState === 'ready') return;
+  /** Loads a song with whichever scene is running; a scene change just retries later. */
+  private loadSong(song: Song): void {
+    const state = this.state(song);
+    if (state === 'loading' || state === 'ready') return;
     // The newest running scene: the loading screen may be on its way out when the menu asks.
     const scene = [...this.game.scene.getScenes(true)].reverse().find(s => s.load && s.scene.key !== 'PreloadScene' && s.scene.key !== 'BootScene');
     // A scene still in create() is not running yet: try again on the next step.
-    if (!scene) { this.game.events.once(Phaser.Core.Events.POST_STEP, () => this.loadMenuSong()); return; }
-    const { KEY, URL } = GAME_CONFIG.MENU_MUSIC;
-    if (this.game.cache.audio.exists(KEY)) { this.onMenuSongReady(); return; }
-    this.menuSongState = 'loading';
-    const done = () => { cleanup(); this.onMenuSongReady(); };
+    if (!scene) { this.game.events.once(Phaser.Core.Events.POST_STEP, () => this.loadSong(song)); return; }
+    const { KEY, URL } = song;
+    if (this.game.cache.audio.exists(KEY)) { this.onSongReady(song); return; }
+    this.songState.set(KEY, 'loading');
+    const done = () => { cleanup(); this.onSongReady(song); };
     const failed = (file: Phaser.Loader.File) => {
       if (file.key !== KEY) return;
       cleanup();
-      this.menuSongState = 'failed';
-      if (this.waitingForMenuSong) { this.waitingForMenuSong = false; this.start('music-menu'); }
+      this.songState.set(KEY, 'failed');
+      if (this.waitingFor === song) { this.waitingFor = undefined; this.start(this.fallbackFor(song)); }
     };
     const aborted = () => {
       cleanup();
-      if (this.menuSongState !== 'loading') return;
-      this.menuSongState = 'idle';
+      if (this.state(song) !== 'loading') return;
+      this.songState.set(KEY, 'idle');
       // The scene closed mid-download: carry on with whichever scene comes next.
-      if (this.waitingForMenuSong) this.game.events.once(Phaser.Core.Events.POST_STEP, () => this.loadMenuSong());
+      if (this.waitingFor === song) this.game.events.once(Phaser.Core.Events.POST_STEP, () => this.loadSong(song));
     };
     const cleanup = () => {
       scene.load.off(`filecomplete-audio-${KEY}`, done);
@@ -116,14 +128,16 @@ export class GameAudio {
     scene.load.start();
   }
 
-  private onMenuSongReady(): void {
-    this.menuSongState = 'ready';
-    if (this.waitingForMenuSong) { this.waitingForMenuSong = false; this.start(GAME_CONFIG.MENU_MUSIC.KEY); }
+  private onSongReady(song: Song): void {
+    this.songState.set(song.KEY, 'ready');
+    if (this.waitingFor === song) { this.waitingFor = undefined; this.start(song.KEY); }
+    // With the menu song in, the fight song downloads in the background, ready for the first fight.
+    if (song !== GAME_CONFIG.FIGHT_MUSIC) this.loadSong(GAME_CONFIG.FIGHT_MUSIC);
   }
 
   /** Switches the menu track and, if a menu track is playing, changes it right away. */
   toggleMenuTrack(): void {
-    const playingMenu = this.music?.key === 'music-menu' || this.music?.key === GAME_CONFIG.MENU_MUSIC.KEY || this.waitingForMenuSong;
+    const playingMenu = this.music?.key === 'music-menu' || this.music?.key === GAME_CONFIG.MENU_MUSIC.KEY || this.waitingFor === GAME_CONFIG.MENU_MUSIC;
     this.menuTrack = this.menuTrack === 'cinturao' ? 'original' : 'cinturao';
     this.applySettings();
     if (playingMenu) this.play('music-menu');
@@ -184,7 +198,7 @@ export class GameAudio {
 
 export function musicControls(scene: Phaser.Scene, x = 1250, y = 24): void {
   const audio = GameAudio.for(scene);
-  const style = { fontFamily: FONT_UI, fontSize: '16px', color: '#fae8cb', backgroundColor: '#241a35', padding: { x: 8, y: 6 } };
+  const style = { fontFamily: FONT_UI, fontSize: '16px', color: '#fff7ec', backgroundColor: '#1f6fd6', padding: { x: 8, y: 6 } };
   const label = scene.add.text(x - 62, y, '', style).setOrigin(1, 0).setDepth(240).setScrollFactor(0)
     .setInteractive({ useHandCursor: true }).on('pointerdown', () => audio.toggle());
   const refresh = () => label.setText(audio.muted ? 'M · Música apagada' : `M · Música ${Math.round(audio.volume * 100)}%`);

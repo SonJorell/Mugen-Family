@@ -51,6 +51,20 @@ export const DRIVE_GRAB_ATTACK: AttackDefinition = {
   hitbox: { x: 28, y: -230, width: 95, height: 170 },
 };
 
+/** Jorell must confirm a telegraphed stomach punch before the energy cinematic can start. */
+export const JORELL_STOMACH_ATTACK: AttackDefinition = {
+  name: 'SPECIAL_ATTACK', startup: 20, active: 6, recovery: 38,
+  damage: 0, hitstun: 0, knockback: 0, causesKnockdown: false, blockstun: 12, blockPushback: 100,
+  hitbox: { x: 25, y: -195, width: 90, height: 85 },
+};
+
+/** Tata's visible palm shove must connect before the beer-and-bicycle cinematic. */
+export const TATA_SHOVE_ATTACK: AttackDefinition = {
+  name: 'SPECIAL_ATTACK', startup: 22, active: 6, recovery: 36,
+  damage: 0, hitstun: 0, knockback: 0, causesKnockdown: false, blockstun: 12, blockPushback: 100,
+  hitbox: { x: 25, y: -235, width: 95, height: 105 },
+};
+
 /** Command specials (↓ ↘ → + punch). Each fighter names one in `FighterStats.commandMove`. */
 export type CommandMoveId = 'rush' | 'stomp';
 export const COMMAND_MOVES: Record<CommandMoveId, AttackDefinition> = {

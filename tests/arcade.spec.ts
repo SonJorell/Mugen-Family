@@ -21,12 +21,16 @@ async function openArcade(page: Page) {
 
 /** Ends the running arcade fight as if its deciding round had just finished. */
 async function finishFight(page: Page, winner: 'player' | 'opponent') {
-  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 15000 });
+  await page.waitForFunction(() => {
+    const g = (window as any).__game;
+    return g.scene.isActive('FightScene') && g.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT';
+  }, null, { timeout: 15000 });
   await page.evaluate(w => (window as any).__game.scene.getScene('FightScene').leaveMatch(w), winner);
   await page.waitForFunction(() => (window as any).__game.scene.isActive('ArcadeScene'));
 }
 
 test('arcade: pick a fighter, climb a ladder of rising difficulty, continue after a loss, and reach the ending and credits', async ({ page }) => {
+  test.setTimeout(150000); // Six fights plus a continue with the expanded roster.
   await openArcade(page);
   expect((await arcade(page)).view).toBe('pick');
   await page.keyboard.press('ArrowDown');            // colour: Amatista
@@ -36,7 +40,10 @@ test('arcade: pick a fighter, climb a ladder of rising difficulty, continue afte
   expect(ladder.run).toEqual({ player: { characterId: 'tilin', paletteId: 'amethyst' }, step: 0, continues: 0 });
   expect(ladder.ladder).toEqual([
     { id: 'cesar', difficulty: 'easy', boss: false },
-    { id: 'tilin', difficulty: 'normal', boss: false },
+    { id: 'joako', difficulty: 'easy', boss: false },
+    { id: 'jorell', difficulty: 'normal', boss: false },
+    { id: 'tata', difficulty: 'normal', boss: false },
+    { id: 'tilin', difficulty: 'hard', boss: false },
     { id: 'cesar', difficulty: 'hard', boss: true },
   ]);
 
@@ -48,14 +55,28 @@ test('arcade: pick a fighter, climb a ladder of rising difficulty, continue afte
   await finishFight(page, 'player');
   expect(await arcade(page)).toMatchObject({ view: 'ladder', run: { step: 1, continues: 0 } });
 
-  // Fight 2 (mirror, normal): lose, continue, and win the rematch.
+  // Fight 2 (Joako, easy): lose, continue, and win the rematch.
   await page.keyboard.press('Enter');
   await finishFight(page, 'opponent');
   expect(await arcade(page)).toMatchObject({ view: 'continue', run: { step: 1 } });
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('FightScene'));
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 15000 });
-  expect(await fightData(page)).toMatchObject({ opponent: 'tilin', difficulty: 'normal', arcade: { step: 1, continues: 1 } });
+  expect(await fightData(page)).toMatchObject({ opponent: 'joako', difficulty: 'easy', arcade: { step: 1, continues: 1 } });
+  await finishFight(page, 'player');
+
+  // Jorell joins the ladder before the mirror match.
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
+  expect(await fightData(page)).toMatchObject({ opponent: 'jorell', difficulty: 'normal', arcade: { step: 2 } });
+  await finishFight(page, 'player');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
+  expect(await fightData(page)).toMatchObject({ opponent: 'tata', difficulty: 'normal', arcade: { step: 3 } });
+  await finishFight(page, 'player');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
+  expect(await fightData(page)).toMatchObject({ opponent: 'tilin', difficulty: 'hard', arcade: { step: 4 } });
   await finishFight(page, 'player');
 
   // Final boss on hard, then the ending and the credits.
@@ -77,6 +98,19 @@ test('arcade: pick a fighter, climb a ladder of rising difficulty, continue afte
   expect(credits).toContain('scripts/generate-music.mjs');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('MenuScene'));
+});
+
+test('arcade keeps all five fighter cards and the six-fight start button within the playable screen', async ({ page }) => {
+  await openArcade(page);
+  const bounds = () => page.evaluate(() => (window as any).__game.scene.getScene('ArcadeScene').content.list
+    .filter((c: any) => c.input?.enabled).map((c: any) => {
+      const b = c.getBounds(); return { left: b.left, right: b.right, top: b.top, bottom: b.bottom };
+    }));
+  const cards = await bounds(); expect(cards).toHaveLength(5);
+  for (const b of cards) { expect(b.left).toBeGreaterThanOrEqual(24); expect(b.right).toBeLessThanOrEqual(1256); }
+  await page.keyboard.press('Enter');
+  const buttons = await bounds(); expect(buttons).toHaveLength(1);
+  expect(buttons[0].bottom).toBeLessThan(660);
 });
 
 test('arcade: losing offers continue or menu, and Esc returns to the main menu', async ({ page }) => {

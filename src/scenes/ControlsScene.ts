@@ -10,7 +10,7 @@ import {
 } from '../input/Bindings';
 import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
-const INK = '#fff3d8', AQUA = '#9fe8e1', GOLD = '#f5bd75', RED = '#ff8f8f', MUTED = '#d3dce2';
+const INK = '#fff7ec', AQUA = '#7fd4ff', GOLD = '#ffb02e', RED = '#ff8f8f', MUTED = '#d3dce2';
 
 /** One row per remappable action, then «Restaurar valores» and «Volver». */
 export class ControlsScene extends Phaser.Scene {
@@ -37,7 +37,7 @@ export class ControlsScene extends Phaser.Scene {
     isolateSceneKeyboard(this);
     GameAudio.for(this).play('music-menu');
     this.add.image(640, 360, 'menu_arica_coast').setDisplaySize(1324, 745).setAlpha(0.55);
-    this.add.rectangle(640, 360, 1280, 720, 0x06111b, 0.86);
+    this.add.rectangle(640, 360, 1280, 720, 0x1257c4, 0.86);
     this.add.text(96, 40, 'CONTROLES', { fontFamily: FONT_IMPACT, fontSize: '56px', color: INK });
     this.content = this.add.container(0, 0);
 
@@ -117,8 +117,8 @@ export class ControlsScene extends Phaser.Scene {
     // Player tabs.
     (['p1', 'p2'] as const).forEach((slot, i) => {
       const active = this.slot === slot, x = 96 + i * 200;
-      const tab = this.add.rectangle(x, 128, 186, 44, active ? 0x143a51 : 0x0c1c29, active ? 1 : 0.7).setOrigin(0, 0.5)
-        .setStrokeStyle(active ? 2 : 1, active ? 0x9fe8e1 : 0x2c4a60).setInteractive({ useHandCursor: true });
+      const tab = this.add.rectangle(x, 128, 186, 44, active ? 0x1f6fd6 : 0x0c1c29, active ? 1 : 0.7).setOrigin(0, 0.5)
+        .setStrokeStyle(active ? 2 : 1, active ? 0x7fd4ff : 0x2c4a60).setInteractive({ useHandCursor: true });
       tab.on('pointerdown', () => { if (!active) this.switchSlot(); });
       this.content.add(tab);
       this.text(x + 20, 128, slot === 'p1' ? 'JUGADOR 1' : 'JUGADOR 2', 20, active ? AQUA : MUTED, true);
@@ -126,9 +126,9 @@ export class ControlsScene extends Phaser.Scene {
     const keys = this.bindings[this.slot];
     REMAPPABLE.forEach((action, i) => {
       const y = 186 + i * 37, selected = i === this.selectedIndex;
-      const bg = this.add.rectangle(96, y, 640, 33, 0x143a51, selected ? 0.95 : 0.35).setOrigin(0, 0.5)
+      const bg = this.add.rectangle(96, y, 640, 33, 0x1f6fd6, selected ? 0.95 : 0.35).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
-      if (selected) bg.setStrokeStyle(2, 0x9fe8e1);
+      if (selected) bg.setStrokeStyle(2, 0x7fd4ff);
       bg.on('pointerdown', () => { this.selectedIndex = i; this.activate(); });
       this.content.add(bg);
       this.text(116, y, ACTION_LABELS[action], 19, selected ? AQUA : INK, true);
@@ -138,9 +138,9 @@ export class ControlsScene extends Phaser.Scene {
     const extraY = 186 + REMAPPABLE.length * 37 + 8;
     ['Restaurar valores', 'Volver'].forEach((label, j) => {
       const i = REMAPPABLE.length + j, selected = i === this.selectedIndex, y = extraY + j * 42;
-      const bg = this.add.rectangle(96, y, 260, 36, j === 0 ? 0x4a2338 : 0x143a51, selected ? 0.95 : 0.45).setOrigin(0, 0.5)
+      const bg = this.add.rectangle(96, y, 260, 36, j === 0 ? 0x4a2338 : 0x1f6fd6, selected ? 0.95 : 0.45).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
-      if (selected) bg.setStrokeStyle(2, 0x9fe8e1);
+      if (selected) bg.setStrokeStyle(2, 0x7fd4ff);
       bg.on('pointerdown', () => { this.selectedIndex = i; this.activate(); });
       this.content.add(bg);
       this.text(116, y, label, 19, selected ? AQUA : INK, true);

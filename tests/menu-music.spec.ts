@@ -36,15 +36,16 @@ test('the menu song follows the music volume and M, and the fight keeps its own 
   await expect.poll(async () => (await music(page))?.mute).toBe(true);
   await page.keyboard.press('m');
   await expect.poll(async () => (await music(page))?.mute).toBe(false);
-  // Into a fight: the original fight track, alone; pausing the fight pauses it.
+  // Into a fight: «Hardline Beatdown», alone and without its silent ends; pausing the fight pauses it.
   await page.evaluate(() => {
     const g = (window as any).__game;
     g.scene.stop('MenuScene');
     g.scene.start('FightScene', { mode: 'training' });
   });
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 20000 });
-  await expect.poll(async () => (await music(page))?.key).toBe('music-fight');
+  await expect.poll(async () => (await music(page))?.key, { timeout: 30000 }).toBe('music-hardline');
   expect((await music(page))!.count).toBe(1);
+  expect((await music(page))!.marker).toEqual({ start: 0.08, duration: expect.closeTo(170.62, 2), loop: true });
   await page.keyboard.press('Escape');
   await expect.poll(async () => (await music(page))?.paused).toBe(true);
   // Back to the menu: the song again.
@@ -78,4 +79,18 @@ test('the credits name the song and its pending licence', async ({ page }) => {
   const credits = await page.evaluate(async () => (await import('/src/config/arcade.ts')).CREDITS.flatMap((c: any) => c.lines).join('\n'));
   expect(credits).toContain('Cinturão de Elite');
   expect(credits).toContain('licencia por confirmar');
+});
+
+test('if «Hardline Beatdown» cannot load, the fight plays the original track', async ({ page }) => {
+  await page.route('**/hardline-beatdown.mp3', route => route.abort());
+  await bootGame(page);
+  await page.keyboard.press('Shift');
+  await page.evaluate(() => {
+    const g = (window as any).__game;
+    g.scene.getScenes(true).forEach((s: any) => g.scene.stop(s.scene.key));
+    g.scene.start('FightScene', { mode: 'training' });
+  });
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 20000 });
+  await expect.poll(async () => (await music(page))?.key, { timeout: 30000 }).toBe('music-fight');
+  expect((await music(page))!.count).toBe(1);
 });

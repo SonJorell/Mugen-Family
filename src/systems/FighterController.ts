@@ -59,13 +59,13 @@ export class FighterController {
         if (defender.throwable) defender.grabbedFrom(attacker);
         return;
       }
-      if (attackDef.name === 'SPECIAL_ATTACK' && attacker.stats.special === 'drive') {
-        // Airborne opponents escape a grounded grab; frontal guard also stops the opener.
+      if (attackDef.name === 'SPECIAL_ATTACK' && ['drive', 'kame', 'bike'].includes(attacker.stats.special)) {
+        // These close grounded openers must connect before starting their cinematic.
         if (!defender.isGrounded || !defender.canReceiveHit) return;
         attacker.hasHitThisSwing = true;
         attacker.hitbox.active = false;
         if (defender.isGuarding && defender.facingRight === fromRight) {
-          defender.receiveHit(0, 0, 0, false, fromRight);
+          defender.receiveHit(0, 0, 0, false, fromRight, false, attackDef.blockstun, attackDef.blockPushback);
         } else {
           this.onSuperHit?.(attacker, defender);
         }

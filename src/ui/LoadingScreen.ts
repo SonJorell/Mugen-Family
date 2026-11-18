@@ -1,72 +1,160 @@
-// ============================================================
-// LoadingScreen — Title, real progress bar and what is being loaded
-// ============================================================
-
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { FONT_UI, FONT_IMPACT } from './fonts';
+import { FIGHTER_ROSTER } from '../config/roster';
+import { menuArtKey } from '../config/characters';
+import { FONT_UI, FONT_NUMBER, FONT_IMPACT } from './fonts';
 
 const TIPS = [
-  'Un golpe suave que conecta se puede cancelar en uno fuerte: prueba J y luego K.',
-  'Bloquear con L de frente te deja contraatacar tras un golpe fuerte.',
-  'Con la energía al 100 %, O lanza el súper de tu luchador.',
-  'En el modo práctica, la pausa activa el visor de entradas y los datos de frames.',
-  'Pulsa W otra vez en el aire para el doble salto.',
+  'Conecta un golpe suave con J y continúa con K para encadenar un golpe fuerte.',
+  'Bloquea de frente con L y aprovecha la recuperación del rival para contraatacar.',
+  'Con la energía al 100 %, pulsa O para lanzar el súper de tu luchador.',
+  'En práctica, abre la pausa para activar el visor de entradas y los datos de frames.',
+  'Pulsa W otra vez en el aire para saltar por encima de tu rival.',
 ];
 
-/**
- * Progress is spread over loading phases (the manifests first, then everything they list), so
- * the bar only moves forward. Phaser reports progress by files completed, which is real progress.
- */
+/** Reveals existing artwork as it arrives, without adding downloads or delaying the menu. */
 export class LoadingScreen {
-  /** Shown progress, 0–1. Never decreases. */
+  /** Real file progress, spread over both loading phases. Never decreases. */
   progress = 0;
   private phaseStart = 0;
   private phaseEnd = 1;
   private readonly fill: Phaser.GameObjects.Rectangle;
   private readonly glow: Phaser.GameObjects.Rectangle;
+  private readonly marker: Phaser.GameObjects.Rectangle;
   private readonly percent: Phaser.GameObjects.Text;
   private readonly status: Phaser.GameObjects.Text;
-  private readonly width = 640;
+  private readonly width = 1152;
+  private readonly left = 64;
+  private readonly revealed = new Set<string>();
+  private readonly motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  private shadow?: Phaser.GameObjects.Ellipse;
+  private readonly reveals: { art: Phaser.GameObjects.Image; tween: Phaser.Tweens.Tween }[] = [];
+  private readonly onProgress = (value: number) => this.setProgress(this.phaseStart + value * (this.phaseEnd - this.phaseStart));
+  private readonly onFile = (key: string, type: string) => { this.revealArt(key); this.describe(key, type); };
+  private readonly onMotion = () => {
+    if (this.motion.matches) this.reveals.forEach(({ art, tween }) => {
+      if (tween.isPlaying()) { tween.stop(); art.setAlpha(1); }
+    });
+  };
 
   constructor(private readonly scene: Phaser.Scene) {
-    const W = GAME_CONFIG.WIDTH, H = GAME_CONFIG.HEIGHT, x = W / 2 - this.width / 2;
-    scene.add.rectangle(W / 2, H / 2, W, H, 0x0b0814);
-    scene.add.text(W / 2, H / 2 - 150, 'FIGHTER\nFAMILY', {
-      fontFamily: FONT_IMPACT, fontSize: '74px', color: '#f5bd75', align: 'center',
-      stroke: '#3d1f0f', strokeThickness: 10, lineSpacing: -12,
-    }).setOrigin(0.5).setName('loading-title');
-    scene.add.text(W / 2, H / 2 - 24, 'Arica es tu escenario.', { fontFamily: FONT_UI, fontSize: '20px', color: '#a1ece5' })
-      .setOrigin(0.5);
-    scene.add.rectangle(W / 2, H / 2 + 40, this.width + 8, 26, 0x14101e).setStrokeStyle(2, 0xf5bd75, 0.8);
-    this.fill = scene.add.rectangle(x, H / 2 + 40, 1, 18, 0xef709d).setOrigin(0, 0.5);
-    this.glow = scene.add.rectangle(x, H / 2 + 40, 1, 6, 0xffffff, 0.45).setOrigin(0, 1).setBlendMode(Phaser.BlendModes.ADD);
-    this.percent = scene.add.text(W / 2 + this.width / 2, H / 2 + 62, '0 %', {
-      fontFamily: FONT_IMPACT, fontSize: '22px', color: '#fae8cb',
-    }).setOrigin(1, 0).setName('loading-percent');
-    this.status = scene.add.text(W / 2 - this.width / 2, H / 2 + 66, 'Preparando…', {
-      fontFamily: FONT_UI, fontSize: '17px', color: '#c9b8da',
-    }).setName('loading-status');
-    scene.add.text(W / 2, H - 70, TIPS[Math.floor(Math.random() * TIPS.length)], {
-      fontFamily: FONT_UI, fontSize: '17px', color: '#9aa4b2', align: 'center', wordWrap: { width: 900 },
-    }).setOrigin(0.5);
+    const W = GAME_CONFIG.WIDTH;
+    this.drawBackdrop();
+    const titleStyle = { fontFamily: FONT_IMPACT, fontSize: '108px', color: '#ffe0a6',
+      stroke: '#291c23', strokeThickness: 3, lineSpacing: -17 };
+    scene.add.text(71, 115, 'FIGHTER\nFAMILY', { ...titleStyle, color: '#101b2b', strokeThickness: 10 }).setDepth(5);
+    scene.add.text(67, 109, 'FIGHTER\nFAMILY', { ...titleStyle, color: '#a25535', strokeThickness: 5 }).setDepth(5);
+    scene.add.text(64, 104, 'FIGHTER\nFAMILY', titleStyle).setDepth(6).setName('loading-title');
+    scene.add.text(69, 344, 'Arica es tu escenario.', {
+      fontFamily: FONT_UI, fontSize: '25px', color: '#f0bb85',
+    }).setDepth(6);
+    scene.add.rectangle(70, 416, 30, 3, 0xf0bb85).setOrigin(0, 0.5).setDepth(6);
+    scene.add.text(113, 404, 'Consejo de combate', {
+      fontFamily: FONT_UI, fontSize: '18px', fontStyle: 'bold', color: '#f6f0e3',
+    }).setDepth(6);
+    scene.add.text(70, 441, TIPS[Math.floor(Math.random() * TIPS.length)], {
+      fontFamily: FONT_UI, fontSize: '19px', color: '#b8cbd7', lineSpacing: 6,
+      wordWrap: { width: 410 },
+    }).setDepth(6).setName('loading-tip');
 
-    scene.load.on(Phaser.Loader.Events.PROGRESS, (value: number) => this.setProgress(this.phaseStart + value * (this.phaseEnd - this.phaseStart)));
-    scene.load.on(Phaser.Loader.Events.FILE_COMPLETE, (key: string, type: string) => this.describe(key, type));
+    scene.add.text(this.left, 563, 'Preparando el combate', {
+      fontFamily: FONT_UI, fontSize: '25px', fontStyle: 'bold', color: '#f6f0e3',
+    }).setDepth(6);
+    this.percent = scene.add.text(W - this.left, 545, '0 %', {
+      fontFamily: FONT_NUMBER, fontSize: '53px', color: '#ffe0a6',
+    }).setOrigin(1, 0).setDepth(6).setName('loading-percent');
+    scene.add.rectangle(this.left, 620, this.width, 9, 0x263e51).setOrigin(0, 0.5).setDepth(6);
+    this.fill = scene.add.rectangle(this.left, 620, 1, 9, 0xe9ad70).setOrigin(0, 0.5).setDepth(7);
+    this.glow = scene.add.rectangle(this.left, 617, 1, 2, 0xffedc8, 0.9).setOrigin(0, 0.5).setDepth(7);
+    this.marker = scene.add.rectangle(this.left, 620, 3, 17, 0xffefd3).setDepth(7).setVisible(false);
+    this.status = scene.add.text(this.left, 644, 'Preparando…', {
+      fontFamily: FONT_UI, fontSize: '17px', color: '#b8cbd7',
+    }).setDepth(6).setName('loading-status');
+    scene.add.text(W - this.left, 644, 'Arica, Chile', {
+      fontFamily: FONT_UI, fontSize: '17px', color: '#b8cbd7',
+    }).setOrigin(1, 0).setDepth(6);
+
+    this.revealArt('menu_arica_coast');
+    FIGHTER_ROSTER.forEach(fighter => this.revealArt(menuArtKey(fighter.id)));
+    scene.load.on(Phaser.Loader.Events.PROGRESS, this.onProgress);
+    scene.load.on(Phaser.Loader.Events.FILE_COMPLETE, this.onFile);
+    this.motion.addEventListener('change', this.onMotion);
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      scene.load.off(Phaser.Loader.Events.PROGRESS, this.onProgress);
+      scene.load.off(Phaser.Loader.Events.FILE_COMPLETE, this.onFile);
+      this.motion.removeEventListener('change', this.onMotion);
+    });
   }
 
-  /** The next files fill the bar from `start` to `end` (0–1). */
+  /** A native canvas coast silhouette appears before the first file arrives. */
+  private drawBackdrop(): void {
+    const s = this.scene, W = GAME_CONFIG.WIDTH, H = GAME_CONFIG.HEIGHT;
+    if (!s.textures.exists('loading-dusk')) {
+      const texture = s.textures.createCanvas('loading-dusk', W, H)!;
+      const c = texture.context;
+      const sky = c.createLinearGradient(0, 0, W, H);
+      sky.addColorStop(0, '#101d31'); sky.addColorStop(0.55, '#543846'); sky.addColorStop(1, '#c9754b');
+      c.fillStyle = sky; c.fillRect(0, 0, W, H);
+      const sun = c.createRadialGradient(900, 273, 16, 900, 273, 245);
+      sun.addColorStop(0, 'rgba(255,220,156,0.55)'); sun.addColorStop(1, 'rgba(242,137,83,0)');
+      c.fillStyle = sun; c.fillRect(600, 0, 680, 560);
+      c.fillStyle = '#edbb85'; c.beginPath(); c.arc(900, 273, 44, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#193448'; c.fillRect(0, 394, W, H - 394);
+      c.fillStyle = '#34313b'; c.beginPath(); c.moveTo(743, 394); c.lineTo(910, 313);
+      c.lineTo(957, 205); c.lineTo(1124, 166); c.lineTo(W, 192); c.lineTo(W, 478); c.closePath(); c.fill();
+      c.strokeStyle = 'rgba(210,184,143,0.16)'; c.lineWidth = 1;
+      for (let i = 0; i < 9; i++) {
+        const y = 407 + i * i * 1.8;
+        c.beginPath(); c.moveTo(160 - i * 20, y); c.lineTo(860 + i * 35, y); c.stroke();
+      }
+      texture.refresh();
+    }
+    s.add.image(W / 2, H / 2, 'loading-dusk').setDepth(0);
+    this.shadow = s.add.ellipse(928, 527, 468, 37, 0x07121e, 0.55).setDepth(2).setVisible(false);
+    if (!s.textures.exists('loading-shade')) {
+      const texture = s.textures.createCanvas('loading-shade', W, H)!;
+      const c = texture.context;
+      const side = c.createLinearGradient(0, 0, W, 0);
+      side.addColorStop(0, 'rgba(16,78,180,0.97)'); side.addColorStop(0.37, 'rgba(16,78,180,0.89)');
+      side.addColorStop(0.6, 'rgba(16,78,180,0.15)'); side.addColorStop(1, 'rgba(16,78,180,0.08)');
+      c.fillStyle = side; c.fillRect(0, 0, W, H);
+      const floor = c.createLinearGradient(0, 470, 0, H);
+      floor.addColorStop(0, 'rgba(16,78,180,0)'); floor.addColorStop(0.4, 'rgba(16,78,180,0.94)');
+      floor.addColorStop(1, '#07111d'); c.fillStyle = floor; c.fillRect(0, 470, W, H - 470);
+      texture.refresh();
+    }
+    s.add.image(W / 2, H / 2, 'loading-shade').setDepth(4);
+  }
+
+  private revealArt(key: string): void {
+    if (this.revealed.has(key) || !this.scene.textures.exists(key)) return;
+    let art: Phaser.GameObjects.Image;
+    if (key === 'menu_arica_coast') {
+      art = this.scene.add.image(640, 360, key).setDisplaySize(1280, 720).setDepth(1).setName('loading-coast');
+    } else if (key === menuArtKey('tilin')) {
+      art = this.scene.add.image(782, 534, key).setOrigin(0.5, 1).setDisplaySize(290, 435).setDepth(3).setName('loading-tilin');
+    } else if (key === menuArtKey('cesar')) {
+      art = this.scene.add.image(1080, 534, key).setOrigin(0.5, 1).setDisplaySize(320, 480)
+        .setFlipX(true).setDepth(3).setName('loading-cesar');
+    } else return;
+    this.revealed.add(key);
+    if (key !== 'menu_arica_coast') this.shadow?.setVisible(true);
+    if (!this.motion.matches) {
+      art.setAlpha(0);
+      this.reveals.push({ art, tween: this.scene.tweens.add({ targets: art, alpha: 1, duration: 450, ease: 'Sine.easeOut' }) });
+    }
+  }
+
   setPhase(start: number, end: number): void {
-    this.phaseStart = start;
-    this.phaseEnd = end;
+    this.phaseStart = start; this.phaseEnd = end;
     this.setProgress(start);
   }
 
   setProgress(value: number): void {
     this.progress = Phaser.Math.Clamp(Math.max(this.progress, value), 0, 1);
     const w = Math.max(1, this.width * this.progress);
-    this.fill.setSize(w, 18);
-    this.glow.setSize(w, 6);
+    this.fill.setSize(w, 9); this.glow.setSize(w, 2);
+    this.marker.setX(this.left + w).setVisible(this.progress > 0);
     this.percent.setText(`${Math.round(this.progress * 100)} %`);
   }
 

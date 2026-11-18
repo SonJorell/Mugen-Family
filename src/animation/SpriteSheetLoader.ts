@@ -27,8 +27,12 @@ export interface SpriteGridLayout {
    * instead of re-normalising each animation to its own reference frame.
    */
   sourceBodyHeight?: number;
+  /** Horizontal root in the source cell, independent of attack extension. */
+  sourceAnchorX?: number;
   /** Floor line inside each nominal cell (source pixels), used with `sourceBodyHeight`. */
   groundY?: number;
+  /** Optional headroom for raised arms, preserving the same body scale and foot origin. */
+  canvasHeight?: number;
 }
 
 export interface SpriteSheetOptions extends SpriteGridLayout {
@@ -191,7 +195,9 @@ export class SpriteSheetLoader {
     rowCuts.push(src.height);
     const colCuts = Array.from({ length: layout.rows }, (_, r) => {
       const cuts = [0];
-      for (let c = 1; c < layout.columns; c++) cuts.push(cut(false, c * src.width / layout.columns, src.width / layout.columns * 0.2, rowCuts[r], rowCuts[r + 1]));
+      // Some airborne poses extend beyond the nominal cell. Search less than half
+      // a cell so adjacent search windows remain separate and the whole body survives.
+      for (let c = 1; c < layout.columns; c++) cuts.push(cut(false, c * src.width / layout.columns, src.width / layout.columns * 0.4, rowCuts[r], rowCuts[r + 1]));
       return [...cuts, src.width];
     });
     const frames: { canvas: HTMLCanvasElement; left: number; right: number; top: number; bottom: number; offsetX: number; offsetY: number }[] = [];
@@ -217,17 +223,18 @@ export class SpriteSheetLoader {
     const referenceHeight = Math.max(1, reference.bottom - reference.top + 1);
     const fixed = typeof layout.sourceBodyHeight === 'number' && layout.sourceBodyHeight > 0;
     const scale = 330 / (fixed ? layout.sourceBodyHeight! : referenceHeight);
-    const anchorX = fixed ? src.width / layout.columns / 2 : (reference.left + reference.right) / 2 + reference.offsetX;
+    const anchorX = fixed ? (layout.sourceAnchorX ?? src.width / layout.columns / 2) : (reference.left + reference.right) / 2 + reference.offsetX;
     return frames.map((frame, i) => {
       const key = `${this.characterId}_${animName}_${imgIdx * count + i}`;
       if (!this.scene.textures.exists(key)) {
         // Large fixed canvases preserve limbs, alpha, and one consistent foot origin.
-        const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 384;
+        const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = layout.canvasHeight ?? 384;
         const ctx = canvas.getContext('2d')!;
-        ctx.imageSmoothingEnabled = false;
-        const baseline = fixed ? (layout.groundY ?? src.height / layout.rows) - frame.offsetY
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        const baseline = fixed ? (layout.alignFeet === true ? frame.bottom + 1 : (layout.groundY ?? src.height / layout.rows) - frame.offsetY)
           : layout.alignFeet === false ? reference.bottom + reference.offsetY - frame.offsetY + 1 : frame.bottom + 1;
-        ctx.drawImage(frame.canvas, 256 + (frame.offsetX - anchorX) * scale, 374.5 - baseline * scale,
+        ctx.drawImage(frame.canvas, 256 + (frame.offsetX - anchorX) * scale, canvas.height * 0.975 + 0.1 - baseline * scale,
           frame.canvas.width * scale, frame.canvas.height * scale);
         this.scene.textures.addCanvas(key, canvas);
       }
@@ -563,3 +570,4 @@ export class SpriteSheetLoader {
     });
   }
 }
+

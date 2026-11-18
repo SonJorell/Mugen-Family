@@ -62,11 +62,11 @@ test('matches, the best combo and arcade clears are saved and shown in the stats
   expect(saved.byFighter.tilin).toEqual({ wins: 1, losses: 0, draws: 0 });
   expect(saved.bestCombo).toEqual({ hits: 2, damage: 17, fighter: 'tilin' });
 
-  // An arcade clear with one continue.
+  // Win the fourth and final fight of the expanded roster with one continue.
   await page.evaluate(() => {
     const g = (window as any).__game;
     g.scene.getScenes(true).forEach((s: any) => g.scene.stop(s.scene.key));
-    g.scene.start('ArcadeScene', { run: { player: { characterId: 'cesar', paletteId: 'original' }, step: 2, continues: 1 }, result: 'player' });
+    g.scene.start('ArcadeScene', { run: { player: { characterId: 'cesar', paletteId: 'original' }, step: 4, continues: 1 }, result: 'player' });
   });
   await page.waitForFunction(() => (window as any).__game.scene.isActive('ArcadeScene'));
   expect((await stats(page)).arcade).toEqual({ cesar: { clears: 1, fewestContinues: 1 } });

@@ -34,11 +34,12 @@ test('keyboard selects both fighters and a stage before starting the match', asy
 
 test('mouse selection and back navigation retain arena and practice mode, and a mirror match tints the rival', async ({ page }) => {
   await openSelection(page);
-  await page.mouse.click(640, 565);
-  await page.mouse.click(826, 630);
+  // 2×2 buttons: Rival · CPU on top, Volver · Continuar below.
+  await page.mouse.click(524, 528);
+  await page.mouse.click(756, 584);
   await page.mouse.click(640, 370);
   await page.keyboard.press('Escape');
-  await page.mouse.click(826, 630);
+  await page.mouse.click(756, 584);
   await page.mouse.click(1080, 630);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
   const data = await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').getMatchData());

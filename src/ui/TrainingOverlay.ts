@@ -48,7 +48,7 @@ export class TrainingOverlay {
 
   constructor(scene: Phaser.Scene, options: TrainingOptions) {
     this.options = { ...options };
-    const style = { fontFamily: 'Courier New, monospace', fontSize: '17px', color: '#fae8cb', backgroundColor: '#0b0d16cc', padding: { x: 10, y: 8 } };
+    const style = { fontFamily: 'Courier New, monospace', fontSize: '17px', color: '#fff7ec', backgroundColor: '#0b0d16cc', padding: { x: 10, y: 8 } };
     this.inputText = scene.add.text(28, 270, '', style).setDepth(59).setScrollFactor(0).setName('training-inputs');
     this.framesText = scene.add.text(GAME_CONFIG.WIDTH - 28, 176, '', { ...style, align: 'right' }).setOrigin(1, 0)
       .setDepth(59).setScrollFactor(0).setName('training-frames');

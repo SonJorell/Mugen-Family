@@ -10,7 +10,7 @@ async function fight(page: Page) {
   await page.waitForFunction(() => (window as any).__game?.scene.isActive('MenuScene'));
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
-  await page.mouse.click(640, 565); // Rival: CPU → Práctica
+  await page.mouse.click(524, 528); // Rival: CPU → Práctica
   await confirmSelection(page);
 }
 /** Screen-pinned banner lettering currently alive in the fight (Title3D containers). */

@@ -8,6 +8,7 @@ import { LoadingScreen } from '../ui/LoadingScreen';
 import { ANNOUNCER_LINES, announcerKey } from '../systems/Announcer';
 import { FIGHTER_ROSTER } from '../config/roster';
 import { DRIVE_ASSETS } from '../combat/driveAssets';
+import { prepareDriveAtlas } from '../animation/DriveSpriteAtlas';
 import { CharacterManifest, isValidManifest, manifestKey, menuArtKey, sortAnimationFiles, superPortraitKey, UI_SOUNDS } from '../config/characters';
 import { FONT_UI } from '../ui/fonts';
 
@@ -54,12 +55,13 @@ export class PreloadScene extends Phaser.Scene {
       this.load.image(stage.textureKey, stage.imagePath);
     });
     this.load.image('menu_arica_coast', '/assets/menu/arica-coast.webp');
+    this.load.image('joako_rifle', '/assets/characters/joako/rifle.webp');
     for (const fighter of FIGHTER_ROSTER) {
       this.load.image(menuArtKey(fighter.id), fighter.menuArtPath);
       this.load.image(superPortraitKey(fighter.id), fighter.superPortraitPath);
     }
     for (const [key, path] of Object.entries(DRIVE_ASSETS)) this.load.image(key, path);
-    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'super-drive', 'music-menu', 'music-fight', ...UI_SOUNDS, ...ANNOUNCER_LINES.map(announcerKey)]) {
+    for (const key of ['hit-light', 'hit-heavy', 'hit-special', 'hit-block', 'voice-canto', 'super-canto', 'super-drive', 'super-build', 'super-kame', 'super-bike', 'music-menu', 'music-fight', ...UI_SOUNDS, ...ANNOUNCER_LINES.map(announcerKey)]) {
       this.load.audio(key, `/assets/audio/${key}.wav`);
     }
     // The native HTML video owns loading and playback; avoid downloading it twice.
@@ -73,9 +75,10 @@ export class PreloadScene extends Phaser.Scene {
         this.showLoadError();
         return;
       }
-      for (const key of ['menu_arica_coast', ...Object.keys(DRIVE_ASSETS), ...FIGHTER_ROSTER.flatMap(f => [menuArtKey(f.id), superPortraitKey(f.id)]), ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
+      for (const key of ['menu_arica_coast', 'joako_rifle', ...Object.keys(DRIVE_ASSETS), ...FIGHTER_ROSTER.flatMap(f => [menuArtKey(f.id), superPortraitKey(f.id)]), ...GAME_CONFIG.STAGES.map(stage => stage.textureKey)]) {
         this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
       }
+      prepareDriveAtlas(this);
       this.scene.start('MenuScene', { manifest: this.manifests[0] });
     });
 
@@ -83,6 +86,7 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   private showLoadError(): void {
+    this.add.rectangle(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT, 0x030a13, 0.8).setDepth(9);
     this.add.rectangle(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, 800, 250, 0x12121c).setDepth(10);
     this.add.text(GAME_CONFIG.WIDTH / 2, 320, 'No se pudieron cargar los archivos del juego.\nComprueba la conexión y vuelve a intentarlo.', {
       fontFamily: FONT_UI, fontSize: '24px', color: '#ffffff', align: 'center',

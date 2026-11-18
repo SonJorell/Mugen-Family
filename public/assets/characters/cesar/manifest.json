@@ -1,195 +1,354 @@
 {
   "characterId": "cesar",
   "name": "César",
-  "assetPath": "/assets/characters/cesar-v2/",
-  "version": 2,
+  "assetPath": "/assets/characters/cesar-unified/",
+  "version": 4,
   "spriteSheet": {
-    "columns": 4,
-    "rows": 3,
-    "frameCount": 12,
+    "columns": 6,
+    "rows": 1,
+    "frameCount": 6,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
     "animations": {
       "IDLE": {
         "frameRate": 10,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 251,
+        "alignFeet": true,
+        "sourceAnchorX": 139.5
       },
       "WALK_FORWARD": {
         "frameRate": 13,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 251,
+        "alignFeet": true,
+        "sourceAnchorX": 136.5
       },
       "WALK_BACKWARD": {
         "frameRate": 12,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 251,
+        "alignFeet": true,
+        "sourceAnchorX": 134.5
       },
       "DASH": {
         "frameRate": 22,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 250,
+        "alignFeet": true,
+        "sourceAnchorX": 134.5
       },
       "CROUCH": {
         "frameRate": 30,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 144
       },
       "JUMP": {
         "frameRate": 12,
         "repeat": 0,
-        "alignFeet": false
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 256,
+        "alignFeet": false,
+        "sourceAnchorX": 144
       },
       "LIGHT_PUNCH": {
         "frameRate": 24,
         "repeat": 0,
         "impactStart": 4,
-        "impactEnd": 6
+        "impactEnd": 6,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 252,
+        "alignFeet": true,
+        "sourceAnchorX": 132
       },
       "HEAVY_PUNCH": {
         "frameRate": 20,
         "repeat": 0,
-        "impactStart": 6,
-        "impactEnd": 8
+        "impactStart": 7,
+        "impactEnd": 7,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 254,
+        "alignFeet": true,
+        "sourceAnchorX": 131.5
       },
       "LIGHT_KICK": {
         "frameRate": 24,
         "repeat": 0,
         "impactStart": 5,
-        "impactEnd": 7
+        "impactEnd": 7,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 140.5
       },
       "HEAVY_KICK": {
         "frameRate": 19,
         "repeat": 0,
-        "impactStart": 6,
-        "impactEnd": 8
+        "impactStart": 7,
+        "impactEnd": 7,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 140
       },
       "BLOCK": {
         "frameRate": 40,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 253,
+        "alignFeet": true,
+        "sourceAnchorX": 138.5
       },
       "HIT_REACTION": {
         "frameRate": 26,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 252,
+        "alignFeet": true,
+        "sourceAnchorX": 139
       },
       "KNOCKDOWN": {
         "frameRate": 20,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 143
       },
       "GET_UP": {
         "frameRate": 18,
         "repeat": 0,
-        "referenceFrame": 11
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 249,
+        "alignFeet": true,
+        "sourceAnchorX": 124
       },
       "TAUNT": {
         "frameRate": 12,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 250,
+        "alignFeet": false,
+        "sourceAnchorX": 130
       },
       "VICTORY": {
         "frameRate": 10,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 250,
+        "alignFeet": false,
+        "sourceAnchorX": 136.5
       },
       "DEFEAT": {
         "frameRate": 16,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 253,
+        "alignFeet": true,
+        "sourceAnchorX": 142.5
       },
       "SPECIAL_ATTACK": {
         "frameRate": 20,
         "repeat": 0,
         "impactStart": 7,
-        "impactEnd": 9
+        "impactEnd": 9,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 251,
+        "alignFeet": false,
+        "sourceAnchorX": 142.5
       },
       "STUN": {
         "frameRate": 12,
-        "repeat": -1
+        "repeat": -1,
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 256,
+        "alignFeet": true,
+        "sourceAnchorX": 154.5
       },
       "AIR_PUNCH": {
         "frameRate": 24,
         "repeat": 0,
         "impactStart": 5,
         "impactEnd": 8,
-        "alignFeet": false
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 256,
+        "alignFeet": false,
+        "sourceAnchorX": 132.5
       },
       "AIR_KICK": {
         "frameRate": 24,
         "repeat": 0,
         "impactStart": 5,
         "impactEnd": 8,
-        "alignFeet": false
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 249,
+        "alignFeet": false,
+        "sourceAnchorX": 136.5
       },
       "DOUBLE_JUMP": {
         "frameRate": 16,
         "repeat": 0,
-        "alignFeet": false
+        "columns": 6,
+        "rows": 2,
+        "frameCount": 12,
+        "sourceBodyHeight": 238,
+        "groundY": 251,
+        "alignFeet": false,
+        "sourceAnchorX": 139
       },
       "LANDING": {
         "frameRate": 36,
-        "repeat": 0
+        "repeat": 0,
+        "columns": 4,
+        "rows": 3,
+        "frameCount": 12,
+        "sourceBodyHeight": 318,
+        "groundY": 335,
+        "alignFeet": true,
+        "sourceAnchorX": 203
       }
     }
   },
   "animations": {
     "IDLE": [
-      "/assets/characters/cesar-v2/IDLE.webp"
+      "/assets/characters/cesar-unified/IDLE.webp"
     ],
     "WALK_FORWARD": [
-      "/assets/characters/cesar-v2/WALK_FORWARD.webp"
+      "/assets/characters/cesar-unified/WALK_FORWARD.webp"
     ],
     "WALK_BACKWARD": [
-      "/assets/characters/cesar-v2/WALK_BACKWARD.webp"
+      "/assets/characters/cesar-unified/WALK_BACKWARD.webp"
     ],
     "DASH": [
-      "/assets/characters/cesar-v2/DASH.webp"
+      "/assets/characters/cesar-unified/DASH.webp"
     ],
     "CROUCH": [
-      "/assets/characters/cesar-v2/CROUCH.webp"
+      "/assets/characters/cesar-unified/CROUCH.webp"
     ],
     "JUMP": [
-      "/assets/characters/cesar-v2/JUMP.webp"
+      "/assets/characters/cesar-unified/JUMP.webp"
     ],
     "LIGHT_PUNCH": [
-      "/assets/characters/cesar-v2/LIGHT_PUNCH.webp"
+      "/assets/characters/cesar-unified/LIGHT_PUNCH.webp"
     ],
     "HEAVY_PUNCH": [
-      "/assets/characters/cesar-v2/HEAVY_PUNCH.webp"
+      "/assets/characters/cesar-unified/HEAVY_PUNCH.webp"
     ],
     "LIGHT_KICK": [
-      "/assets/characters/cesar-v2/LIGHT_KICK.webp"
+      "/assets/characters/cesar-unified/LIGHT_KICK.webp"
     ],
     "HEAVY_KICK": [
-      "/assets/characters/cesar-v2/HEAVY_KICK.webp"
+      "/assets/characters/cesar-unified/HEAVY_KICK.webp"
     ],
     "BLOCK": [
-      "/assets/characters/cesar-v2/BLOCK.webp"
+      "/assets/characters/cesar-unified/BLOCK.webp"
     ],
     "HIT_REACTION": [
-      "/assets/characters/cesar-v2/HIT_REACTION.webp"
+      "/assets/characters/cesar-unified/HIT_REACTION.webp"
     ],
     "KNOCKDOWN": [
-      "/assets/characters/cesar-v2/KNOCKDOWN.webp"
+      "/assets/characters/cesar-unified/KNOCKDOWN.webp"
     ],
     "GET_UP": [
-      "/assets/characters/cesar-v2/GET_UP.webp"
+      "/assets/characters/cesar-unified/GET_UP.webp"
     ],
     "TAUNT": [
-      "/assets/characters/cesar-v2/TAUNT.webp"
+      "/assets/characters/cesar-unified/TAUNT.webp"
     ],
     "VICTORY": [
-      "/assets/characters/cesar-v2/VICTORY.webp"
+      "/assets/characters/cesar-unified/VICTORY.webp"
     ],
     "DEFEAT": [
-      "/assets/characters/cesar-v2/DEFEAT.webp"
+      "/assets/characters/cesar-unified/DEFEAT.webp"
     ],
     "SPECIAL_ATTACK": [
-      "/assets/characters/cesar-v2/SPECIAL_ATTACK.webp"
+      "/assets/characters/cesar-unified/SPECIAL_ATTACK.webp"
     ],
     "STUN": [
-      "/assets/characters/cesar-v2/STUN.webp"
+      "/assets/characters/cesar-unified/STUN.webp"
     ],
     "AIR_PUNCH": [
-      "/assets/characters/cesar-v2/AIR_PUNCH.webp"
+      "/assets/characters/cesar-unified/AIR_PUNCH.webp"
     ],
     "AIR_KICK": [
-      "/assets/characters/cesar-v2/AIR_KICK.webp"
+      "/assets/characters/cesar-unified/AIR_KICK.webp"
     ],
     "DOUBLE_JUMP": [
-      "/assets/characters/cesar-v2/DOUBLE_JUMP.webp"
+      "/assets/characters/cesar-unified/DOUBLE_JUMP.webp"
     ],
     "LANDING": [
-      "/assets/characters/cesar-v2/LANDING.webp"
+      "/assets/characters/cesar-unified/LANDING.webp"
     ]
-  }
+  },
+  "visualStyle": "painted-arcade-2026"
 }

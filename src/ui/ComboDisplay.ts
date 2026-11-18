@@ -21,7 +21,7 @@ export class ComboDisplay {
         fontFamily: FONT_NUMBER, fontSize: '48px', color: '#ffd166', stroke: '#2a0d16', strokeThickness: 7,
       }).setOrigin(origin, 0).setDepth(58).setScrollFactor(0).setVisible(false).setName(`combo-hits-${side}`));
       this.damage.push(scene.add.text(x, 230, '', {
-        fontFamily: FONT_UI, fontSize: '18px', fontStyle: 'bold', color: '#fae8cb', stroke: '#0b0d16', strokeThickness: 4,
+        fontFamily: FONT_UI, fontSize: '18px', fontStyle: 'bold', color: '#fff7ec', stroke: '#0e3a80', strokeThickness: 4,
       }).setOrigin(origin, 0).setDepth(58).setScrollFactor(0).setVisible(false).setName(`combo-damage-${side}`));
     }
   }

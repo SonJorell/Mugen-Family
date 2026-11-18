@@ -31,7 +31,7 @@ export class EmberField {
       vx: Phaser.Math.FloatBetween(-14, 22),
       vy: Phaser.Math.FloatBetween(-62, -26),
       vz: -Phaser.Math.FloatBetween(0.04, 0.12),
-      color: Math.random() < 0.72 ? (Math.random() < 0.5 ? 0xffb347 : 0xff8a4c) : 0x9fe8e1,
+      color: Math.random() < 0.72 ? (Math.random() < 0.5 ? 0xffb347 : 0xff8a4c) : 0x7fd4ff,
       phase: Math.random() * Math.PI * 2,
     };
   }
@@ -135,7 +135,7 @@ export class GroundPulse {
     const emit = () => {
       const { x, y } = getOrigin();
       const ring = this.scene.add.ellipse(x, y, 330, 46).setDepth(this.depth)
-        .setStrokeStyle(3, 0x9fe8e1, 1).setBlendMode(Phaser.BlendModes.ADD).setScale(0.35).setAlpha(0.9);
+        .setStrokeStyle(3, 0x7fd4ff, 1).setBlendMode(Phaser.BlendModes.ADD).setScale(0.35).setAlpha(0.9);
       ring.isFilled = false;
       this.rings.push(ring);
       this.scene.tweens.add({
@@ -169,8 +169,8 @@ export class Title3D {
     /** Pin to the screen instead of the world (for HUD banners over a scrolling camera). */
     fixed?: boolean;
   } = {}) {
-    const fontSize = options.fontSize ?? 98, [far, near] = options.side ?? [0x24150e, 0x9a5a33];
-    const [faceTop, faceBottom] = options.face ?? [0xfff3d8, 0xd99b58];
+    const fontSize = options.fontSize ?? 98, [far, near] = options.side ?? [0x3a0a05, 0xb3260f];
+    const [faceTop, faceBottom] = options.face ?? [0xfff3c4, 0xff8a1f];
     const style: Phaser.Types.GameObjects.Text.TextStyle = { fontFamily: FONT_IMPACT, fontSize: fontSize + 'px' };
     const back = Phaser.Display.Color.ValueToColor(far), front = Phaser.Display.Color.ValueToColor(near);
     let top = y;

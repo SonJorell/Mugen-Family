@@ -9,7 +9,7 @@ import { GameAudio } from '../systems/GameAudio';
 import { PlayerStats, loadStats, resetStats } from '../systems/Stats';
 import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
-const INK = '#fff3d8', AQUA = '#9fe8e1', GOLD = '#f5bd75', MUTED = '#d3dce2', RED = '#ff8f8f';
+const INK = '#fff7ec', AQUA = '#7fd4ff', GOLD = '#ffb02e', MUTED = '#d3dce2', RED = '#ff8f8f';
 
 const pct = (part: number, total: number) => total ? `${Math.round(part / total * 100)} %` : '—';
 /** «1 victoria», «3 victorias». */
@@ -34,7 +34,7 @@ export class StatsScene extends Phaser.Scene {
     isolateSceneKeyboard(this);
     GameAudio.for(this).play('music-menu');
     this.add.image(640, 360, 'menu_arica_coast').setDisplaySize(1324, 745).setAlpha(0.55);
-    this.add.rectangle(640, 360, 1280, 720, 0x06111b, 0.86);
+    this.add.rectangle(640, 360, 1280, 720, 0x1257c4, 0.86);
     this.add.text(96, 40, 'ESTADÍSTICAS', { fontFamily: FONT_IMPACT, fontSize: '56px', color: INK });
     this.add.text(100, 110, 'Se guardan en este navegador.', { fontFamily: FONT_UI, fontSize: '18px', color: AQUA });
     this.content = this.add.container(0, 0);

@@ -186,6 +186,17 @@ export const GAME_CONFIG = {
     LOOP_END: 174.9,
   },
 
+  /**
+   * Fight music: «Hardline Beatdown» (supplied by Jorell, MP3). It downloads in the background
+   * once the menu song is in; if it fails, the original synthesized fight track plays.
+   */
+  FIGHT_MUSIC: {
+    KEY: 'music-hardline',
+    URL: '/assets/audio/hardline-beatdown.mp3',
+    LOOP_START: 0.08,
+    LOOP_END: 170.7,
+  } as { KEY: string; URL: string; LOOP_START?: number; LOOP_END?: number },
+
   /** Announcer lines play at this level before the announcer volume of Configuración. */
   ANNOUNCER_GAIN: 0.9,
 
@@ -213,13 +224,6 @@ export const GAME_CONFIG = {
   JUGGLE: { LAUNCH_VELOCITY: 760, POP_VELOCITY: 380, CARRY_SPEED: 60, MAX_HITS: 3, GRAVITY_STEP: 0.35 },
 
   /** Hit feel: freeze on contact, camera shake and sparks. Times in ms. */
-  /** Prototype: pixel-art hit sparks from pixelfx (src/systems/HitEffects.ts); false keeps the vector sparks. */
-  HIT_EFFECTS: true,
-  /** Screen pixels per effect pixel (integer). 2 keeps the sparks from covering the fighters. */
-  HIT_EFFECT_SCALE: 2,
-  /** Strength of the effects' additive glow (pixelfx default 1). */
-  HIT_EFFECT_GLOW: 0.7,
-
   HIT_FEEL: {
     /** Both fighters freeze this long when a hit connects; the round clock keeps running. */
     HITSTOP_MS: { light: 55, heavy: 90, knockdown: 120, block: 50 },

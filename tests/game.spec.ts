@@ -229,7 +229,7 @@ test('practice mode can be selected and stays passive', async ({ page }) => {
   await boot(page);
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
-  await page.mouse.click(640, 565); // Rival: CPU → Práctica
+  await page.mouse.click(524, 528); // Rival: CPU → Práctica
   await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').mode)).toBe('training');
   await confirmSelection(page);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').roundSystem?.phase === 'FIGHT');

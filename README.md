@@ -1,6 +1,6 @@
 # Fighter Family
 
-Juego de pelea 2D para navegador con Phaser 3, TypeScript y Vite. Dos luchadores de Arica (Tilin y César), modo arcade con escalera de rivales, combates contra la CPU en tres dificultades, dos jugadores en el mismo teclado o con mandos, modo práctica con herramientas de entrenamiento, combos, súpers cinemáticos y música original. Los recursos originales se conservan como respaldo.
+Juego de pelea 2D para navegador con Phaser 3, TypeScript y Vite. Cinco luchadores de Arica (Tilin, César, Joako, Jorell y Tata), modo arcade con escalera de rivales, combates contra la CPU en tres dificultades, dos jugadores en el mismo teclado o con mandos, modo práctica con herramientas de entrenamiento, combos, súpers cinemáticos y música original. Los recursos originales se conservan como respaldo.
 
 ## Ejecutar
 
@@ -15,10 +15,14 @@ Abrir http://localhost:3000. Se juega con teclado o mando (hasta dos). El lienzo
 
 ## Modos y escenarios
 
-**Elegir luchadores** abre el selector arcade. El plantel tiene dos luchadores, cada uno con cuatro colores (Original, Amatista, Menta y Coral):
+**Elegir luchadores** abre el selector arcade. El plantel tiene cinco luchadores, cada uno con cuatro colores (Original, Amatista, Menta y Coral):
 
 - **Tilin:** ágil, con canto sónico.
 - **César:** grande y pesado. Tiene 125 de vida y pega un 20 % más fuerte, pero camina, salta y ataca más lento, y casi no retrocede al recibir golpes. Su súper, *Furia del i30*, comienza con un agarre cercano: lanza al rival al extremo opuesto, sube a su Hyundai i30, lo atropella en una secuencia arcade y vuelve a su posición con una Monster. Sus 23 animaciones usan 276 cuadros redibujados; dirección visual, prompts y procedencia en `art/cesar-v2/`. Los recursos de la cinemática están documentados en `art/cesar-drive/`.
+
+- **Joako:** rápido y ágil. Su súper conecta un pelotazo, construye pared y escalera y dispara desde la estructura.
+- **Jorell:** movimientos equilibrados; golpe al estómago, teletransporte, transformación dorada y Kamehameha.
+- **Tata:** 165 cm, 110 de vida y movimiento tranquilo. Su súper, *Brindis a pedales*, requiere energía completa y un empujón inicial que puede bloquearse o esquivarse: bebe cerveza, monta su bicicleta, arrolla al rival y vuelve para brindar. Son 60 de daño en una secuencia de 6 segundos con sonidos originales de botella, campanilla, pedales e impacto.
 
 Q / E cambia de luchador en el lado activo. Los colores no cambian las estadísticas. Para sumar un luchador: crea su carpeta en `public/assets/characters/<id>/` con `manifest.json` y agrega una entrada en `src/config/roster.ts`, con su ilustración de portada (`menuArtPath`, PNG transparente 2:3) y su lema (`motto`).
 
@@ -44,7 +48,7 @@ La portada es una escena animada con efecto 3D sobre la costa de Arica. Al abrir
 
 La portada presenta a los luchadores del plantel en orden aleatorio y los rota cada 6,5 s: el actual gira de canto, y el siguiente entra girando con su nombre, lema y poder. La ilustración de César (`public/assets/menu/cesar-3d-v2.png`) usa el mismo acabado 3D suave de Tilin; fue generada con ImageGen integrado y su procedencia está en `art/cesar-menu-3d/`.
 
-El selector comparte el lenguaje visual. Detrás hay un suelo de rejilla en perspectiva que avanza hacia el jugador, con horizonte luminoso y chispas. En **luchadores**, las tarjetas entran desde los lados, cada personaje está sobre un pedestal con anillos y foco, el VS en relieve cae con sacudida, y el personaje salta al cambiar de luchador o color. En **escenarios**, las miniaturas se levantan una tras otra, la vista grande se abre como una puerta y recorre la arena lentamente sin deformarla. En **combate listo**, los dos luchadores entran corriendo, un VS grande golpea la pantalla y la cruza una hoja de luz. Cada cambio reconstruye la pantalla en su posición final y anima encima, así que ninguna animación bloquea teclas ni clics. Con **Reducir movimiento** todo aparece quieto y completo.
+El selector comparte el lenguaje visual. Detrás hay un suelo de rejilla en perspectiva que avanza hacia el jugador, con horizonte luminoso y chispas. En **luchadores**, el fondo es el video `public/assets/menu/fondo menu personajes.mp4` en bucle y sin sonido: cada luchador elegido aparece grande a su lado (1P a la izquierda, rival a la derecha), cortado por el borde inferior, con su nombre en letras de fuego en la esquina; los retratos del plantel van en una fila arriba al centro con las marcas 1P y CPU, un VS grande en relieve cae solo al centro, y abajo quedan **Rival** y, debajo, **Volver**, **CPU: dificultad** y **Continuar**. En **escenarios**, las miniaturas se levantan una tras otra, la vista grande se abre como una puerta y recorre la arena lentamente sin deformarla. En **combate listo**, los dos luchadores entran corriendo, un VS grande golpea la pantalla y la cruza una hoja de luz. Cada cambio reconstruye la pantalla en su posición final y anima encima, así que ninguna animación bloquea teclas ni clics. Con **Reducir movimiento** todo aparece quieto y completo.
 
 Decisión técnica: el efecto usa solo Phaser (plano con perspectiva `Plane`, filtros `postFX` y proyección propia de partículas), sin añadir un motor 3D ni recursos nuevos. Con el renderizador Canvas la luchadora se dibuja plana y los brillos se omiten. Los efectos viven en `src/ui/menu/MenuEffects.ts` y `src/ui/selection/SelectionBackdrop.ts`, separados de la lógica de `MenuScene` y `SelectionScene`; `tests/menu-3d.spec.ts` y `tests/selection-3d.spec.ts` los verifican.
 
@@ -172,3 +176,9 @@ El manifiesto activo sigue en `public/assets/characters/tilin/manifest.json`. De
 Los JPG originales permanecen intactos. El manifiesto anterior está respaldado en `art/tilin-v2/original-manifest.json`; el cargador mantiene compatibilidad con sus hojas de tres cuadros y fondo verde. Si falta `GET_UP`, la recuperación conserva su alternativa segura. Si falla la descarga de recursos, se muestra una opción para reintentar.
 
 `inspect-sprites.mjs` necesita el servidor de desarrollo en el puerto 3000. Guarda capturas, hojas de contacto y mediciones de los 276 cuadros en `artifacts/tilin-v2/`, y falla si encuentra cuadros vacíos, transparencia ausente, recortes en los bordes o errores de ejecución. `inspect-sonic.mjs` ejecuta la inspección actual del súper y guarda la barra cargada, la onda, el retrato, los impactos y la recuperación en `artifacts/super-canto/`.
+
+## Plantel unificado y estaturas
+
+La revisión de noviembre de 2026 unifica el acabado pintado de los cinco luchadores con 1074 poses en 126 animaciones. Las escalas de combate y los retratos del selector usan las estaturas indicadas: Tata 165 cm, Tilin 167 cm, Joako 181 cm, Jorell 182 cm y César 183 cm. Jorell conserva lentes negros, un torso más ancho que Joako, brazos y piernas más delgados, una panza moderada y visible y ambos tatuajes de dragón en el brazo del reloj, incluyendo su transformación y retratos.
+
+Los PNG, prompts y registros de ImageGen están en `art/roster-unified/`; los activos del juego en `public/assets/characters/*-unified/`. Para reconstruir esta revisión se usa `node scripts/pack-roster.mjs`. La auditoría y capturas del plantel se generan con `node scripts/inspect-roster.mjs` y Vite en el puerto 3018.

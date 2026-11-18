@@ -9,7 +9,7 @@ import { AnimationDefinition } from '../animation/AnimationDefinition';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { CombatState } from '../combat/CombatState';
 import { Hitbox, Hurtbox, DEFAULT_HURTBOX } from '../combat/Hitbox';
-import { AttackDefinition, ATTACK_DEFINITIONS, COMMAND_MOVES, DRIVE_GRAB_ATTACK } from '../combat/AttackDefinition';
+import { AttackDefinition, ATTACK_DEFINITIONS, COMMAND_MOVES, DRIVE_GRAB_ATTACK, JORELL_STOMACH_ATTACK, TATA_SHOVE_ATTACK } from '../combat/AttackDefinition';
 import { SonicWave } from '../combat/SonicWave';
 import { DEFAULT_STATS, FighterStats } from '../config/roster';
 
@@ -348,11 +348,13 @@ export class Fighter {
     if (attackName === 'SPECIAL_ATTACK' && (!this.superReady || !this.isGrounded)) return;
 
     const driveGrab = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'drive';
+    const stomachPunch = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'kame';
+    const bicycleShove = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'bike';
     const command = attackName === 'COMMAND_SPECIAL';
     if (command && !this.isGrounded) return;
     // Punches and kicks in the air use the jump-attack data.
     const airborne = !this.isGrounded && ['LIGHT_PUNCH', 'HEAVY_PUNCH', 'LIGHT_KICK', 'HEAVY_KICK'].includes(attackName);
-    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : command ? COMMAND_MOVES[this.stats.commandMove]
+    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : stomachPunch ? JORELL_STOMACH_ATTACK : bicycleShove ? TATA_SHOVE_ATTACK : command ? COMMAND_MOVES[this.stats.commandMove]
       : airborne ? ATTACK_DEFINITIONS[attackName.includes('KICK') ? 'AIR_KICK' : 'AIR_PUNCH'] : ATTACK_DEFINITIONS[attackName];
     if (!baseDef) return;
     if (baseDef.crouch && !this.isGrounded) return;
@@ -374,7 +376,7 @@ export class Fighter {
       ? (attackName.includes('KICK') ? 'AIR_KICK' : 'AIR_PUNCH') : attackName);
     this.playAnimation(this.registry.has(aerial) ? aerial : attackName, true);
 
-    if (attackName === 'SPECIAL_ATTACK' && !driveGrab) { this.hitbox = null; return; }
+    if (attackName === 'SPECIAL_ATTACK' && !driveGrab && !stomachPunch && !bicycleShove) { this.hitbox = null; return; }
 
     // Create hitbox (Hitbox.getWorldRect handles facing direction cleanly without double inversion)
     this.hitbox = new Hitbox(this.characterId, {
@@ -390,11 +392,12 @@ export class Fighter {
     if (!this.currentAttackDef) return;
     const { startup, active, recovery } = this.currentAttackDef;
     const elapsedFrames = this.combatState.stateTimer * 60 / 1000;
-    if (this.currentAttackDef.name === 'SPECIAL_ATTACK' && this.stats.special === 'sonic' && !this.sonicReleased && elapsedFrames + 1e-6 >= startup) {
+    if (this.currentAttackDef.name === 'SPECIAL_ATTACK' && (this.stats.special === 'sonic' || this.stats.special === 'build') && !this.sonicReleased && elapsedFrames + 1e-6 >= startup) {
       this.sonicReleased = true;
       const direction = this.facingRight ? 1 : -1;
-      this.sonicWaves.push(new SonicWave(this.scene, this.x + direction * 65, this.y - 215, direction));
-      this.playImpactSound('voice-canto');
+      const ball = this.stats.special === 'build';
+      this.sonicWaves.push(new SonicWave(this.scene, this.x + direction * 65, this.y - (ball ? 225 : 215), direction, ball ? 'ball' : 'sonic'));
+      this.playImpactSound(ball ? 'hit-light' : 'voice-canto');
     }
     if (elapsedFrames + 1e-6 >= startup + active + recovery) {
       this.endAttack();

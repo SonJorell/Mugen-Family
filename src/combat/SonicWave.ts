@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { ActiveBox } from './Hitbox';
 import { GAME_CONFIG } from '../config/gameConfig';
 
-export type WaveStyle = 'sonic' | 'quake';
+export type WaveStyle = 'sonic' | 'quake' | 'ball';
 
 /**
  * One travelling super opener: world-space hitbox and artwork share the same position.
@@ -20,11 +20,12 @@ export class SonicWave {
     if (!this.active) return;
     this.age += delta;
     const quake = this.style === 'quake';
-    this.x += this.direction * (quake ? 520 : 640) * delta / 1000;
+    this.x += this.direction * (quake ? 520 : this.style === 'ball' ? 780 : 640) * delta / 1000;
     if (this.age >= (quake ? 1050 : 900) || this.x < 0 || this.x > GAME_CONFIG.STAGE_WIDTH) this.destroy();
     else this.draw();
   }
   get bounds(): ActiveBox {
+    if (this.style === 'ball') return { worldX: this.x - 22, worldY: this.y - 22, width: 44, height: 44 };
     // The quake hugs the floor (y is 70 px above it), so a jump clears it.
     return this.style === 'quake'
       ? { worldX: this.x - 45, worldY: this.y - 40, width: 90, height: 110 }
@@ -32,6 +33,7 @@ export class SonicWave {
       : { worldX: this.x - 32, worldY: this.y - 40, width: 64, height: 80 };
   }
   private draw(): void {
+    if (this.style === 'ball') { this.drawBall(); return; }
     if (this.style === 'quake') { this.drawQuake(); return; }
     this.art.clear().setPosition(this.x, this.y).setScale(this.direction, 1);
     for (let i = 0; i < 3; i++) {
@@ -47,6 +49,19 @@ export class SonicWave {
       if (!i) this.art.moveTo(x, y); else this.art.lineTo(x, y);
     }
     this.art.strokePath();
+  }
+  private drawBall(): void {
+    const g = this.art.clear().setPosition(this.x, this.y).setScale(this.direction, 1);
+    g.lineStyle(3, 0x9ce8ff, 0.65).lineBetween(-70, -12, -32, -12).lineBetween(-86, 4, -34, 4);
+    g.fillStyle(0xf9f8e9).fillCircle(0, 0, 22);
+    g.lineStyle(2, 0x162d43).strokeCircle(0, 0, 22);
+    const a = this.age * 0.012;
+    const points = Array.from({ length: 5 }, (_, i) => ({ x: Math.cos(a + i * Math.PI * 2 / 5) * 9, y: Math.sin(a + i * Math.PI * 2 / 5) * 9 }));
+    g.fillStyle(0x162d43).fillPoints(points, true);
+    for (const p of points) {
+      g.lineStyle(1.5, 0x162d43).lineBetween(p.x, p.y, p.x * 2.35, p.y * 2.35);
+      g.fillCircle(p.x * 2.1, p.y * 2.1, 4);
+    }
   }
   private drawQuake(): void {
     const g = this.art.clear().setPosition(this.x, this.y + 70).setScale(this.direction, 1);

@@ -13,23 +13,32 @@ export class SelectionBackdrop {
   private readonly beams: Phaser.GameObjects.Graphics;
   private readonly horizon: Phaser.GameObjects.Image;
   private readonly embers: EmberField;
+  private readonly base: Phaser.GameObjects.Rectangle;
+  private shown = true;
   private time = 0;
   private viewX = 0;
   private viewY = 0;
 
   constructor(scene: Phaser.Scene) {
-    scene.add.rectangle(W / 2, H / 2, W, H, 0x1a1230);
+    this.base = scene.add.rectangle(W / 2, H / 2, W, H, 0x3b8ff0);
     this.beams = scene.add.graphics();
     this.horizon = scene.add.image(W / 2, HORIZON, ensureGlowTexture(scene)).setBlendMode(Phaser.BlendModes.ADD)
-      .setTint(0xef709d).setDisplaySize(1700, 300).setAlpha(0.55);
+      .setTint(0xff6a1f).setDisplaySize(1700, 300).setAlpha(0.55);
     this.grid = scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD).setName('selection-grid');
     this.embers = new EmberField(scene, 46, 1, 0.6, 3);
     this.draw();
   }
 
+  /** Hides the whole arena (embers included), e.g. while a video plays behind the canvas. */
+  setVisible(visible: boolean): void {
+    this.shown = visible;
+    for (const object of [this.base, this.beams, this.horizon, this.grid]) object.setVisible(visible);
+    this.embers.setVisible(visible);
+  }
+
   /** `motion` false freezes the scene in a calm still frame. */
   update(dt: number, pointerX: number, pointerY: number, motion: boolean): void {
-    this.embers.setVisible(motion);
+    this.embers.setVisible(motion && this.shown);
     if (!motion) {
       if (this.viewX !== 0 || this.viewY !== 0) { this.viewX = 0; this.viewY = 0; this.draw(); }
       return;
@@ -47,7 +56,7 @@ export class SelectionBackdrop {
     this.horizon.setPosition(vanish, horizon).setAlpha(0.5 + Math.sin(this.time * 1.1) * 0.08);
 
     // Diagonal light beams sliding slowly across the back wall.
-    const b = this.beams.clear().fillStyle(0x473b72, 0.2);
+    const b = this.beams.clear().fillStyle(0x2f86f0, 0.2);
     const shift = (this.time * 14) % 140 - this.viewX * 20;
     for (let x = -440 + shift; x < 1500; x += 140) b.fillTriangle(x, H, x + 400, 0, x + 460, 0);
 
@@ -55,14 +64,14 @@ export class SelectionBackdrop {
     // Lines running away from the viewer converge on the vanishing point.
     for (let i = -14; i <= 14; i++) {
       const alpha = 0.34 - Math.abs(i) * 0.016;
-      g.lineStyle(2, 0x8f6cf5, alpha).lineBetween(vanish + i * 16, horizon, W / 2 + i * 190 - this.viewX * 30, H);
+      g.lineStyle(2, 0xffffff, alpha).lineBetween(vanish + i * 16, horizon, W / 2 + i * 190 - this.viewX * 30, H);
     }
     // Cross lines: evenly spaced in depth, so they bunch up near the horizon and roll forward.
     const rows = 14, scroll = (this.time * 0.35) % 1;
     for (let k = 0; k < rows; k++) {
       const depth = (k + 1 - scroll) / rows;          // 1 = far, → 0 = at the viewer's feet
       const y = horizon + (H - horizon) * Math.pow(1 - depth, 2.4) + 2;
-      g.lineStyle(2, 0xa1ece5, 0.05 + (1 - depth) * 0.3).lineBetween(0, y, W, y);
+      g.lineStyle(2, 0x7fd4ff, 0.05 + (1 - depth) * 0.3).lineBetween(0, y, W, y);
     }
   }
 }

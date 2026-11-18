@@ -11,7 +11,7 @@ async function fight(page: Page, live = false) {
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
   await page.keyboard.press('KeyE');
-  await page.mouse.click(640, 565);
+  await page.mouse.click(524, 528);
   await confirmSelection(page);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
   if (!live) await page.evaluate(() => { (window as any).__game.loop.stop(); });
