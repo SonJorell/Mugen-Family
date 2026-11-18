@@ -3,7 +3,7 @@
 // ============================================================
 //
 // Each burst simulates in its own low-resolution pixelfx frame placed in world space, is composited
-// to RGBA and uploaded into a small Phaser CanvasTexture, then shown at an integer scale (SCALE) so
+// to RGBA and uploaded into a small Phaser CanvasTexture, then shown at an integer scale (GAME_CONFIG.HIT_EFFECT_SCALE) so
 // its pixels stay crisp next to the fighters. Textures are only redrawn while a burst is alive.
 //
 // pixelfx keeps two buffers: opaque color and additive light. Its composite() turns light over a
@@ -19,8 +19,6 @@ import * as parry from '../vendor/pixelfx/fx/impacts/parry.js';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { ImpactKind } from '../ui/ImpactEffects';
 
-/** Screen pixels per pixelfx pixel. */
-const SCALE = 3;
 /** Where shield-block's dome takes the blow, in its local pixels (see HIT in shield-block.js). */
 /**
  * How a block looks: 'parry' (a clash star in guard blue at the contact point) or 'shield'
@@ -49,6 +47,8 @@ interface LiveBurst {
 }
 
 let serial = 0;
+/** Screen pixels per pixelfx pixel (an integer, so the pixels stay square). */
+const SCALE = () => Math.max(1, Math.round(GAME_CONFIG.HIT_EFFECT_SCALE));
 
 /** Same surface as ImpactEffects (spawn / count / destroy) plus update(), which must run every frame. */
 export class HitEffects {
@@ -63,8 +63,8 @@ export class HitEffects {
    * facing right was hit from the right, so the blow travels left.
    */
   spawn(x: number, y: number, kind: ImpactKind, defenderFacingRight: boolean): void {
-    const floor = Math.round(GAME_CONFIG.FLOOR_Y / SCALE);
-    const lx = Math.round(x / SCALE), ly = Math.round(y / SCALE);
+    const floor = Math.round(GAME_CONFIG.FLOOR_Y / SCALE());
+    const lx = Math.round(x / SCALE()), ly = Math.round(y / SCALE());
     const blowLeft = defenderFacingRight;
     const seed = (serial * 7919 + 13) % 1000;
     let mod: FxModule, ox: number, oy: number, flip: boolean;
@@ -88,7 +88,7 @@ export class HitEffects {
       const top = ly - h, bottom = oy + 6;
       frame = createFrame(w * 2, bottom - top, ox - w, top);
     }
-    const fx = createFx(mod, { ...options, x: ox, y: oy, flip });
+    const fx = createFx(mod, { ...options, x: ox, y: oy, flip, light: GAME_CONFIG.HIT_EFFECT_GLOW });
     const id = serial++;
     const color = this.layer(`pixelfx-${id}`, frame, `impact-${kind}`);
     const light = this.layer(`pixelfx-${id}-light`, frame, `impact-${kind}-light`);
@@ -101,8 +101,8 @@ export class HitEffects {
   private layer(key: string, frame: FxFrame, name: string): Layer {
     const texture = this.scene.textures.createCanvas(key, frame.w, frame.h)!;
     const pixels = texture.context.createImageData(frame.w, frame.h);
-    const image = this.scene.add.image(frame.ox * SCALE, frame.oy * SCALE, key)
-      .setOrigin(0, 0).setScale(SCALE).setDepth(40).setName(name);
+    const image = this.scene.add.image(frame.ox * SCALE(), frame.oy * SCALE(), key)
+      .setOrigin(0, 0).setScale(SCALE()).setDepth(40).setName(name);
     return { key, texture, image, pixels };
   }
 
