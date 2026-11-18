@@ -39,12 +39,11 @@ const CASES: [string, string, boolean, string][] = [
 for (const [player, opponent] of [['tilin', 'cesar'], ['cesar', 'tilin']]) {
   test(`pixelfx bursts draw at the contact point for hits and blocks (${player} vs ${opponent})`, async ({ page }) => {
     await startFight(page, player, opponent, { mode: 'training' });
-    for (const [label, attack, block, name] of CASES) {
+    for (const [, attack, block, name] of CASES) {
       const r = await landAndRender(page, attack, block, 50);
       expect(r.count).toBe(1);
       expect(r.names).toEqual([name]);
       expect(r.drawn).toBeGreaterThan(20);
-      await page.screenshot({ path: `artifacts/pixelfx/${label}-${player}.png` });
     }
     // Bursts end on their own and free their textures.
     const left = await page.evaluate(() => {
