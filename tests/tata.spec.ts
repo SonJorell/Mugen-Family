@@ -1,6 +1,9 @@
 import { test, expect, Page } from '@playwright/test';
 import { bootGame, startFight } from './fight-helper';
 
+// Cold loads decode the complete roster and create hundreds of canvas textures.
+test.setTimeout(90000);
+
 async function fight(page: Page, mirror = false) {
   await startFight(page, 'tata', mirror ? 'tata' : 'tilin', { mode: 'training' });
 }

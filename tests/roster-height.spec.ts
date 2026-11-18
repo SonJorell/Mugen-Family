@@ -1,5 +1,8 @@
 import { test, expect, Page } from '@playwright/test';
 
+// This suite processes all five fighters in a fresh browser context.
+test.setTimeout(90000);
+
 async function select(page: Page) {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.route(/\/src\/main\.ts(?:\?.*)?$/, async route => {

@@ -6,6 +6,7 @@ const out = 'artifacts/roster-unified/visual';
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, reducedMotion: 'reduce' });
+page.setDefaultTimeout(60000);
 const errors = [];
 try {
   page.on('pageerror', e => errors.push(e.message));
