@@ -213,6 +213,9 @@ export const GAME_CONFIG = {
   JUGGLE: { LAUNCH_VELOCITY: 760, POP_VELOCITY: 380, CARRY_SPEED: 60, MAX_HITS: 3, GRAVITY_STEP: 0.35 },
 
   /** Hit feel: freeze on contact, camera shake and sparks. Times in ms. */
+  /** Prototype: pixel-art hit sparks from pixelfx (src/systems/HitEffects.ts); false keeps the vector sparks. */
+  HIT_EFFECTS: true,
+
   HIT_FEEL: {
     /** Both fighters freeze this long when a hit connects; the round clock keeps running. */
     HITSTOP_MS: { light: 55, heavy: 90, knockdown: 120, block: 50 },

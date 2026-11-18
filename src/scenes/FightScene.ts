@@ -17,6 +17,7 @@ import { InputManager } from '../input/InputManager';
 import { FacingSystem } from '../systems/FacingSystem';
 import { FighterController, ImpactEvent } from '../systems/FighterController';
 import { ImpactEffects } from '../ui/ImpactEffects';
+import { HitEffects } from '../systems/HitEffects';
 import { TouchControls, isTouchDevice } from '../ui/TouchControls';
 import { ComboTracker } from '../systems/ComboTracker';
 import { ComboDisplay } from '../ui/ComboDisplay';
@@ -69,7 +70,7 @@ export class FightScene extends Phaser.Scene {
   private facingSystem = new FacingSystem();
   private fighterController = new FighterController();
   private superMove!: SuperMove;
-  private impacts!: ImpactEffects;
+  private impacts!: ImpactEffects | HitEffects;
   private combos = new ComboTracker();
   private comboDisplay!: ComboDisplay;
   /** Remaining freeze after a hit connects (ms). Fighters stand still; the clock runs. */
@@ -360,7 +361,7 @@ export class FightScene extends Phaser.Scene {
     this.trainingOverlay = this.mode === 'training' ? new TrainingOverlay(this, this.training) : null;
     this.seenAttackSerial = this.player.attackSerial;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.trainingOverlay?.destroy(); this.trainingOverlay = null; });
-    this.impacts = new ImpactEffects(this);
+    this.impacts = GAME_CONFIG.HIT_EFFECTS ? new HitEffects(this) : new ImpactEffects(this);
     this.fighterController.onImpact = event => this.onImpact(event);
     this.fighterController.scaleHit = (attacker, defender, damage) => this.scaleComboHit(attacker, defender, damage);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.impacts.destroy());
@@ -533,6 +534,8 @@ export class FightScene extends Phaser.Scene {
   update(_time: number, delta: number): void {
     if (!this.roundSystem || !this.player || !this.opponent) return;
     delta = Math.min(Math.max(delta, 0), 50);
+    // Pixel sparks keep playing through hitstop, supers and the round end.
+    if (this.impacts instanceof HitEffects) this.impacts.update(delta);
     if (this.superMove.active) {
       this.superMove.update(delta);
       this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
