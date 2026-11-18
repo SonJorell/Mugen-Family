@@ -4,10 +4,9 @@
 //
 // Roles ("Arcade Impact HUD"):
 //   UI      Chivo for menus, data and interface text.
-//   NAME    Bebas Neue for fighter names and headings.
+//   NAME    Edo SZ, a brush face, for fighter names (Jorell keeps it there).
 //   NUMBER  Anton for the clock, health values, combo counter and button callouts.
-//   IMPACT  Edo SZ, a brush face, for the big announcements (ROUND, ¡PELEA!, K.O., victory) and titles.
-//           Jorell picked it; the design system suggests Bebas Neue (FONT_NAME) as the alternative.
+//   IMPACT  Bebas Neue for the big announcements (ROUND, ¡PELEA!, K.O., victory) and titles.
 //
 // Licences: Chivo, Bebas Neue, Rajdhani, Teko, Anton and Black Ops One are SIL OFL (see the OFL-*.txt files). Edo SZ
 // (Vic Fieger) is freeware with no written redistribution terms: settle its licence before the game
@@ -18,15 +17,12 @@
 // created; BootScene waits for `loadGameFonts()` before the game goes on.
 
 export const FONT_UI = "Chivo, 'Trebuchet MS', sans-serif";
-export const FONT_NAME = "'Bebas Neue', Impact, 'Arial Narrow', sans-serif";
+export const FONT_NAME = "'Edo SZ', Impact, 'Arial Narrow', sans-serif";
 export const FONT_NUMBER = "Anton, Impact, 'Arial Black', sans-serif";
-export const FONT_IMPACT = "'Edo SZ', Impact, 'Arial Black', sans-serif";
+export const FONT_IMPACT = "'Bebas Neue', Impact, 'Arial Black', sans-serif";
 
 const FACES: { family: string; file: string; weight: string }[] = [
-  // Rajdhani's Regular is thin on a busy background; Medium stands in as the normal weight.
-  { family: 'Rajdhani', file: 'Rajdhani-Medium.ttf', weight: '400' },
-  { family: 'Rajdhani', file: 'Rajdhani-Bold.ttf', weight: '700' },
-  { family: 'Teko', file: 'Teko[wght].ttf', weight: '300 700' },
+  // Rajdhani and Teko (the earlier UI and name faces) stay in the folder but are no longer loaded.
   { family: 'Chivo', file: 'Chivo[wght].ttf', weight: '100 900' },
   { family: 'Bebas Neue', file: 'BebasNeue-Regular.ttf', weight: '400' },
   { family: 'Anton', file: 'Anton-Regular.ttf', weight: '400' },
