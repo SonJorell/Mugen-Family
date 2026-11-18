@@ -2,12 +2,14 @@
 // fonts — The game's typefaces, bundled in public/assets/fonts
 // ============================================================
 //
-// Three roles:
-//   UI      Rajdhani for menus and interface text; Teko for fighter names over the health bars.
-//   NUMBER  Anton for the clock, health values and the combo counter.
+// Roles ("Arcade Impact HUD"):
+//   UI      Chivo for menus, data and interface text.
+//   NAME    Bebas Neue for fighter names and headings.
+//   NUMBER  Anton for the clock, health values, combo counter and button callouts.
 //   IMPACT  Edo SZ, a brush face, for the big announcements (ROUND, ¡PELEA!, K.O., victory) and titles.
+//           Jorell picked it; the design system suggests Bebas Neue (FONT_NAME) as the alternative.
 //
-// Licences: Rajdhani, Teko, Anton and Black Ops One are SIL OFL (see the OFL-*.txt files). Edo SZ
+// Licences: Chivo, Bebas Neue, Rajdhani, Teko, Anton and Black Ops One are SIL OFL (see the OFL-*.txt files). Edo SZ
 // (Vic Fieger) is freeware with no written redistribution terms: settle its licence before the game
 // is published. Black Ops One stays in the folder as the open replacement: add its face below and
 // put it first in FONT_IMPACT to switch.
@@ -15,8 +17,8 @@
 // Phaser draws text on a canvas, so a face must be loaded before the first text that uses it is
 // created; BootScene waits for `loadGameFonts()` before the game goes on.
 
-export const FONT_UI = "Rajdhani, 'Trebuchet MS', sans-serif";
-export const FONT_NAME = "Teko, Impact, 'Arial Narrow', sans-serif";
+export const FONT_UI = "Chivo, 'Trebuchet MS', sans-serif";
+export const FONT_NAME = "'Bebas Neue', Impact, 'Arial Narrow', sans-serif";
 export const FONT_NUMBER = "Anton, Impact, 'Arial Black', sans-serif";
 export const FONT_IMPACT = "'Edo SZ', Impact, 'Arial Black', sans-serif";
 
@@ -25,6 +27,8 @@ const FACES: { family: string; file: string; weight: string }[] = [
   { family: 'Rajdhani', file: 'Rajdhani-Medium.ttf', weight: '400' },
   { family: 'Rajdhani', file: 'Rajdhani-Bold.ttf', weight: '700' },
   { family: 'Teko', file: 'Teko[wght].ttf', weight: '300 700' },
+  { family: 'Chivo', file: 'Chivo[wght].ttf', weight: '100 900' },
+  { family: 'Bebas Neue', file: 'BebasNeue-Regular.ttf', weight: '400' },
   { family: 'Anton', file: 'Anton-Regular.ttf', weight: '400' },
   { family: 'Edo SZ', file: 'edosz.ttf', weight: '400' },
 ];
