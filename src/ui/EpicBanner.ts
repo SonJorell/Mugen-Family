@@ -3,6 +3,7 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import { playUiSound } from '../config/characters';
 import { ensureGlowTexture, ensureRaysTexture, Title3D } from './menu/MenuEffects';
 import { FONT_UI } from './fonts';
+import { C, CSS, GLASS } from './theme';
 
 const CX = GAME_CONFIG.WIDTH / 2, CY = GAME_CONFIG.HEIGHT / 2;
 
@@ -30,13 +31,14 @@ export interface BannerStyle {
 }
 
 export const BANNER_STYLES = {
-  round: { side: [0x10202e, 0x2f6f8f], face: [0xffffff, 0x9fe8e1], accent: 0x9fe8e1, fontSize: 104, shake: 0.004, volume: 0.45 },
-  fight: { side: [0x4a0d0d, 0xc8371f], face: [0xfff3a8, 0xff9a2e], accent: 0xffb347, fontSize: 150, shake: 0.012, volume: 0.9 },
-  ko: { side: [0x3a0606, 0xb81616], face: [0xffffff, 0xff5a4a], accent: 0xff4d4d, fontSize: 190, shake: 0.016, volume: 1 },
-  time: { side: [0x10202e, 0x2f6f8f], face: [0xffffff, 0x9fe8e1], accent: 0x9fe8e1, fontSize: 150, shake: 0.008, volume: 0.7 },
-  victory: { side: [0x4a2a08, 0xc98a1e], face: [0xfffbe0, 0xffc93c], accent: 0xffd76a, fontSize: 150, shake: 0.01, volume: 0.9, celebrate: true },
-  defeat: { side: [0x16060a, 0x5e1420], face: [0xffb3b3, 0xb3202e], accent: 0xff4d4d, fontSize: 150, shake: 0.006, volume: 0.8, mourn: true },
-  draw: { side: [0x1b1f2a, 0x5b6477], face: [0xffffff, 0xb9c2d3], accent: 0xd3dce2, fontSize: 150, shake: 0.006, volume: 0.6 },
+  // Arcade Impact palette (theme.ts): extrusion in ink toward the accent, faces from white.
+  round: { side: [C.ink, 0x004f58], face: [C.white, C.tertiary], accent: C.tertiary, fontSize: 104, shake: 0.004, volume: 0.45 },
+  fight: { side: [C.ink, 0x8a1c00], face: [0xfff1c2, C.primary], accent: C.primary, fontSize: 150, shake: 0.012, volume: 0.9 },
+  ko: { side: [C.ink, 0x930019], face: [C.white, C.secondary], accent: C.secondary, fontSize: 190, shake: 0.016, volume: 1 },
+  time: { side: [C.ink, 0x004f58], face: [C.white, C.tertiary], accent: C.tertiary, fontSize: 150, shake: 0.008, volume: 0.7 },
+  victory: { side: [C.ink, 0x8a5a00], face: [0xfffbe0, C.gold], accent: C.gold, fontSize: 150, shake: 0.01, volume: 0.9, celebrate: true },
+  defeat: { side: [C.ink, 0x930019], face: [0xffdad8, C.secondary], accent: C.secondary, fontSize: 150, shake: 0.006, volume: 0.8, mourn: true },
+  draw: { side: [C.ink, 0x5e3f38], face: [C.white, 0xe6e1e5], accent: C.ivory, fontSize: 150, shake: 0.006, volume: 0.6 },
 } satisfies Record<string, BannerStyle>;
 
 /**
@@ -53,9 +55,13 @@ export function showBanner(scene: Phaser.Scene, text: string, style: BannerStyle
   };
   const tweens = scene.tweens;
 
-  const band = pin(scene.add.rectangle(CX, CY, GAME_CONFIG.WIDTH, style.caption ? 250 : 200, 0x05060a, 0.62));
-  const edges = [-1, 1].map(side => pin(scene.add.rectangle(CX, CY + side * band.height / 2, GAME_CONFIG.WIDTH, 3, style.accent, 0.9), 1));
-  const wash = style.mourn ? pin(scene.add.rectangle(CX, CY, GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT, 0x3a0008, 0.38), -1) : null;
+  // A band of ivory glass between hard ink rules, each with an accent line.
+  const band = pin(scene.add.rectangle(CX, CY, GAME_CONFIG.WIDTH, style.caption ? 250 : 200, C.ivory, GLASS.fill * 0.8));
+  const edges = [-1, 1].flatMap(side => [
+    pin(scene.add.rectangle(CX, CY + side * (band.height / 2 + 2), GAME_CONFIG.WIDTH, 4, C.ink, 0.9), 1),
+    pin(scene.add.rectangle(CX, CY + side * (band.height / 2 - 3), GAME_CONFIG.WIDTH, 3, style.accent, 0.95), 1),
+  ]);
+  const wash = style.mourn ? pin(scene.add.rectangle(CX, CY, GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT, 0x410006, 0.32), -1) : null;
   const rays = style.celebrate ? pin(scene.add.image(CX, CY, ensureRaysTexture(scene)).setBlendMode(Phaser.BlendModes.ADD).setTint(style.accent).setScale(1.5).setAlpha(0), 1) : null;
 
   const title = new Title3D(scene, CX, CY - (style.fontSize ?? 150) * 0.62 - (style.caption ? 26 : 0), [text], depth + 3, {
@@ -64,7 +70,7 @@ export function showBanner(scene: Phaser.Scene, text: string, style: BannerStyle
   parts.push(title);
   const line = title.lines[0];
   const caption = style.caption ? pin(scene.add.text(CX, CY + (style.fontSize ?? 150) * 0.36, style.caption, {
-    fontFamily: FONT_UI, fontStyle: 'bold', fontSize: '42px', color: '#fff3d8', stroke: '#07090f', strokeThickness: 6,
+    fontFamily: FONT_UI, fontStyle: 'bold', fontSize: '38px', color: CSS.ink, stroke: CSS.ivory, strokeThickness: 5,
   }).setOrigin(0.5), 3) : null;
 
   const leave = () => {
