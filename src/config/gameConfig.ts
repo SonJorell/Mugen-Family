@@ -206,7 +206,7 @@ export const GAME_CONFIG = {
    * at MAX_HITS (the last hit knocks down) and never takes more than DAMAGE_CAP of the defender's
    * maximum health (supers excluded), so there are no infinite loops.
    */
-  COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900, FREE_HITS: 2, SCALE_STEP: 0.15, MIN_SCALE: 0.3, MAX_HITS: 8, DAMAGE_CAP: 0.45 },
+  COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 1000, FREE_HITS: 2, SCALE_STEP: 0.15, MIN_SCALE: 0.3, MAX_HITS: 8, DAMAGE_CAP: 0.45 },
 
   /**
    * Throw (light punch + light kick up close). The two presses may be PRESS_WINDOW_MS apart (a light
