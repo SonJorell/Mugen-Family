@@ -90,9 +90,14 @@ test('music switches with scenes, pauses with combat, and mute survives restart'
     .filter((s: any) => s.key.startsWith('music-') && !s.pendingRemove).map((s: any) => ({ key: s.key, playing: s.isPlaying, paused: s.isPaused, mute: s.mute })));
   // The menu plays «Cinturão de Elite», loaded in the background (AUD-01).
   await expect.poll(currentMusic, { timeout: 15000 }).toEqual([{ key: 'music-cinturao', playing: true, paused: false, mute: false }]);
-  await page.keyboard.press('KeyM');
+  // Music is muted from Configuración (the only place with sound settings): Música → apagar.
+  await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
+  await page.waitForFunction(() => (window as any).__game.scene.isActive('SettingsScene'));
+  await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
   await expect.poll(async () => (await currentMusic())[0]?.mute).toBe(true);
-  await page.keyboard.press('ArrowUp'); await page.keyboard.press('Enter');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => (window as any).__game.scene.isActive('MenuScene'));
+  await page.evaluate(() => { const m = (window as any).__game.scene.getScene('MenuScene'); m.selectedIndex = 0; m.options[0].action(); });
   await confirmSelection(page);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
   await expect.poll(currentMusic).toEqual([{ key: 'music-hardline', playing: true, paused: false, mute: true }]);
@@ -101,8 +106,10 @@ test('music switches with scenes, pauses with combat, and mute survives restart'
   await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('FightScene'));
   await expect.poll(currentMusic).toEqual([{ key: 'music-hardline', playing: true, paused: false, mute: true }]);
+  // M is no longer a sound shortcut: the fight keeps the muted music.
   await page.keyboard.press('KeyM');
-  await expect.poll(async () => (await currentMusic())[0]?.mute).toBe(false);
+  await page.waitForTimeout(300);
+  expect((await currentMusic())[0]?.mute).toBe(true);
 });
 
 test('stage selection after the fighters uses the chosen arena', async ({ page }) => {
