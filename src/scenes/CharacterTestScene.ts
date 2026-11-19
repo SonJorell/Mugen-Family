@@ -10,7 +10,7 @@ import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { Fighter } from '../characters/Fighter';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
-import { GameAudio, musicControls } from '../systems/GameAudio';
+import { GameAudio } from '../systems/GameAudio';
 import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 
@@ -44,7 +44,6 @@ export class CharacterTestScene extends Phaser.Scene {
   create(): void {
     isolateSceneKeyboard(this);
     GameAudio.for(this).play('music-menu');
-    musicControls(this, 1250, 24);
     const htmlVideo = document.getElementById('menu-video-bg') as HTMLVideoElement | null;
     if (htmlVideo) {
       htmlVideo.style.display = 'none';

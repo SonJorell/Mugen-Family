@@ -40,7 +40,7 @@ export const DEFAULT_P2_BINDINGS: KeyBindings = {
 };
 
 /** Keys that already do something else in the game and cannot be assigned to an action. */
-export const RESERVED_KEYS: readonly string[] = ['ESC', 'F1', 'F2', 'F11', 'M', 'COMMA', 'PERIOD', 'ENTER', 'TAB'];
+export const RESERVED_KEYS: readonly string[] = ['ESC', 'F1', 'F2', 'F11', 'ENTER', 'TAB'];
 
 const STORAGE_KEY = 'fighter-keys';
 

@@ -33,7 +33,7 @@ test('remapping refuses duplicates and reserved keys, saves the change and the f
   expect((await controls(page)).p1.LIGHT_PUNCH).toEqual(['J']);
 
   await page.keyboard.press('Enter');
-  await page.keyboard.press('m');                             // reserved for the music
+  await page.keyboard.press('F2');                            // reserved for the game (stage switch)
   await expect.poll(async () => (await controls(page)).message).toContain('reservada');
 
   await page.keyboard.press('Enter');

@@ -8,7 +8,7 @@ import { SelectionBackdrop } from '../ui/selection/SelectionBackdrop';
 import { ensureFaceTexture } from '../ui/selection/fighterFaces';
 import { ensureGlowTexture, Title3D } from '../ui/menu/MenuEffects';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
-import { GameAudio, musicControls } from '../systems/GameAudio';
+import { GameAudio } from '../systems/GameAudio';
 import { announce } from '../systems/Announcer';
 import { FONT_UI, FONT_IMPACT, FONT_NAME } from '../ui/fonts';
 import { C, CSS } from '../ui/theme';
@@ -111,7 +111,6 @@ export class SelectionScene extends Phaser.Scene {
       loader.loadAnimationFromUrls('IDLE', animationUrls(manifest, 'IDLE'));
       this.idleKeys.set(fighter.id, loader.getPhaserAnimKey('IDLE'));
     }
-    musicControls(this);
     const key = (name: string, action: () => void) => this.input.keyboard!.on('keydown-' + name, (event: KeyboardEvent) => {
       event.preventDefault(); if (!event.repeat) action();
     });

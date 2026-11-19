@@ -6,7 +6,6 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { FightScene } from './FightScene';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
-import { musicControls } from '../systems/GameAudio';
 import { MOVE_LIST, describeKeys, keyLabel } from '../input/InputMapping';
 import { activeKeys, loadBindings } from '../input/Bindings';
 import { rosterEntry } from '../config/roster';
@@ -44,7 +43,6 @@ export class PauseScene extends Phaser.Scene {
 
   create(): void {
     isolateSceneKeyboard(this);
-    musicControls(this, 1250, 138);
     this.selectedIndex = 0;
     this.menuItems = [];
     this.moveList = null;

@@ -25,7 +25,7 @@ import { RoundSystem, RoundWinner, RoundEndReason } from '../systems/RoundSystem
 import { HUD } from '../ui/HUD';
 import { FightMessages } from '../ui/FightMessages';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
-import { GameAudio, musicControls } from '../systems/GameAudio';
+import { GameAudio } from '../systems/GameAudio';
 import { FighterChoice, fighterPalette, normalizeChoice, rosterEntry } from '../config/roster';
 import { CharacterManifest, createAliasLoader, createCharacterLoader, getManifest } from '../config/characters';
 import { SuperMove } from '../combat/SuperMove';
@@ -112,7 +112,6 @@ export class FightScene extends Phaser.Scene {
     isolateSceneKeyboard(this);
     const audio = GameAudio.for(this);
     audio.play('music-fight');
-    musicControls(this, 1250, 138);
     this.events.on(Phaser.Scenes.Events.PAUSE, audio.pause, audio);
     this.events.on(Phaser.Scenes.Events.RESUME, audio.resume, audio);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
