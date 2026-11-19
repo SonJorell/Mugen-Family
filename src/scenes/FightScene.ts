@@ -5,7 +5,6 @@
 import Phaser from 'phaser';
 import { CpuDifficulty, GAME_CONFIG, GameMode, normalizeDifficulty, normalizeMode } from '../config/gameConfig';
 import { activeKeys, loadBindings } from '../input/Bindings';
-import { describeKeys } from '../input/InputMapping';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { PlayerFighter } from '../characters/PlayerFighter';
@@ -33,7 +32,7 @@ import { SuperMove } from '../combat/SuperMove';
 import type { ArcadeRun } from '../config/arcade';
 import { recordCombo, recordMatch } from '../systems/Stats';
 import { FONT_UI } from '../ui/fonts';
-import { CHIP, CHIP_PRIMARY } from '../ui/theme';
+import { CHIP_PRIMARY } from '../ui/theme';
 
 /** Starting marks, reused at the start of every round. */
 const PLAYER_START_X = GAME_CONFIG.STAGE_WIDTH * 0.35;
@@ -139,14 +138,7 @@ export class FightScene extends Phaser.Scene {
     this.fighterShadows = [this.player, this.opponent].map(fighter =>
       this.add.ellipse(fighter.x, GAME_CONFIG.FLOOR_Y + 2, 150, 16, 0x09121a, 0.26).setDepth(1));
     this.createSystems();
-    this.add.text(GAME_CONFIG.WIDTH / 2, 682, this.controlsHint(),
-      { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', ...CHIP, padding: { x: 16, y: 9 } }
-    ).setOrigin(0.5).setDepth(60).setScrollFactor(0).setName('fight-controls');
-    // The keyboard footer would sit under the touch buttons: show one or the other.
-    const footer = this.children.getByName('fight-controls') as Phaser.GameObjects.Text;
-    footer.setVisible(!this.touchControls?.visible);
-    this.events.on('touch-controls-visible', (visible: boolean) => footer.setVisible(!visible));
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('touch-controls-visible'));
+    // No keyboard footer during the fight (Jorell): the keys are in the pause menu's move list.
     this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
       fontFamily: FONT_UI, fontSize: '16px', fontStyle: 'bold', ...CHIP_PRIMARY, padding: { x: 12, y: 8 },
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(60).setInteractive({ useHandCursor: true })
@@ -291,20 +283,6 @@ export class FightScene extends Phaser.Scene {
 
   // ── Fighters ──────────────────────────────────────────────
 
-  /** Footer with the keys in use; in a two-player match, a short line for each player. */
-  private controlsHint(): string {
-    const set = loadBindings();
-    const k = (slot: 'p1' | 'p2', action: Parameters<typeof describeKeys>[0]) => describeKeys(action, activeKeys(set, slot, this.mode === 'versus'));
-    if (this.mode !== 'versus') {
-      return `${k('p1', 'MOVE_LEFT')}  Mover    ${k('p1', 'JUMP')} ×2  Doble salto    ${k('p1', 'CROUCH')}  Agacharse    `
-        + `${k('p1', 'LIGHT_PUNCH')} ${k('p1', 'HEAVY_PUNCH')}  Puños    ${k('p1', 'LIGHT_KICK')} ${k('p1', 'HEAVY_KICK')}  Patadas    `
-        + `${k('p1', 'BLOCK')}  Bloquear    ${k('p1', 'SPECIAL')}  Poder`;
-    }
-    const line = (slot: 'p1' | 'p2') => `${slot === 'p1' ? 'J1' : 'J2'}: ${k(slot, 'MOVE_LEFT')} ${k(slot, 'JUMP')} ${k(slot, 'CROUCH')} · `
-      + `Puños ${k(slot, 'LIGHT_PUNCH')} ${k(slot, 'HEAVY_PUNCH')} · Patadas ${k(slot, 'LIGHT_KICK')} ${k(slot, 'HEAVY_KICK')} · `
-      + `Bloq. ${k(slot, 'BLOCK')} · Poder ${k(slot, 'SPECIAL')}`;
-    return `${line('p1')}     ${line('p2')}`;
-  }
 
   private createFighters(): void {
     const bindings = loadBindings(), versus = this.mode === 'versus';

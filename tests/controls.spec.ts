@@ -73,7 +73,6 @@ test('remapping refuses duplicates and reserved keys, saves the change and the f
   expect(await attack()).toBe('');
   await page.keyboard.press('g', { delay: 60 });
   await expect.poll(attack).toBe('LIGHT_PUNCH');
-  expect(await page.evaluate(() => (window as any).__game.scene.getScene('FightScene').children.getByName('fight-controls').text)).toContain('G K');
 });
 
 test('Restaurar valores brings back the default keys for both players', async ({ page }) => {
