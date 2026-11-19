@@ -51,14 +51,14 @@ export class PlayerFighter extends Fighter {
 
     if (state.block && this.isGrounded) {
       this.velocityX = 0;
-      this.hurtbox.rect = this.standingHurtbox;
-      if (this.combatState.state !== 'BLOCKING') {
-        this.combatState.setState('BLOCKING');
-        this.playAnimation('BLOCK');
-      }
+      this.crouchGuarding = !!state.crouch;
+      this.hurtbox.rect = this.crouchGuarding ? this.crouchHurtbox : this.standingHurtbox;
+      if (this.combatState.state !== 'BLOCKING') this.combatState.setState('BLOCKING');
+      this.playAnimation(this.crouchGuarding && this.registry.has('CROUCH') ? 'CROUCH' : 'BLOCK');
       return;
     }
     if (this.combatState.state === 'BLOCKING') {
+      this.crouchGuarding = false;
       this.combatState.setState('IDLE');
       this.playAnimation('IDLE');
     }
@@ -135,11 +135,12 @@ export class PlayerFighter extends Fighter {
       && (together || this.combatState.state === 'GRABBED' || this.combatState.canAct() || this.canCancelInto('THROW'));
     if (bothLights) this.lastLight = { punch: -Infinity, kick: -Infinity };
     if (this.combatState.state === 'GRABBED') { if (bothLights) this.techThrow(); return; }
-    const punch = state.lightPunch || state.heavyPunch;
-    const command = punch && this.readCommand();
     // Holding ↓ on the ground turns buttons into crouching attacks: light → low kick,
     // heavy punch → launcher, heavy kick → sweep.
     const low = !!state.crouch && this.isGrounded;
+    const punch = state.lightPunch || state.heavyPunch;
+    // Only read grounded quarter-circle commands when not holding crouch (preserves air punches and ↓+K launcher).
+    const command = this.isGrounded && !low && punch && this.readCommand();
     const pressed = command ? 'COMMAND_SPECIAL' : bothLights && !low ? 'THROW'
       : low && (state.lightPunch || state.lightKick) ? 'CROUCH_LIGHT' : low && state.heavyPunch ? 'LAUNCHER' : low && state.heavyKick ? 'SWEEP'
       : state.lightPunch ? 'LIGHT_PUNCH' : state.heavyPunch ? 'HEAVY_PUNCH'

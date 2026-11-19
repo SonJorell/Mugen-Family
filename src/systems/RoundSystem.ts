@@ -66,6 +66,13 @@ export class RoundSystem {
     this.startRound();
   }
 
+  /** Resets wins and round counter so practice mode can continue indefinitely. */
+  reset(): void {
+    this._round = 1;
+    this._wins = { player: 0, opponent: 0 };
+    this.startRound();
+  }
+
   startRound(): void {
     this._phase = 'INTRO';
     this._timeLeft = GAME_CONFIG.ROUND_TIME;

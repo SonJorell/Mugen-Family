@@ -1,0 +1,68 @@
+[
+  {
+    "sheet": "air",
+    "prompt": "Image1 is the original TATA identity and clothing. Image2 is the approved Tata game design: match this SAME older man's face, balding gray hair, forest-green cable-knit sweater, full blue jeans, navy shoes, body mass and polished painted 2D arcade rendering EXACTLY. No pixel art, no glasses, no beard, no text. Real transparent RGBA, alpha ZERO in all margins, gutters and between limbs; no matte, shadows, gradients or colored backdrop. EXACT1536x1024 PNG, strict6equal columns by4equal rows,24poses. Every cell256x256, local body root x128, standing height238, normal feet baseline248, enough space for all limbs and no overlap/cropped borders. Same head/body scale in ALL cells. Faces right. Row1 CROUCH: guard to lowering hips, deeply crouched guard. Row2 JUMP: compress knees, takeoff, ascent tuck, apex knees bent, descending, landing ready. Row3 AIR_PUNCH: six airborne guard, shoulder windup, arm extension, full punch, retract, guard, knees tucked. Row4 AIR_KICK: six airborne windup, raised knee, extended front kick, fully extended kick, retract knee, landing ready. All full denim legs and dark shoes remain intact.",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/movement.png"
+    ]
+  },
+  {
+    "sheet": "attacks",
+    "prompt": "Image1 is the original TATA identity and clothing. Image2 is the approved Tata game design: match this SAME older man's face, balding gray hair, forest-green cable-knit sweater, full blue jeans, navy shoes, body mass and polished painted 2D arcade rendering EXACTLY. No pixel art, no glasses, no beard, no text. Real transparent RGBA, alpha ZERO in all margins, gutters and between limbs; no matte, shadows, gradients or colored backdrop. EXACT1536x1024 PNG, strict6equal columns by4equal rows,24poses. Every cell256x256, local body root x128, standing height238, normal feet baseline248, enough space for all limbs and no overlap/cropped borders. Same head/body scale in ALL cells. Faces right. Row1 LIGHT_PUNCH: six frames guard, shoulder anticipation, extension, fully extended fist (frame4), recoil, guard. Row2 HEAVY_PUNCH: six frames guard, weight winding back, stepping twist, powerful straight punch at frame4, recoil, guard. Row3 LIGHT_KICK: guard, knee lift, extend shin, full straight kick frame4, knee retract, guard. Row4 HEAVY_KICK: guard, torso windup, raised bent leg, full sidekick at frame4, recoil, guard. Elderly but capable, motion comes from weight and posture rather than huge muscles. Keep all fingers, feet, trousers inside their cells.",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/movement.png"
+    ]
+  },
+  {
+    "sheet": "defense",
+    "prompt": "Image1 is the original TATA identity and clothing. Image2 is the approved Tata game design: match this SAME older man's face, balding gray hair, forest-green cable-knit sweater, full blue jeans, navy shoes, body mass and polished painted 2D arcade rendering EXACTLY. No pixel art, no glasses, no beard, no text. Real transparent RGBA, alpha ZERO in all margins, gutters and between limbs; no matte, shadows, gradients or colored backdrop. EXACT1536x1024 PNG, strict6equal columns by4equal rows,24poses. Every cell256x256, local body root x128, standing height238, normal feet baseline248, enough space for all limbs and no overlap/cropped borders. Same head/body scale in ALL cells. Faces right. Row1 BLOCK: six guard, raise forearms, closed defensive guard, absorb blow, lower arms, guard. Row2 HIT_REACTION: six guard, recoil chest, head turns from hit, backward body bend, recover balance, guard. Row3 STUN: six increasingly dizzy/slumped sways and recovery, no stars painted in. Row4 GET_UP: six poses starting lying on side on floor, hand presses floor, sitting with knee up, kneeling, rising crouch, full standing guard. Keep body scale the same; lying poses do not enlarge.",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/movement.png"
+    ]
+  },
+  {
+    "sheet": "recovery",
+    "prompt": "Image1 is the original TATA identity and clothing. Image2 is the approved Tata game design: match this SAME older man's face, balding gray hair, forest-green cable-knit sweater, full blue jeans, navy shoes, body mass and polished painted 2D arcade rendering EXACTLY. No pixel art, no glasses, no beard, no text. Real transparent RGBA, alpha ZERO in all margins, gutters and between limbs; no matte, shadows, gradients or colored backdrop. EXACT1536x1024 PNG, strict6equal columns by4equal rows,24poses. Every cell256x256, local body root x128, standing height238, normal feet baseline248, enough space for all limbs and no overlap/cropped borders. Same head/body scale in ALL cells. Faces right. Row1 KNOCKDOWN: six sequential backward stumble, leaning falling, legs lifted, hips hit floor, rolled on side, resting on side. Row2 DEFEAT: guard dazed, sag, knee drops, both knees, lower torso, lies on side defeated. Row3 VICTORY: six relaxed smile, clenched fist rises, proud fist at shoulder, upraised fist, cheerful nod, relaxedguard. Row4 TAUNT: six beckons opponent with fingers, shrug palms up, mischievous elder smile, hand waves come on, lowers hands, guard. No beer or bicycle on this sheet.",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/movement.png"
+    ]
+  },
+  {
+    "sheet": "special",
+    "prompt": "Image1 is the original TATA identity and clothing. Image2 is the approved Tata game design: match this SAME older man's face, balding gray hair, forest-green cable-knit sweater, full blue jeans, navy shoes, body mass and polished painted 2D arcade rendering EXACTLY. No pixel art, no glasses, no beard, no text. Real transparent RGBA, alpha ZERO in all margins, gutters and between limbs; no matte, shadows, gradients or colored backdrop. EXACT1536x1024 PNG, strict6equal columns by4equal rows,24poses. Every cell256x256, local body root x128, standing height238, normal feet baseline248, enough space for all limbs and no overlap/cropped borders. Same head/body scale in ALL cells. Faces right. Row1 SPECIAL_ATTACK: six guard, open hand preparation, step and shoulder twist, extended palm shove to opponent chest at frame4, recoil, guard. Row2 DRINK: six bottle materializes from sweater pocket, raises amber glass beer bottle with plain cream label, bottle to lips, tilts head back drinking, lowers bottle with satisfied smile, stows bottle. Make drinking natural, bottle in fingers not floating. Row3 CELEBRATE: six smiles and raises same beer bottle in a toast, relaxed cheering, lowers it, thumbs up, nod, guard. Row4 LANDING: six prepares feet, bendsknees at impact, full impact compression, rebounds, rises, guard. All same Tata identity and 238px standing scale.",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/movement.png"
+    ]
+  },
+  {
+    "sheet": "doublejump",
+    "prompt": "Image1 is the original TATA identity and clothing. Image2 is the approved Tata game design: match this SAME older man's face, balding gray hair, forest-green cable-knit sweater, full blue jeans, navy shoes, body mass and polished painted 2D arcade rendering EXACTLY. No pixel art, no glasses, no beard, no text. Real transparent RGBA, alpha ZERO in all margins, gutters and between limbs; no matte, shadows, gradients or colored backdrop. Exact1536x1024 PNG, strict4equalcolumns x3equalrows,12poses. Cell384x341.33, root x192, feet floor330 in standing endpoints, standingbodyheight318. FaceRIGHT. Eachposecontainedwithcleartransparentgaps.12 sequential frames of a continuous double jump: prepare crouch, spring upward, tuck knees, twist hips left, rotate shoulders right, extend one leg, gather both legs, recover aerial guard, begin descending, lower legs, prepare feet, soft crouch landing. Keep full jeans on both legs and hands visible. Athletic but believable older man; no flips upside-down. Crisp anticipation and follow-through, stable head size and volume.",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/movement.png"
+    ]
+  },
+  {
+    "sheet": "mount-bike",
+    "prompt": "Image1 is the original TATA identity and clothing. Image2 is the approved Tata game design: match this SAME older man's face, balding gray hair, forest-green cable-knit sweater, full blue jeans, navy shoes, body mass and polished painted 2D arcade rendering EXACTLY. No pixel art, no glasses, no beard, no text. Real transparent RGBA, alpha ZERO in all margins, gutters and between limbs; no matte, shadows, gradients or colored backdrop. Exact1536x1024, strict3equal columns x2equalrows,6poses, each512x512, clear outer margins, allbikesfullyvisible.Image3 is the APPROVED Tata + RED city bicycle model. Reuse exact bicycle wheels,redframe,silverfenders,handlebars,blackseat and SAME Tata body/head scale. SIX sequential mounting poses: (1) Tata standing on near left side beside stationary bicycle, hand on handlebar; (2) swings right leg carefully over saddle; (3) lowers onto saddle; (4) both hands gripbar and near foot finds pedal; (5) pushes off with rear foot; (6) rides hunched slightly forward with both feet on pedals, matching Image3. Bike remains pointingRIGHT, exactlysameposition eachcell, both wheels on baseline500, centers rear110y407/front396y407, radius90. Each full bike and body mustfitcell withcleartransparentgaps. Do NOT detach legs, do not change bike model. No extraneous bikes, no frame numbering.",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/movement.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/cycling.png"
+    ]
+  },
+  {
+    "sheet": "cutin",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tata/movement.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/jorell/cutin.png"
+    ],
+    "prompt": "Create a cinematic super-move portrait of TATA. Image1original identity, Image2approved identity/clothes, Image3ONLY polished 3D cinematic rendering style. Same elderly man, gray hair at sides and baldtop, forehead wrinkles, clean-shaven, green cable-knit sweater, blue jeans. Dynamic waist-up three-quarter portrait, confident mischievous smile, raises a cold amber beer bottle with plain cream label in RIGHT hand as a toast; LEFT hand grips curved silver handlebar of his red city bike entering lowerframe. Rich material detail on sweater knit, amberglass condensation, glossyredmetal. Goldenwarm rimlight and coolturquoise filllight, matching other game's super portraits. Exact1536x1024 landscape, focusfaceandbottle, no text, no background scenery. Genuine transparent RGBA cutout, outside characterandpropsalpha0, no color matte, no checkerboard."
+  }
+]

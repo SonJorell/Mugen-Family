@@ -1,0 +1,408 @@
+[
+  {
+    "id": "tilin",
+    "sheet": "movement",
+    "names": [
+      "IDLE",
+      "WALK_FORWARD"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: looping quiet guard breathing, alternate slight knee bend and shoulder weight, returns to first pose. NEXT12: walking forward right, heel contact, passing, toeoff, mirrored steps, balanced guard, looping.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "travel",
+    "names": [
+      "WALK_BACKWARD",
+      "DASH"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: controlled backward walk retreating left while facing right, alternate steps in guard. NEXT12: dash right, guard, lean, accelerate crouched, long stride, passing legs, brake, recover upright guard by12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "air",
+    "names": [
+      "CROUCH",
+      "JUMP"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: smooth crouch downward from standing guard to deep lowguard, final6frames stay low with subtlebreath. NEXT12: jump, standing frame1 then crouch anticipation, launch, rising tuck, apex kneesraised, descending extendlegs, landing crouch, recover guard.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "punches",
+    "names": [
+      "LIGHT_PUNCH",
+      "HEAVY_PUNCH"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: quick jab right, guard1,load2-3,extend4,contact5-6,withdraw7-9,guard10-12. NEXT12: heavy right cross,guard1,weightback2-4,rotatehip5-6,fullyextendedpunch7-8,followthrough9,withdraw10-11,guard12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "kicks",
+    "names": [
+      "LIGHT_KICK",
+      "HEAVY_KICK"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: front kick right,guard1-2,liftknee3-4,extend5,fullcontact6-7,retract8-9,footdown10-11,guard12. NEXT12: strong side kick right,guard1,loadhip2-4,chamberknee5-6,extend7-8,retract9-10,footdown11,guard12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "defense",
+    "names": [
+      "BLOCK",
+      "HIT_REACTION"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: guard to forearm block, braces against incominghit,rightside,then relaxesguard. NEXT12: hit reaction,guard1,stomachhit2-4,torsofolds/turns and headrecoils5-7,staggers8-10,guard11-12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "recovery",
+    "names": [
+      "KNOCKDOWN",
+      "GET_UP"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: knockdown,standing1,offbalance2-3,flyingback4-5,landonhip6-7,roll8-9,lyingonSIDEwithheadRIGHT10-12 facingopponent. NEXT12: get up,START exactly same SIDElying/headRIGHT pose,rollontoelbow2-3,sit4-5,handandkneeunderbody6-7,lowcrouch8-9,rise10-11,standingguard12. Everyposecomplete confined256cell;lyingposeanatomy same bodilylength asstandingheight238.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "celebration",
+    "names": [
+      "TAUNT",
+      "VICTORY"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: playful beckoning taunt,guard1,relax2-3,extendopenpalm4-5,beckonfingers6-8,smile9-10,returnguard11-12. NEXT12: victory,guard1,smile2-3,raiseonefist4-7,celebrate8-10,lower11-12 toloop. Keep handsinsidecell and no resizing when raised.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "special",
+    "names": [
+      "DEFEAT",
+      "SPECIAL_ATTACK"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: defeat,guard1,kneesbuckle2-3,drop4-6,slump7-9,lie still on side headRIGHT10-12. NEXT12: singing sonic super,inhale1-3,handtoneck4,mouthopen singing5-9,onehandreachesright,exhale10-11,guard12.NO beam or notes painted.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "reactions",
+    "names": [
+      "STUN",
+      "AIR_PUNCH"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: dizzy standing loop,headslump shouldersfall bentknees,small left/right sway,armsdown,eyesdazed,notlying. NEXT12: aerial punch from jumpingtuck,windup2-4,extendrightfist5-8,retract9-10,compactmidairguard11-12,legsflexed throughout,no paintedmotionlines.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "aerial",
+    "names": [
+      "AIR_KICK",
+      "DOUBLE_JUMP"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: aerial sidekick right,tuckedjump1,chamber2-4,extend5-8,retract9-10,tuckedjump11-12. NEXT12: doublejump midair,compact1,kneescoil2-3,legsdriveapart4-5,upwardstretch6,airturn7-8,retuck9-10,descendinglegs11-12. Same adult proportions, no exaggerated giant head.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "tilin",
+    "sheet": "landing",
+    "names": [
+      "LANDING"
+    ],
+    "columns": 4,
+    "rows": 3,
+    "sourceBodyHeight": 318,
+    "groundY": 330,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult woman Tilin 167cm, long straight dark brown hair, black rectangular glasses, olive green crop tee, blue straight jeans, beige sneakers. Natural female proportions, average build, no exaggeration. Preserve glasses and outfit in ALL poses. 1536x1024 4columns x3rows=12poses. Cell384x341.33; OVERRIDEcellgeometry: standingbody318px,crown12,soles330,center192,margin8. 12pose smooth landing and recovery:1 legsreachingground,2feetcontact,3kneesflex,4-5deepcompression,6-8rebound,9-11rise,12guard.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/tilin-v2/IDLE/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "movement",
+    "names": [
+      "IDLE",
+      "WALK_FORWARD"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: looping quiet guard breathing, alternate slight knee bend and shoulder weight, returns to first pose. NEXT12: walking forward right, heel contact, passing, toeoff, mirrored steps, balanced guard, looping.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "travel",
+    "names": [
+      "WALK_BACKWARD",
+      "DASH"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: controlled backward walk retreating left while facing right, alternate steps in guard. NEXT12: dash right, guard, lean, accelerate crouched, long stride, passing legs, brake, recover upright guard by12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "air",
+    "names": [
+      "CROUCH",
+      "JUMP"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: smooth crouch downward from standing guard to deep lowguard, final6frames stay low with subtlebreath. NEXT12: jump, standing frame1 then crouch anticipation, launch, rising tuck, apex kneesraised, descending extendlegs, landing crouch, recover guard.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "punches",
+    "names": [
+      "LIGHT_PUNCH",
+      "HEAVY_PUNCH"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: quick jab right, guard1,load2-3,extend4,contact5-6,withdraw7-9,guard10-12. NEXT12: heavy right cross,guard1,weightback2-4,rotatehip5-6,fullyextendedpunch7-8,followthrough9,withdraw10-11,guard12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "kicks",
+    "names": [
+      "LIGHT_KICK",
+      "HEAVY_KICK"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: front kick right,guard1-2,liftknee3-4,extend5,fullcontact6-7,retract8-9,footdown10-11,guard12. NEXT12: strong side kick right,guard1,loadhip2-4,chamberknee5-6,extend7-8,retract9-10,footdown11,guard12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "defense",
+    "names": [
+      "BLOCK",
+      "HIT_REACTION"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: guard to forearm block, braces against incominghit,rightside,then relaxesguard. NEXT12: hit reaction,guard1,stomachhit2-4,torsofolds/turns and headrecoils5-7,staggers8-10,guard11-12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "recovery",
+    "names": [
+      "KNOCKDOWN",
+      "GET_UP"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: knockdown,standing1,offbalance2-3,flyingback4-5,landonhip6-7,roll8-9,lyingonSIDEwithheadRIGHT10-12 facingopponent. NEXT12: get up,START exactly same SIDElying/headRIGHT pose,rollontoelbow2-3,sit4-5,handandkneeunderbody6-7,lowcrouch8-9,rise10-11,standingguard12. Everyposecomplete confined256cell;lyingposeanatomy same bodilylength asstandingheight238.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "celebration",
+    "names": [
+      "TAUNT",
+      "VICTORY"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: playful beckoning taunt,guard1,relax2-3,extendopenpalm4-5,beckonfingers6-8,smile9-10,returnguard11-12. NEXT12: victory,guard1,smile2-3,raiseonefist4-7,celebrate8-10,lower11-12 toloop. Keep handsinsidecell and no resizing when raised.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "special",
+    "names": [
+      "DEFEAT",
+      "SPECIAL_ATTACK"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: defeat,guard1,kneesbuckle2-3,drop4-6,slump7-9,lie still on side headRIGHT10-12. NEXT12: heavy stomp special,guard1,kneelift2-4,footraised5-7,stompcontact8-9,kneerebound10,recoverguard11-12.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "reactions",
+    "names": [
+      "STUN",
+      "AIR_PUNCH"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: dizzy standing loop,headslump shouldersfall bentknees,small left/right sway,armsdown,eyesdazed,notlying. NEXT12: aerial punch from jumpingtuck,windup2-4,extendrightfist5-8,retract9-10,compactmidairguard11-12,legsflexed throughout,no paintedmotionlines.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "aerial",
+    "names": [
+      "AIR_KICK",
+      "DOUBLE_JUMP"
+    ],
+    "columns": 6,
+    "rows": 4,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 EXACT6columns x4rows=24poses. Eachcell256x256. Firstanimation12consecutiveposes occupiesrows1-2; secondanimation12poses occupiesrows3-4. Readrowmajor. FIRST12: aerial sidekick right,tuckedjump1,chamber2-4,extend5-8,retract9-10,tuckedjump11-12. NEXT12: doublejump midair,compact1,kneescoil2-3,legsdriveapart4-5,upwardstretch6,airturn7-8,retuck9-10,descendinglegs11-12. Same adult proportions, no exaggerated giant head.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  },
+  {
+    "id": "cesar",
+    "sheet": "landing",
+    "names": [
+      "LANDING"
+    ],
+    "columns": 4,
+    "rows": 3,
+    "sourceBodyHeight": 318,
+    "groundY": 330,
+    "prompt": "Production fighting-game sprite atlas. Image1 defines the character IDENTITY/OUTFIT only; image2 defines the COMMON ART STYLE of the whole game. Render the character in the SAME polished smooth hand-painted 2D arcade illustration as image2: fine clean dark contours, soft 3-tone shading, natural adult face and anatomy, no pixel blocks, no chibi, no photographic/3D render. Keep the exact identity, hair, skin tone, clothes and accessories of image1; NEVER copy image2's clothes or identity. Natural adult head/body balance near 7 heads, stable skull and torso volume in every pose. Consistent upper-left soft lighting. Facing RIGHT 3/4 view. TRUE transparent RGBA alpha0 background; no white matte, checkerboard, floor, shadows, text, grid or labels. Each cell isolated with min6px transparent gutter. Full body, no clipping. Character feet baseline localy248, standing crown y10 (238px body), centerx128. Same fixed anatomical size throughout; crouching/jumping changes pose not scale. Adult man César 183cm, distinctly HEAVY/STOCKY build with wide soft belly and broad arms/thighs (not bodybuilder), dark hair with blond fringe, gray tee, black shorts, tattoos on forearms, blue/white sneakers. Preserve robust build; no slimmer waist. Normal adult head relative to body. 1536x1024 4columns x3rows=12poses. Cell384x341.33; OVERRIDEcellgeometry: standingbody318px,crown12,soles330,center192,margin8. 12pose smooth landing and recovery:1 legsreachingground,2feetcontact,3kneesflex,4-5deepcompression,6-8rebound,9-11rise,12guard.",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/characters/cesar-v2/IDLE.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ]
+  }
+]

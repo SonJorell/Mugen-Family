@@ -1,0 +1,8 @@
+{
+  "prompt": "Use case: precise-object-edit. Edit image 1 transparent 2-column 4-row sprite sheet, exactly 1024x1536. Keep ALL car geometry, silver Hyundai i30 body, wheel locations, doors opening/closing progression, grid, clean painted 2D rendering, and transparency unchanged. Correct ONLY Cesar's physical size relative to the car in ALL eight frames. He is much too large currently. Make him 20% shorter (not thinner) relative to car. First frame standing character from local y112 to y364, not current y61 to379. Feet on same road as front wheel bottom y364. Head a little below roofline. Keep stocky big belly, grey T-shirt, black shorts, tattoos, blond tips, blue-white sneakers exactly like image 2. Adjust all subsequent boarding poses anatomically to the SAME shorter body scale so he fits naturally through driver door. Keep his head size proportional to torso. In final frame visible driver's head also 20% smaller and naturally seated. No extra figures. Preserve car's full silhouette and margins. Actual alpha transparency everywhere outside characters/car and through empty window openings. No background or shadow.",
+  "refs": [
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/super-unified/cesar-boarding.png",
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/cesar/movement.png"
+  ],
+  "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-117d70b9-1dc8-4345-8ce1-47d5f675e7a5.png"
+}

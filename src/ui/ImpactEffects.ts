@@ -17,12 +17,12 @@ export class ImpactEffects {
   /** Number of bursts still on screen (used by tests and to cap clutter). */
   get count(): number { return this.live.length; }
 
-  spawn(x: number, y: number, kind: ImpactKind, facingRight: boolean): void {
+  spawn(x: number, y: number, kind: ImpactKind, facingRight: boolean, lowBlock = false): void {
     const fx = GAME_CONFIG.HIT_FEEL.SPARKS[kind];
     const reduced = this.motion.matches;
     const g = this.scene.add.graphics({ x, y }).setDepth(40).setName(`impact-${kind}`);
     g.setBlendMode(Phaser.BlendModes.ADD);
-    if (kind === 'block') this.drawBlock(g, fx.size, fx.color, facingRight);
+    if (kind === 'block') this.drawBlock(g, fx.size, fx.color, facingRight, lowBlock);
     else this.drawHit(g, fx.size, fx.color, kind === 'heavy');
     this.live.push(g);
 
@@ -33,7 +33,14 @@ export class ImpactEffects {
       return;
     }
     g.setScale(0.45).setRotation(Phaser.Math.FloatBetween(-0.3, 0.3));
-    this.scene.tweens.add({ targets: g, scale: 1.15, alpha: 0, duration: fx.duration, ease: 'Cubic.easeOut', onComplete: done });
+    this.scene.tweens.add({ targets: g, scale: kind === 'heavy' ? 1.3 : 1.15, alpha: 0, duration: fx.duration, ease: 'Cubic.easeOut', onComplete: done });
+    if (kind === 'heavy') {
+      // Expanding shockwave ring emphasizes heavy impacts and knockdowns.
+      const ring = this.scene.add.circle(x, y, fx.size * 0.35).setStrokeStyle(4, fx.color, 0.9)
+        .setDepth(39).setBlendMode(Phaser.BlendModes.ADD);
+      ring.isFilled = false;
+      this.scene.tweens.add({ targets: ring, scale: 2.3, alpha: 0, duration: fx.duration + 40, ease: 'Cubic.easeOut', onComplete: () => ring.destroy() });
+    }
   }
 
   private drawHit(g: Phaser.GameObjects.Graphics, size: number, color: number, heavy: boolean): void {
@@ -52,12 +59,14 @@ export class ImpactEffects {
     if (heavy) g.lineStyle(4, color, 0.9).strokeCircle(0, 0, size * 0.8);
   }
 
-  private drawBlock(g: Phaser.GameObjects.Graphics, size: number, color: number, facingRight: boolean): void {
-    // A shield arc that opens toward the attacker.
+  private drawBlock(g: Phaser.GameObjects.Graphics, size: number, color: number, facingRight: boolean, lowBlock: boolean): void {
+    // A shield arc that opens toward the attacker; crouching guard draws a tighter low hexagonal glow.
     const dir = facingRight ? 0 : Math.PI;
-    g.lineStyle(7, color, 0.9).beginPath().arc(0, 0, size * 0.7, dir - 1.05, dir + 1.05).strokePath();
-    g.lineStyle(3, 0xffffff, 0.95).beginPath().arc(0, 0, size * 0.5, dir - 0.8, dir + 0.8).strokePath();
-    g.fillStyle(0xffffff, 0.8).fillCircle(Math.cos(dir) * size * 0.25, 0, size * 0.16);
+    const span = lowBlock ? 0.82 : 1.05;
+    const shieldColor = lowBlock ? 0x66ffe3 : color;
+    g.lineStyle(7, shieldColor, 0.92).beginPath().arc(0, 0, size * 0.72, dir - span, dir + span).strokePath();
+    g.lineStyle(3, 0xffffff, 0.95).beginPath().arc(0, 0, size * 0.5, dir - span * 0.76, dir + span * 0.76).strokePath();
+    g.fillStyle(0xffffff, 0.85).fillCircle(Math.cos(dir) * size * 0.25, 0, size * 0.16);
   }
 
   destroy(): void {

@@ -1,0 +1,32 @@
+{
+  "generator": "Built-in ImageGen",
+  "assets": [
+    {
+      "name": "grab-throw-sheet",
+      "refs": [
+        "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/cesar-drive/cesar-grab.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create a production animation sprite sheet of the EXACT adult heavyset César in the reference, same face, black hair with blond fringe, earrings, tattoos, charcoal t-shirt, black shorts, white socks, blue-white high top sneakers. Smooth polished 3D animated film style, not pixel art. Genuine transparent background. EXACTLY 12 full-body poses in a perfectly regular 4 columns by 3 rows grid, read left to right then next row. Every cell equal size, identical camera, lighting, body proportions and scale, shoe soles on the same baseline at 92 percent of each cell, entire actor contained within each cell with generous transparent gutters. Face and body face right in three-quarter side view. This is ONE continuous grabbing and throwing action with small natural increments, NOT 12 random actions: frames 1-4 bend knees and reach both hands forward to seize an unseen opponent, frames 5-6 pull hands and weight back into a deep coiled stance, frames 7-9 explosively rotate hips and extend arms forward-up to release the unseen opponent, frames 10-12 follow through then regain balance. Hands grip empty air: do not draw the opponent or any objects. Keep feet planted naturally except the rear heel pivots. Cinematic fluid weight transfer, clear curved trajectories for elbows and wrists. No scenery, shadow floor, text, labels, grid lines, borders, extra limbs, overlap between cells, clothing changes or zoom changes. Preserve the reference identity exactly. Target large landscape sheet, 2048 by 1536 if possible.",
+      "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-4d780d92-ee23-4144-a442-c04a327b89ba.png",
+      "saved": "public/assets/effects/cesar-drive-fluid/grab-throw-sheet.png"
+    },
+    {
+      "name": "boarding-sheet",
+      "refs": [
+        "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/cesar-drive/i30-enter.png"
+      ],
+      "prompt": "Use case: stylized-concept. Make a production transparent animation sprite sheet based on this exact silver Hyundai i30 hatchback and EXACT adult heavyset César, same blond-black hair, tattoos, charcoal t-shirt, black shorts, white socks and blue-white sneakers. Smooth detailed 3D animated film style, not pixel. EXACTLY 8 equal-size cells in a 2 columns by 4 rows regular grid, read left to right then next row. Every cell shows the entire SAME CAR facing right in the SAME side/front three-quarter camera as the reference, wheels and body aligned IDENTICALLY, constant scale and perspective, no camera movement, wheel contact at 90 percent of cell height, generous transparent gutters. Animate only César and the driver's door in EIGHT consecutive small increments of getting into the car: 1 standing outside beside open door with hand on door, 2 lifting right foot onto sill, 3 bending upper body into cabin, 4 lowering body toward driver's seat, 5 drawing the outside leg inside, 6 seated behind steering wheel with door still open, 7 pulling door nearly shut, 8 fully closed silver metal door with César visible ONLY through the glass window, hands on steering wheel. Physically plausible sequence. Car body stays fully opaque, never show legs through metal. Exactly one César in every cell. Actual transparent background, no stage, no captions, no grid lines, no shadows outside silhouettes, no clipped wheels or limbs, no car design changes or scene changes. High resolution vertical sheet.",
+      "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-60dc7223-3c48-42dd-ac0c-454c458b8157.png",
+      "saved": "public/assets/effects/cesar-drive-fluid/boarding-sheet.png"
+    },
+    {
+      "name": "return-sheet",
+      "refs": [
+        "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/cesar-drive/cesar-monster.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create a production transparent animation sprite sheet of the EXACT adult heavyset César from this reference: identical face and blond-black hair, earrings, tattoos, charcoal t-shirt, black shorts, white socks and blue-white sneakers, holding the same black Monster energy can with a green claw mark. Smooth high quality 3D animated movie style, not pixels. EXACTLY 12 full-body poses on a regular 4 columns by 3 rows grid, read left to right then next row. Uniform cell size and scale, same 3/4 camera, actor facing right, identical head and body proportions, full body stays within cell, constant ground line at 92 percent of cell height and clear transparent gutters. A coherent continuous return-and-celebrate animation: first 6 cells are small successive poses of a natural relaxed walk to the right with the can carried in his right hand, alternating heel strike and toe push-off, the character stays centered in each cell; cells 7-8 gradually plant feet and settle weight; cells 9-11 raise can from waist to shoulder in a cheerful toast; cell12 final proud relaxed smile holding can up, left hand on hip like reference. Maintain realistic subtle secondary movement of shoulders and belly. No text, no labels, no grid lines, no extra characters, no can switching hands, no duplicate arms, no painted scenery or floor shadows. Genuine transparent background. Large landscape sheet, 2048 by 1536 if possible.",
+      "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-1f63d08a-50fc-4ab5-90de-07b0d54010e8.png",
+      "saved": "public/assets/effects/cesar-drive-fluid/return-sheet.png"
+    }
+  ]
+}

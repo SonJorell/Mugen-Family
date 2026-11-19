@@ -28,6 +28,24 @@ export const COMBO_EXAMPLES: Record<string, ComboExample[]> = {
     { title: 'Barrido', route: ['D+LK', 'D+HK'] },
     { title: 'Con súper', route: ['LP', 'HP', 'CMD', 'SUPER'], note: 'con la energía al 100 %' },
   ],
+  joako: [
+    { title: 'Presión veloz', route: ['LP', 'LK', 'HP', 'DASH', 'LP', 'HK'], note: 'aprovecha su velocidad' },
+    { title: 'Ataque rápido', route: ['D+LK', 'HP', 'CMD'] },
+    { title: 'Aéreo largo', route: ['D+LK', 'D+HP', 'LP', 'LK'], note: 'los dos últimos en el aire' },
+    { title: 'Pelotazo y obra', route: ['LP', 'HP', 'SUPER'], note: 'con la energía al 100 %' },
+  ],
+  jorell: [
+    { title: 'Cadena equilibrada', route: ['LP', 'LK', 'HP', 'CMD'] },
+    { title: 'Presión con dash', route: ['LP', 'HP', 'DASH', 'LK', 'HK'] },
+    { title: 'Lanzador clásico', route: ['D+LK', 'D+HP', 'LP', 'LK'], note: 'los dos últimos en el aire' },
+    { title: 'Despertar Saiyajin', route: ['LP', 'HP', 'CMD', 'SUPER'], note: 'de cerca, energía al 100 %' },
+  ],
+  tata: [
+    { title: 'Ritmo firme', route: ['LP', 'LK', 'HK'] },
+    { title: 'Paso y barrido', route: ['D+LK', 'D+HK'] },
+    { title: 'Avance seguro', route: ['LK', 'HP', 'CMD'] },
+    { title: 'Brindis a pedales', route: ['LP', 'HP', 'SUPER'], note: 'de cerca, energía al 100 %' },
+  ],
 };
 
 export function comboExamples(fighterId: string): ComboExample[] {

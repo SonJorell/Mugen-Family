@@ -1,0 +1,9 @@
+{
+  "file": "cesar-return",
+  "refs": [
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/cesar-drive-fluid/return-sheet.png",
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/cesar/movement.png"
+  ],
+  "prompt": "Reference 1 is action/layout target. Reference 2 supplies exact painted character style. Painted 2D arcade fighter sprites matching the SECOND reference exactly: clean dark contours, soft simplified cel shading, warm natural colors, same face and proportions. NOT photorealistic, NOT 3D rendering, NOT pixel art. Cesar is a stocky broad adult man with a visible rounded belly, short dark hair with blond tips, grey T-shirt, black shorts, tattoos on both arms, white socks, blue-white sneakers. Preserve his large body. Redraw 12 frames at 1536x1024, EXACTLY 4 equal columns x 3 equal rows, no skipped cell. Right-facing full-body Cesar holds a SMALL black Monster energy drink can with lime-green claw logo in his front hand, attached naturally to fingers. Frames 1-6 are a relaxed returning walk with alternating steps, can steady near chest; frames 7-8 plant both feet; 9-10 raise can in a casual toast and smile; 11-12 settle into relaxed guard holding the can. Same torso, belly, face and clothing as the combat reference, head/body scale constant. Each cell root pelvis x=192 and floor y=331, full standing height about306px, can never covers face. Genuine RGBA transparency, alpha exactly zero everywhere outside subjects and inside limb gaps. No background, haze, ground, shadow, panel borders, text or effects. Every pose fully contained in its cell with clear transparent gutters. ",
+  "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-d897c501-a933-4907-ad34-c1756af06319.png"
+}

@@ -16,12 +16,12 @@ export class Timer {
 
   constructor(private readonly scene: Phaser.Scene) {
     this.plate = scene.add.graphics().setDepth(50).setScrollFactor(0);
-    this.plate.fillStyle(0x07090f, 0.96).fillCircle(CX, CY, RADIUS + 5);
-    this.plate.lineStyle(2, 0xf5bd75, 0.9).strokeCircle(CX, CY, RADIUS + 5);
-    this.plate.lineStyle(6, 0x2b3142, 1).strokeCircle(CX, CY, RADIUS - 3);
+    this.plate.fillStyle(0x0e3a80, 0.96).fillCircle(CX, CY, RADIUS + 5);
+    this.plate.lineStyle(2, 0xffb02e, 0.9).strokeCircle(CX, CY, RADIUS + 5);
+    this.plate.lineStyle(6, 0x2f86f0, 1).strokeCircle(CX, CY, RADIUS - 3);
     this.ring = scene.add.graphics().setDepth(51).setScrollFactor(0);
     this.text = scene.add.text(CX, CY, '99', {
-      fontFamily: FONT_NUMBER, fontSize: '40px', color: '#ffffff', stroke: '#07090f', strokeThickness: 5,
+      fontFamily: FONT_NUMBER, fontSize: '40px', color: '#ffffff', stroke: '#0e3a80', strokeThickness: 5,
     }).setOrigin(0.5).setDepth(52).setScrollFactor(0);
   }
 
@@ -33,7 +33,7 @@ export class Timer {
     const urgent = display <= 10;
     this.text.setText(display.toString().padStart(2, '0')).setColor(urgent ? '#ff5a5a' : '#ffffff');
     const share = Phaser.Math.Clamp(display / GAME_CONFIG.ROUND_TIME, 0, 1);
-    this.ring.clear().lineStyle(6, urgent ? 0xff4d4d : 0xf5bd75, 1).beginPath()
+    this.ring.clear().lineStyle(6, urgent ? 0xff4d4d : 0xffb02e, 1).beginPath()
       .arc(CX, CY, RADIUS - 3, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * share, false).strokePath();
     if (first || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // Every second ticks; the last ten hit harder.

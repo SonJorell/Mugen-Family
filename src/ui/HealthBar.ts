@@ -36,12 +36,12 @@ export class HealthBar {
     private readonly maxHealth: number,
     name: string,
     private readonly flipped = false,
-    private readonly accent = 0xef709d,
+    private readonly accent = 0xff6a1f,
   ) {
     const add = <T extends Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Depth & Phaser.GameObjects.Components.ScrollFactor>(object: T, depth: number) => {
       object.setDepth(depth).setScrollFactor(0); this.parts.push(object); return object;
     };
-    this.frame = add(scene.add.rectangle(x - 4, y - 4, width + 8, H + 8, 0x07090f).setOrigin(0, 0).setStrokeStyle(2, accent, 0.9), 50);
+    this.frame = add(scene.add.rectangle(x - 4, y - 4, width + 8, H + 8, 0x0e3a80).setOrigin(0, 0).setStrokeStyle(2, accent, 0.9), 50);
     add(scene.add.rectangle(x, y, width, H, 0x35101a).setOrigin(0, 0), 50);
     this.trail = add(scene.add.rectangle(x, y, width, H, 0xffe6b0).setOrigin(0, 0), 51);
     this.bar = add(scene.add.rectangle(x, y, width, H, 0x00dd44).setOrigin(0, 0), 52);
@@ -49,14 +49,14 @@ export class HealthBar {
     this.danger = add(scene.add.rectangle(x, y, width, H, 0xff2a2a, 0).setOrigin(0, 0).setBlendMode(Phaser.BlendModes.ADD), 53);
     this.flash = add(scene.add.rectangle(x, y, width, H, 0xffffff, 0).setOrigin(0, 0).setBlendMode(Phaser.BlendModes.ADD), 54);
     // Notches every tenth make the remaining health readable at a glance.
-    const notches = add(scene.add.graphics(), 54).lineStyle(2, 0x07090f, 0.45);
+    const notches = add(scene.add.graphics(), 54).lineStyle(2, 0x0e3a80, 0.45);
     for (let i = 1; i < 10; i++) notches.lineBetween(x + width * i / 10, y, x + width * i / 10, y + H);
 
     this.nameText = add(scene.add.text(flipped ? x + width : x, y - 25, name.toUpperCase(), {
-      fontFamily: FONT_NAME, fontSize: '26px', color: '#fff3d8', stroke: '#07090f', strokeThickness: 4,
+      fontFamily: FONT_NAME, fontSize: '26px', color: '#fff7ec', stroke: '#0e3a80', strokeThickness: 4,
     }).setOrigin(flipped ? 1 : 0, 0), 55);
     this.valueText = add(scene.add.text(flipped ? x + 8 : x + width - 8, y + H / 2, '', {
-      fontFamily: FONT_NUMBER, fontSize: '17px', color: '#ffffff', stroke: '#07090f', strokeThickness: 4,
+      fontFamily: FONT_NUMBER, fontSize: '17px', color: '#ffffff', stroke: '#0e3a80', strokeThickness: 4,
     }).setOrigin(flipped ? 0 : 1, 0.5), 55);
     this.setHealth(maxHealth);
     this.layout();

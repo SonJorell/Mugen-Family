@@ -229,7 +229,7 @@ test('practice mode can be selected and stays passive', async ({ page }) => {
   await boot(page);
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
-  await page.mouse.click(640, 565); // Rival: CPU → Práctica
+  await page.mouse.click(524, 528); // Rival: CPU → Práctica
   await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').mode)).toBe('training');
   await confirmSelection(page);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').roundSystem?.phase === 'FIGHT');
@@ -256,6 +256,8 @@ test('movement gallery can be opened twice and change backgrounds each time', as
     await page.keyboard.press('F2');
     await page.waitForFunction(() => (window as any).__game.scene.getScene('CharacterTestScene').currentStageIdx >= 0);
     expect(errors).toEqual([]);
+    await page.keyboard.press('KeyE');
+    await expect.poll(() => page.evaluate(() => (window as any).__game.scene.getScene('CharacterTestScene').manifest.characterId)).toBe('cesar');
     await page.keyboard.press('ArrowRight');
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => (window as any).__game.scene.isActive('MenuScene'));

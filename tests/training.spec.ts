@@ -110,3 +110,24 @@ test('without refill, damage stays', async ({ page }) => {
   });
   expect(r).toBe(95);
 });
+
+test('practice mode resets in place after a KO instead of returning to the main menu', async ({ page }) => {
+  await startFight(page, 'tilin', 'tilin', { mode: 'training' });
+  await page.evaluate(() => {
+    const g = (window as any).__game, s = g.scene.getScene('FightScene');
+    g.loop.start(g.loop.callback);
+    // Simulate even a deciding-round KO: practice must stay inside FightScene and reset.
+    s.roundSystem._wins = { player: 1, opponent: 0 };
+    s.opponent.currentHealth = 0;
+  });
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'END');
+  await page.waitForFunction(() => {
+    const g = (window as any).__game, s = g.scene.getScene('FightScene');
+    return g.scene.isActive('FightScene') && s.roundSystem?.phase === 'FIGHT' && s.opponent.currentHealth === s.opponent.maxHealth;
+  }, null, { timeout: 20000 });
+  const state = await page.evaluate(() => {
+    const g = (window as any).__game, s = g.scene.getScene('FightScene');
+    return { active: g.scene.isActive('FightScene'), menu: g.scene.isActive('MenuScene'), wins: s.roundSystem.wins };
+  });
+  expect(state).toEqual({ active: true, menu: false, wins: { player: 0, opponent: 0 } });
+});

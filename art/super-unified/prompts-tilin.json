@@ -1,0 +1,50 @@
+[
+  {
+    "file": "tilin-flight",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/tilin-reaction/caught-flight.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tilin/movement.png"
+    ],
+    "prompt": "Use case: style-transfer. Production transparent fighting-game sprite atlas. Image 1 is ONLY the action/pose sequence to redraw. Image 2 is the authoritative current painted 2D character design and rendering style. Redraw every pose from image 1 in the exact clean illustrated arcade 2D style of image 2, not photorealistic or 3D. Preserve Sofia/Tilin's face, black glasses, long brown hair, olive green cropped T-shirt, full-length blue jeans covering BOTH legs completely, cream sneakers, adult proportions. 12 frames, exactly 4 columns and 3 rows, 1536x1024. First six gradually caught, lifted and knees tuck, final six progressively extending legs into a horizontal fall. Same chronological pose sequence as reference 1. Even equal cells, read left to right then next row. Each body fully inside its own cell with 12 px transparent gutters, consistent anatomical scale in every frame, no giant head, no stretched limbs. Face points RIGHT throughout even when falling; no left-facing poses. Grounded poses align to each cell's bottom minus 12 px. No floor, no shadows, no lines, no labels, no grid. Remove all old background artifacts: genuinely transparent alpha=0 everywhere outside silhouettes. Do NOT reproduce colored pixels or opaque background from reference. Crisp clean edges, no glow. Keep smooth anatomical transitions."
+  },
+  {
+    "file": "tilin-recover",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/tilin-reaction/ground-recovery.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tilin/movement.png"
+    ],
+    "prompt": "Use case: style-transfer. Production transparent fighting-game sprite atlas. Image 1 is ONLY the action/pose sequence to redraw. Image 2 is the authoritative current painted 2D character design and rendering style. Redraw every pose from image 1 in the exact clean illustrated arcade 2D style of image 2, not photorealistic or 3D. Preserve Sofia/Tilin's face, black glasses, long brown hair, olive green cropped T-shirt, full-length blue jeans covering BOTH legs completely, cream sneakers, adult proportions. 12 frames exactly 4 columns and 3 rows, 1536x1024. Lying propped on elbow, bend knees, roll onto hip, palms brace, kneel, crouch then stand in guarded stance in final frame. Same chronological pose sequence as reference 1. Even equal cells, read left to right then next row. Each body fully inside its own cell with 12 px transparent gutters, consistent anatomical scale in every frame, no giant head, no stretched limbs. Face points RIGHT throughout even when falling; no left-facing poses. Grounded poses align to each cell's bottom minus 12 px. No floor, no shadows, no lines, no labels, no grid. Remove all old background artifacts: genuinely transparent alpha=0 everywhere outside silhouettes. Do NOT reproduce colored pixels or opaque background from reference. Crisp clean edges, no glow. Keep smooth anatomical transitions."
+  },
+  {
+    "file": "tilin-impact",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/tilin-reaction/impact-tumble.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tilin/movement.png"
+    ],
+    "prompt": "Use case: style-transfer. Production transparent fighting-game sprite atlas. Image 1 is ONLY the action/pose sequence to redraw. Image 2 is the authoritative current painted 2D character design and rendering style. Redraw every pose from image 1 in the exact clean illustrated arcade 2D style of image 2, not photorealistic or 3D. Preserve Sofia/Tilin's face, black glasses, long brown hair, olive green cropped T-shirt, full-length blue jeans covering BOTH legs completely, cream sneakers, adult proportions. 12 frames exactly 4 columns and 3 rows, 1536x1024. First frame standing startled, recoil, airborne arched back, tuck, tumble onto side, settle, finally lying stunned with head on forearm. Same chronological pose sequence as reference 1. Even equal cells, read left to right then next row. Each body fully inside its own cell with 12 px transparent gutters, consistent anatomical scale in every frame, no giant head, no stretched limbs. Face points RIGHT throughout even when falling; no left-facing poses. Grounded poses align to each cell's bottom minus 12 px. No floor, no shadows, no lines, no labels, no grid. Remove all old background artifacts: genuinely transparent alpha=0 everywhere outside silhouettes. Do NOT reproduce colored pixels or opaque background from reference. Crisp clean edges, no glow. Keep smooth anatomical transitions."
+  },
+  {
+    "file": "tilin-airborne",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/tilin-reaction/flight-v2.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tilin/movement.png"
+    ],
+    "prompt": "Use case: style-transfer. Production transparent fighting-game sprite atlas. Image 1 is ONLY the action/pose sequence to redraw. Image 2 is the authoritative current painted 2D character design and rendering style. Redraw every pose from image 1 in the exact clean illustrated arcade 2D style of image 2, not photorealistic or 3D. Preserve Sofia/Tilin's face, black glasses, long brown hair, olive green cropped T-shirt, full-length blue jeans covering BOTH legs completely, cream sneakers, adult proportions. 16 frames exactly 4 columns and 4 rows, square 1024x1024. First frame tucked knees held near chest in midair; smoothly uncurl legs, torso reclines until final frame fully horizontal legs pointing right, head at left looking right. Same gradual chronological pose sequence as reference 1. Even equal cells, read left to right then next row. Each body fully inside its own cell with 12 px transparent gutters, consistent anatomical scale in every frame, no giant head, no stretched limbs. Face points RIGHT throughout even when falling; no left-facing poses. Grounded poses align to each cell's bottom minus 12 px. No floor, no shadows, no lines, no labels, no grid. Remove all old background artifacts: genuinely transparent alpha=0 everywhere outside silhouettes. Do NOT reproduce colored pixels or opaque background from reference. Crisp clean edges, no glow. Keep smooth anatomical transitions."
+  },
+  {
+    "file": "tilin-landing",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/tilin-reaction/landing-v2.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tilin/movement.png"
+    ],
+    "prompt": "Use case: style-transfer. Production transparent fighting-game sprite atlas. Image 1 is ONLY the action/pose sequence to redraw. Image 2 is the authoritative current painted 2D character design and rendering style. Redraw every pose from image 1 in the exact clean illustrated arcade 2D style of image 2, not photorealistic or 3D. Preserve Sofia/Tilin's face, black glasses, long brown hair, olive green cropped T-shirt, full-length blue jeans covering BOTH legs completely, cream sneakers, adult proportions. 16 frames exactly 4 columns and 4 rows, square 1024x1024. Begin lying with legs extended right, head on left looking right; gently lower raised forearm, bend knees, roll onto hip and plant palms, final frame remains low with weight on hands ready to rise. Same gradual chronological pose sequence as reference 1. Even equal cells, read left to right then next row. Each body fully inside its own cell with 12 px transparent gutters, consistent anatomical scale in every frame, no giant head, no stretched limbs. Face points RIGHT throughout even when falling; no left-facing poses. Grounded poses align to each cell's bottom minus 12 px. No floor, no shadows, no lines, no labels, no grid. Remove all old background artifacts: genuinely transparent alpha=0 everywhere outside silhouettes. Do NOT reproduce colored pixels or opaque background from reference. Crisp clean edges, no glow. Keep smooth anatomical transitions."
+  },
+  {
+    "file": "tilin-canto",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/tilin-super-canto.webp",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tilin/movement.png"
+    ],
+    "prompt": "Use case: style-transfer. Transparent cinematic cut-in illustration, landscape 1536x1024. Redraw the singing pose of reference 1 using the clean painted arcade 2D character design, natural proportions, face, glasses, hair and olive crop top of reference 2. Sofia/Tilin sings powerfully facing right, one hand at chest and other reaching forward, flowing long brown hair. Waist-up composition, full outstretched hand fully inside frame. Beautiful bold painted shading and clear outlines matching the playable roster, not a plastic 3D render. Warm highlights and subtle teal rim light contained on silhouette only. No text, no streaks, no backgrounds, no halos. Actual transparent alpha outside character. Keep skin natural, same outfit."
+  }
+]

@@ -1,8 +1,10 @@
 import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
-await mkdir('artifacts/super-canto', { recursive: true });
+const output = process.env.OUTPUT_DIR ?? 'artifacts/super-canto';
+await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+page.setDefaultTimeout(90000);
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('console', e => { if (e.type() === 'error') errors.push(e.text()); });
@@ -19,11 +21,12 @@ await page.goto(process.env.GAME_URL ?? 'http://127.0.0.1:3000');
 await page.waitForFunction(() => window.__game?.scene.isActive('MenuScene'));
 await page.keyboard.press('Enter');
 await page.waitForFunction(() => window.__game.scene.isActive('SelectionScene'));
-await page.mouse.click(640, 565);
+await page.mouse.click(524, 528);
 await page.keyboard.press('Enter');
 await page.waitForFunction(() => window.__game.scene.getScene('SelectionScene').phase === 'stage');
 await page.keyboard.press('Enter');
 await page.waitForFunction(() => window.__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
+await page.waitForTimeout(1000);
 await page.evaluate(() => {
   const g = window.__game, s = g.scene.getScene('FightScene');
   g.loop.stop(); s.player.x = 700; s.opponent.x = 1100;
@@ -32,14 +35,14 @@ await page.evaluate(() => {
   s.player.gainEnergy(100); s.hud.update(s.player, s.opponent, 99);
   s.sys.pause(); g.step(performance.now(), 0);
 });
-await page.screenshot({ path: 'artifacts/super-canto/energy.png' });
+await page.screenshot({ path: `${output}/energy.png` });
 await page.evaluate(() => {
   const g = window.__game, s = g.scene.getScene('FightScene');
   s.player.executeAttack('SPECIAL_ATTACK');
   for (let i = 0; i < 28; i++) { s.player.update(1000 / 60); s.fighterController.checkCollisions(s.player, s.opponent); }
   s.hud.update(s.player, s.opponent, 99); g.step(performance.now(), 0);
 });
-await page.screenshot({ path: 'artifacts/super-canto/opener.png' });
+await page.screenshot({ path: `${output}/opener.png` });
 await page.evaluate(() => {
   const s = window.__game.scene.getScene('FightScene');
   for (let i = 0; i < 80 && !s.superMove.active; i++) { s.player.update(1000 / 60); s.fighterController.checkCollisions(s.player, s.opponent); }
@@ -51,7 +54,7 @@ for (const [name, time] of [['portrait', 350], ['resonance', 1550], ['finale', 2
     while (s.superMove.active && s.superMove.elapsed < target) s.update(0, Math.min(16, target - s.superMove.elapsed));
     s.hud.update(s.player, s.opponent, 99); g.step(performance.now(), 0);
   }, time);
-  await page.screenshot({ path: `artifacts/super-canto/${name}.png` });
+  await page.screenshot({ path: `${output}/${name}.png` });
   if (name === 'resonance') {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.evaluate(() => {
@@ -59,19 +62,19 @@ for (const [name, time] of [['portrait', 350], ['resonance', 1550], ['finale', 2
       // The loop is stopped for stills, so process resize explicitly.
       g.scale.getParentBounds(); g.scale.refresh(); g.step(performance.now(), 0);
     });
-    await page.screenshot({ path: 'artifacts/super-canto/narrow.png' });
+    await page.screenshot({ path: `${output}/narrow.png` });
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.evaluate(() => {
       const g = window.__game, s = g.scene.getScene('FightScene');
       g.scale.getParentBounds(); g.scale.refresh();
       s.superMove.update(16);
-      if (s.superMove.victim.x !== s.superMove.victimX) throw new Error('Reduced motion did not stop impact shake');
+      if (s.children.getByName('super-cinematic').getByName('canto-victim').x !== 950) throw new Error('Reduced motion did not stop impact shake');
       g.step(performance.now(), 0);
       const bounds = g.canvas.getBoundingClientRect();
       if (bounds.bottom > innerHeight + 1 || bounds.top < -1) throw new Error('Cinematic is cropped after resizing');
     });
-    await page.screenshot({ path: 'artifacts/super-canto/reduced-motion.png' });
+    await page.screenshot({ path: `${output}/reduced-motion.png` });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
   }
 }
@@ -79,7 +82,7 @@ const state = await page.evaluate(() => {
   const s = window.__game.scene.getScene('FightScene');
   return { energy: s.player.energy, health: s.opponent.currentHealth, active: s.superMove.active, state: s.opponent.combatState.state };
 });
-await writeFile('artifacts/super-canto/inspection.json', JSON.stringify({ errors, state }, null, 2));
+await writeFile(`${output}/inspection.json`, JSON.stringify({ errors, state }, null, 2));
 await browser.close();
 if (errors.length || state.health !== 40 || state.active) throw new Error(JSON.stringify({ errors, state }));
 console.log('Captured full meter, opener, portrait, vocal barrage, final impact and recovery. Exactly 60 damage; no runtime/resource errors.');

@@ -1,0 +1,8 @@
+{
+  "file": "jorell-idle",
+  "refs": [
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/jorell/movement.png"
+  ],
+  "prompt": "Identity reference: first row of attached Jorell sheet. Make a NEW 12-frame IDLE animation sheet, exactly 1536x1024, 4 equal columns x 3 equal rows, read left-to-right then down. Painted 2D arcade look matching reference. Jorell wears clear black rectangular glasses, black swept hair, white tank top over a visible modest rounded belly, dark navy cargo shorts, white-strapped flip-flops, black watch with two dragon tattoos on that same arm, red bracelet on opposite arm. Slim arms and legs but a fuller torso; preserve normal head/body ratio and reference identity. All 12 drawings show the SAME right-facing three-quarter relaxed fighting guard, only subtle continuous breathing. FIXED registration: local head top y=26, floor y=331, feet centered at x=130 and x=248, pelvis x=192 IN EVERY 384x341 cell. Same feet, head size, hip location and camera. Frames 1-6 inhale gradually by 2 pixels; 7-12 exhale smoothly to frame 1. No walking, no gesture, no sideways drift, no changing feet or arm positions, no size changes. Last frame almost identical to first to loop seamlessly. Genuine RGBA transparency, alpha exactly zero everywhere outside subjects and inside limb gaps. No background, haze, ground, shadow, panel borders, text or effects. Every pose fully contained in its cell with clear transparent gutters. ",
+  "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-e68b8845-ab87-4954-a996-2ce9eb7d8418.png"
+}

@@ -1,0 +1,236 @@
+{
+  "characterId": "jorell",
+  "name": "Jorell",
+  "assetPath": "/assets/characters/jorell/",
+  "spriteSheet": {
+    "columns": 6,
+    "rows": 1,
+    "frameCount": 6,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "animations": {
+      "IDLE": {
+        "frameRate": 8,
+        "repeat": -1
+      },
+      "WALK_FORWARD": {
+        "frameRate": 12,
+        "repeat": -1
+      },
+      "WALK_BACKWARD": {
+        "frameRate": 11,
+        "repeat": -1
+      },
+      "DASH": {
+        "frameRate": 20,
+        "repeat": 0
+      },
+      "CROUCH": {
+        "frameRate": 30,
+        "repeat": 0
+      },
+      "JUMP": {
+        "frameRate": 10,
+        "repeat": 0
+      },
+      "AIR_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "AIR_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "LIGHT_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "HEAVY_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "LIGHT_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "HEAVY_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "BLOCK": {
+        "frameRate": 30,
+        "repeat": 0
+      },
+      "HIT_REACTION": {
+        "frameRate": 22,
+        "repeat": 0
+      },
+      "STUN": {
+        "frameRate": 10,
+        "repeat": -1
+      },
+      "GET_UP": {
+        "frameRate": 12,
+        "repeat": 0
+      },
+      "KNOCKDOWN": {
+        "frameRate": 14,
+        "repeat": 0
+      },
+      "DEFEAT": {
+        "frameRate": 12,
+        "repeat": 0
+      },
+      "VICTORY": {
+        "frameRate": 10,
+        "repeat": -1
+      },
+      "TAUNT": {
+        "frameRate": 10,
+        "repeat": 0
+      },
+      "SPECIAL_ATTACK": {
+        "frameRate": 15,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "TELEPORT": {
+        "frameRate": 12,
+        "repeat": 0
+      },
+      "TRANSFORM": {
+        "columns": 4,
+        "rows": 3,
+        "frameCount": 12,
+        "sourceBodyHeight": 306,
+        "groundY": 331,
+        "frameRate": 9,
+        "repeat": 0
+      },
+      "CHARGE": {
+        "frameRate": 10,
+        "repeat": 0
+      },
+      "BEAM": {
+        "columns": 4,
+        "rows": 3,
+        "frameCount": 12,
+        "sourceBodyHeight": 306,
+        "groundY": 331,
+        "frameRate": 24,
+        "repeat": 0
+      },
+      "POWER_RETURN": {
+        "frameRate": 10,
+        "repeat": 0
+      },
+      "DOUBLE_JUMP": {
+        "frameRate": 16,
+        "repeat": 0
+      },
+      "LANDING": {
+        "frameRate": 24,
+        "repeat": 0
+      }
+    }
+  },
+  "animations": {
+    "IDLE": [
+      "/assets/characters/jorell/IDLE.webp"
+    ],
+    "WALK_FORWARD": [
+      "/assets/characters/jorell/WALK_FORWARD.webp"
+    ],
+    "WALK_BACKWARD": [
+      "/assets/characters/jorell/WALK_BACKWARD.webp"
+    ],
+    "DASH": [
+      "/assets/characters/jorell/DASH.webp"
+    ],
+    "CROUCH": [
+      "/assets/characters/jorell/CROUCH.webp"
+    ],
+    "JUMP": [
+      "/assets/characters/jorell/JUMP.webp"
+    ],
+    "AIR_PUNCH": [
+      "/assets/characters/jorell/AIR_PUNCH.webp"
+    ],
+    "AIR_KICK": [
+      "/assets/characters/jorell/AIR_KICK.webp"
+    ],
+    "LIGHT_PUNCH": [
+      "/assets/characters/jorell/LIGHT_PUNCH.webp"
+    ],
+    "HEAVY_PUNCH": [
+      "/assets/characters/jorell/HEAVY_PUNCH.webp"
+    ],
+    "LIGHT_KICK": [
+      "/assets/characters/jorell/LIGHT_KICK.webp"
+    ],
+    "HEAVY_KICK": [
+      "/assets/characters/jorell/HEAVY_KICK.webp"
+    ],
+    "BLOCK": [
+      "/assets/characters/jorell/BLOCK.webp"
+    ],
+    "HIT_REACTION": [
+      "/assets/characters/jorell/HIT_REACTION.webp"
+    ],
+    "STUN": [
+      "/assets/characters/jorell/STUN.webp"
+    ],
+    "GET_UP": [
+      "/assets/characters/jorell/GET_UP.webp"
+    ],
+    "KNOCKDOWN": [
+      "/assets/characters/jorell/KNOCKDOWN.webp"
+    ],
+    "DEFEAT": [
+      "/assets/characters/jorell/DEFEAT.webp"
+    ],
+    "VICTORY": [
+      "/assets/characters/jorell/VICTORY.webp"
+    ],
+    "TAUNT": [
+      "/assets/characters/jorell/TAUNT.webp"
+    ],
+    "SPECIAL_ATTACK": [
+      "/assets/characters/jorell/SPECIAL_ATTACK.webp"
+    ],
+    "TELEPORT": [
+      "/assets/characters/jorell/TELEPORT.webp"
+    ],
+    "TRANSFORM": [
+      "/assets/characters/jorell/TRANSFORM.webp"
+    ],
+    "CHARGE": [
+      "/assets/characters/jorell/CHARGE.webp"
+    ],
+    "BEAM": [
+      "/assets/characters/jorell/BEAM.webp"
+    ],
+    "POWER_RETURN": [
+      "/assets/characters/jorell/POWER_RETURN.webp"
+    ],
+    "DOUBLE_JUMP": [
+      "/assets/characters/jorell/DOUBLE_JUMP.webp"
+    ],
+    "LANDING": [
+      "/assets/characters/jorell/LANDING.webp"
+    ]
+  }
+}

@@ -8,7 +8,7 @@ import { GAME_CONFIG } from '../config/gameConfig';
 /** Every line has a WAV made by scripts/generate-announcer-koku.py (Voicebox): announcer-<line>.wav. */
 export const ANNOUNCER_LINES = [
   'round-1', 'round-2', 'round-3', 'round-4', 'round-5',
-  'fight', 'ko', 'time', 'victory', 'defeat', 'draw', 'p1-wins', 'p2-wins',
+  'fight', 'ko', 'time', 'victory', 'defeat', 'draw', 'p1-wins', 'p2-wins', 'select',
 ] as const;
 export type AnnouncerLine = typeof ANNOUNCER_LINES[number];
 

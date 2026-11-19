@@ -70,3 +70,42 @@ test('blockstun locks the guard, keeps blocking, and then frees the defender', a
   // Chip damage is 10 % of 12, rounded down, per blocked hit.
   expect(r).toEqual({ res: 'blocked', state: 'BLOCKSTUN', locked: true, second: 'blocked', after: 'IDLE', health: 98 });
 });
+
+test('high/low guard: lows beat standing guard, crouch-guard blocks lows, and aerial overheads beat crouch-guard', async ({ page }) => {
+  await startFight(page, 'tilin', 'tilin', { mode: 'training' });
+  const r = await page.evaluate(() => {
+    const s = (window as any).__game.scene.getScene('FightScene');
+    const p = s.player, o = s.opponent;
+    const probe = (attack: string, crouchGuard: boolean, airborne = false) => {
+      p.finishRound('IDLE'); o.finishRound('IDLE');
+      p.x = 800; o.x = 900; p.updateFacing(o.x); o.updateFacing(p.x);
+      o.crouchGuarding = crouchGuard;
+      o.hurtbox.rect = crouchGuard ? o.crouchHurtbox : o.standingHurtbox;
+      o.combatState.setState('BLOCKING');
+      if (airborne) { p.y = 540; p.isGrounded = false; p.velocityY = 0; }
+      const before = o.currentHealth;
+      p.executeAttack(attack);
+      let blocked = false;
+      for (let f = 0; f < 22; f++) {
+        p.update(1000 / 60); o.update(1000 / 60);
+        s.fighterController.checkCollisions(p, o);
+        if (o.combatState.state === 'BLOCKSTUN') blocked = true;
+      }
+      return { blocked, lost: before - o.currentHealth, state: o.combatState.state };
+    };
+    return {
+      sweepVsStand: probe('SWEEP', false),
+      sweepVsCrouch: probe('SWEEP', true),
+      airVsCrouch: probe('AIR_PUNCH', true, true),
+      airVsStand: probe('AIR_PUNCH', false, true),
+    };
+  });
+  expect(r.sweepVsStand.blocked).toBe(false);
+  expect(r.sweepVsStand.lost).toBe(11);
+  expect(r.sweepVsCrouch.blocked).toBe(true);
+  expect(r.sweepVsCrouch.lost).toBe(1);
+  expect(r.airVsCrouch.blocked).toBe(false);
+  expect(r.airVsCrouch.lost).toBe(7);
+  expect(r.airVsStand.blocked).toBe(true);
+  expect(r.airVsStand.lost).toBe(0);
+});

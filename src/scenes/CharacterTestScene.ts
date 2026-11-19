@@ -3,7 +3,7 @@
 // ============================================================
 
 import Phaser from 'phaser';
-import { FighterChoice, FIGHTER_ROSTER, normalizeChoice } from '../config/roster';
+import { FighterChoice, FIGHTER_ROSTER, normalizeChoice, rosterEntry } from '../config/roster';
 import { CharacterManifest, createCharacterLoader, getManifest } from '../config/characters';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
@@ -22,6 +22,8 @@ export class CharacterTestScene extends Phaser.Scene {
 
   private debugText!: Phaser.GameObjects.Text;
   private animListText!: Phaser.GameObjects.Text;
+  private fighterLabel!: Phaser.GameObjects.Text;
+  private fighterIndex: number = 0;
   private currentAnimIdx: number = 0;
   private availableAnims: string[] = [];
   private stageBgImage: Phaser.GameObjects.Image | null = null;
@@ -35,6 +37,7 @@ export class CharacterTestScene extends Phaser.Scene {
     // The gallery shows the fighter the player picked; menu data may still carry a manifest.
     this.manifest = data?.playerChoice ? getManifest(this, normalizeChoice(data.playerChoice).characterId)
       : data?.manifest ?? getManifest(this, FIGHTER_ROSTER[0].id);
+    this.fighterIndex = Math.max(0, FIGHTER_ROSTER.findIndex(f => f.id === this.manifest?.characterId));
     this.currentAnimIdx = 0;
     this.currentStageIdx = -1;
     this.stageBgImage = null;
@@ -45,11 +48,6 @@ export class CharacterTestScene extends Phaser.Scene {
     isolateSceneKeyboard(this);
     GameAudio.for(this).play('music-menu');
     musicControls(this, 1250, 24);
-    const htmlVideo = document.getElementById('menu-video-bg') as HTMLVideoElement | null;
-    if (htmlVideo) {
-      htmlVideo.style.display = 'none';
-      htmlVideo.pause();
-    }
 
     if (!this.manifest) {
       this.scene.start('MenuScene');
@@ -111,6 +109,7 @@ export class CharacterTestScene extends Phaser.Scene {
   }
 
   private createFighter(): void {
+    const entry = rosterEntry(this.manifest.characterId);
     this.fighter = new Fighter({
       scene: this,
       registry: this.registry2,
@@ -119,16 +118,38 @@ export class CharacterTestScene extends Phaser.Scene {
       x: GAME_CONFIG.WIDTH / 2,
       y: GAME_CONFIG.FLOOR_Y,
       scale: GAME_CONFIG.CHAR_SCALE,
+      stats: entry.stats,
     });
 
     // Disable gravity for test scene
     this.fighter['isGrounded'] = true;
   }
 
+  private switchFighter(delta: number): void {
+    this.fighterIndex = (this.fighterIndex + delta + FIGHTER_ROSTER.length) % FIGHTER_ROSTER.length;
+    const entry = FIGHTER_ROSTER[this.fighterIndex];
+    const facing = this.fighter?.facingRight ?? true;
+    this.fighter?.destroy();
+    this.manifest = getManifest(this, entry.id);
+    this.currentAnimIdx = 0;
+    this.setupAnimations();
+    this.createFighter();
+    this.fighter.facingRight = facing;
+    this.fighter.sprite.setFlipX(!facing);
+    this.updateFighterLabel();
+    this.updateAnimList();
+    this.updateDebugText();
+  }
+
+  private updateFighterLabel(): void {
+    const entry = FIGHTER_ROSTER[this.fighterIndex];
+    this.fighterLabel?.setText(`${entry.name.toUpperCase()} (${this.fighterIndex + 1}/${FIGHTER_ROSTER.length}) · ${entry.heightCm} cm`);
+  }
+
   private createUI(): void {
     const W = GAME_CONFIG.WIDTH;
 
-    // Title
+    // Title + fighter switcher
     this.add.text(W / 2, 20, 'GALERÍA DE MOVIMIENTOS', {
       fontFamily: FONT_IMPACT,
       fontSize: '20px',
@@ -136,6 +157,16 @@ export class CharacterTestScene extends Phaser.Scene {
       stroke: '#003322',
       strokeThickness: 4,
     }).setOrigin(0.5).setDepth(50);
+
+    const navStyle = { fontFamily: FONT_UI, fontSize: '18px', fontStyle: 'bold', color: '#00ff88', backgroundColor: '#0e2438', padding: { x: 10, y: 2 } };
+    this.add.text(W / 2 - 175, 50, '◀', navStyle).setOrigin(0.5).setDepth(51)
+      .setInteractive({ useHandCursor: true }).on('pointerdown', () => this.switchFighter(-1));
+    this.fighterLabel = this.add.text(W / 2, 50, '', {
+      fontFamily: FONT_UI, fontSize: '18px', fontStyle: 'bold', color: '#fff7ec',
+    }).setOrigin(0.5).setDepth(51).setName('gallery-fighter');
+    this.add.text(W / 2 + 175, 50, '▶', navStyle).setOrigin(0.5).setDepth(51)
+      .setInteractive({ useHandCursor: true }).on('pointerdown', () => this.switchFighter(1));
+    this.updateFighterLabel();
 
     // Debug info box
     const dbgBg = this.add.rectangle(8, 80, 290, 200, 0x000000, 0.75)
@@ -159,7 +190,7 @@ export class CharacterTestScene extends Phaser.Scene {
 
     // Controls legend
     this.add.text(W / 2, GAME_CONFIG.HEIGHT - 30, 
-      '1–0  Animaciones   |   ← →  Elegir   |   A  Girar   |   F2  Escenario   |   F1  Colisiones   |   Esc  Menú',
+      'Q / E  Luchador   |   1–0  Animaciones   |   ← →  Elegir   |   A  Girar   |   F2  Escenario   |   F1  Colisiones   |   Esc  Menú',
       { fontFamily: FONT_UI, fontSize: '13px', color: '#8888cc' }
     ).setOrigin(0.5).setDepth(50);
 
@@ -191,6 +222,11 @@ export class CharacterTestScene extends Phaser.Scene {
       this.fighter.playAnimation(this.availableAnims[this.currentAnimIdx], true);
       this.updateAnimList();
     });
+
+    // Q/E or Tab to switch fighters across the roster
+    this.input.keyboard!.on('keydown-Q', () => this.switchFighter(-1));
+    this.input.keyboard!.on('keydown-E', () => this.switchFighter(1));
+    this.input.keyboard!.on('keydown-TAB', (e: KeyboardEvent) => { e.preventDefault(); this.switchFighter(1); });
 
     // A/D to flip
     this.input.keyboard!.on('keydown-A', () => {

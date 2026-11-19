@@ -1,0 +1,6 @@
+{
+  "generator": "Built-in ImageGen",
+  "prompt": "Edit target: this sixteen-frame Tilin airborne animation sheet. Fix ONLY atlas spacing. Repack EXACTLY these sixteen poses in the same chronological order into a precise FOUR by FOUR equal-cell grid, square transparent PNG. Uniformly reduce all sixteen characters to 70 percent of their existing physical scale, keeping the same scale in every cell. Centre each FULL body within its own cell with generous empty transparent margins on ALL sides. No body, shoe or hair may touch a cell border or overlap another figure. Preserve the sixteen distinct poses, face, clothes, anatomy, native facingRIGHT, colors, camera, lighting and smooth illustrated3D style. No new drawings, no omissions, no labels, no gridlines, no shadows, no background. Actual alpha-zero transparency outside all silhouettes.",
+  "source": "C:/Users/Jorell/.codex/generated_images/01a1b11a-d863-7e11-8fd6-16cc1a8f873f/exec-0851b37d-d815-4521-b4d0-210772e5f39e.png",
+  "saved": "public/assets/effects/tilin-reaction/flight-v2.png"
+}

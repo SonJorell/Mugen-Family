@@ -25,9 +25,9 @@ const config: Phaser.Types.Core.GameConfig = {
   parent: 'game-container',
   backgroundColor: '#000000',
   transparent: true,
-  pixelArt: true,
-  antialias: false,
-  roundPixels: true,
+  pixelArt: false,
+  antialias: true,
+  roundPixels: false,
   scene: [
     BootScene,
     PreloadScene,
@@ -48,14 +48,16 @@ const config: Phaser.Types.Core.GameConfig = {
   input: { gamepad: true },
   scale: {
     mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
+    // #game-container already centres the canvas with flexbox; Phaser's own margins would add a second
+    // offset, shifting the game off the video background and cutting its right edge.
+    autoCenter: Phaser.Scale.NO_CENTER,
     fullscreenTarget: 'game-container',
   },
   render: {
-    pixelArt: true,
-    antialias: false,
+    pixelArt: false,
+    antialias: true,
     antialiasGL: false,
-    roundPixels: true,
+    roundPixels: false,
   },
 };
 

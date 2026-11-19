@@ -1,0 +1,35 @@
+{
+  "mode": "Built-in ImageGen",
+  "prompt": "Use case: background-extraction. Edit ONLY the transparency/background of this existing 1448 x 1086 sprite sheet. Keep the EXACT twelve César sprites, in the EXACT 4-column by 3-row cells, without changing a single pose, scale, face, tattoo, can, outfit, camera, lighting, foot location or spacing. Keep the original image dimensions if possible. Remove ALL the hazy gray, colored and white residue between and around the sprites. Background pixels must be fully transparent alpha=0, not nearly transparent noise, not a checkerboard, and not painted black. Preserve clean antialiased cutout edges and solid opaque bodies and clothing. Preserve every full-body sprite and every hand, shoe and Monster can. Do not redraw the characters, rearrange the grid, add anything, crop or rescale. This is strictly a precise transparent-background cleanup for an already finished animation atlas.",
+  "input": "art/cesar-drive-fluid/return-sheet-first.png",
+  "generatedSource": "C:/Users/Jorell/.codex/generated_images/01a1c817-6ad1-78a2-b080-5e6a2e0d9ef3/exec-f8e15233-8edf-4235-86db-2a2f02e8d3cc.png",
+  "candidate": "art/cesar-drive-fluid/return-sheet-clean-candidate.png",
+  "active": "public/assets/effects/cesar-drive-fluid/return-sheet.png",
+  "activeReplaced": true,
+  "decision": "Selected after alpha statistics and visual review. Same 12 poses, identity, dimensions and scale; no cut-off silhouettes. Atlas source-pixel origin offsets compensate the generated horizontal translations. Original retained as backup.",
+  "size": [
+    1448,
+    1086
+  ],
+  "transparentPixels": {
+    "original": 649,
+    "candidate": 1021089
+  },
+  "lowAlphaPixels1to8": {
+    "original": 1032658,
+    "candidate": 94314
+  },
+  "originOffsetPixelsX": [0, -30, 0, 1, 0, -31, 0, 0, 0, -33, 0, 0],
+  "originOffsetPixelsY": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "feetBottomExclusivePixels": [352, 352, 352, 352, 352, 353, 353, 353, 355, 355, 355, 355],
+  "checks": {
+    "poses": 12,
+    "columns": 4,
+    "rows": 3,
+    "clippedFrames": 0,
+    "minRegisteredSilhouetteDice": 0.982572,
+    "groundLineDifferenceMaxPixels": 1
+  },
+  "comparison": "art/cesar-drive-fluid/transparency-comparison.json",
+  "registration": "art/cesar-drive-fluid/return-registration.json"
+}

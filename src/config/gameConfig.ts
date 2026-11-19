@@ -186,6 +186,17 @@ export const GAME_CONFIG = {
     LOOP_END: 174.9,
   },
 
+  /**
+   * Fight music: «Hardline Beatdown» (supplied by Jorell, MP3). It downloads in the background
+   * once the menu song is in; if it fails, the original synthesized fight track plays.
+   */
+  FIGHT_MUSIC: {
+    KEY: 'music-hardline',
+    URL: '/assets/audio/hardline-beatdown.mp3',
+    LOOP_START: 0.08,
+    LOOP_END: 170.7,
+  } as { KEY: string; URL: string; LOOP_START?: number; LOOP_END?: number },
+
   /** Announcer lines play at this level before the announcer volume of Configuración. */
   ANNOUNCER_GAIN: 0.9,
 
@@ -263,6 +274,23 @@ export const GAME_CONFIG = {
     VICTORY:        { frameRate: 6,  repeat: -1 },
     DEFEAT:         { frameRate: 6,  repeat: 0  },
     SPECIAL_ATTACK: { frameRate: 12, repeat: 0  },
+    STUN:           { frameRate: 8,  repeat: -1 },
+    AIR_PUNCH:      { frameRate: 14, repeat: 0  },
+    AIR_KICK:       { frameRate: 14, repeat: 0  },
+    DOUBLE_JUMP:    { frameRate: 12, repeat: 0  },
+    LANDING:        { frameRate: 14, repeat: 0  },
+    // Character-specific cinematic animations
+    BUILD:          { frameRate: 10, repeat: 0  },
+    FIRE:           { frameRate: 12, repeat: 0  },
+    TELEPORT:       { frameRate: 14, repeat: 0  },
+    TRANSFORM:      { frameRate: 10, repeat: 0  },
+    CHARGE:         { frameRate: 10, repeat: 0  },
+    BEAM:           { frameRate: 12, repeat: 0  },
+    POWER_RETURN:   { frameRate: 10, repeat: 0  },
+    DRINK:          { frameRate: 10, repeat: 0  },
+    MOUNT_BIKE:     { frameRate: 10, repeat: 0  },
+    CYCLE:          { frameRate: 14, repeat: -1 },
+    CELEBRATE:      { frameRate: 10, repeat: 0  },
   } as Record<string, { frameRate: number; repeat: number }>,
 
   // All known animation names

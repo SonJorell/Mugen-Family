@@ -1,6 +1,6 @@
 # Fighter Family
 
-Juego de pelea 2D para navegador con Phaser 3, TypeScript y Vite. Dos luchadores de Arica (Tilin y César), modo arcade con escalera de rivales, combates contra la CPU en tres dificultades, dos jugadores en el mismo teclado o con mandos, modo práctica con herramientas de entrenamiento, combos, súpers cinemáticos y música original. Los recursos originales se conservan como respaldo.
+Juego de pelea 2D para navegador con Phaser 3, TypeScript y Vite. Cinco luchadores de Arica (Tilin, César, Joako, Jorell y Tata), modo arcade con escalera de rivales, combates contra la CPU en tres dificultades, dos jugadores en el mismo teclado o con mandos, modo práctica con herramientas de entrenamiento, combos, súpers cinemáticos y música original. Los recursos originales se conservan como respaldo.
 
 ## Ejecutar
 
@@ -11,32 +11,36 @@ npm ci
 npm run dev
 ```
 
-Abrir http://localhost:3000. Se juega con teclado o mando (hasta dos). El lienzo se adapta al tamaño de la ventana; no hay controles táctiles ni juego en línea.
+Abrir http://localhost:3000. Se juega con teclado, mando (hasta dos) o controles táctiles en pantalla (J1). El lienzo se adapta al tamaño de la ventana manteniendo 16:9; no hay juego en línea.
 
 ## Modos y escenarios
 
-**Elegir luchadores** abre el selector arcade. El plantel tiene dos luchadores, cada uno con cuatro colores (Original, Amatista, Menta y Coral):
+**Elegir luchadores** abre el selector arcade con los cinco luchadores del plantel (en combates espejo, el rival toma automáticamente un tono alternativo; en **Modo arcade** también puedes elegir entre cuatro colores: Original, Amatista, Menta y Coral):
 
 - **Tilin:** ágil, con canto sónico.
 - **César:** grande y pesado. Tiene 125 de vida y pega un 20 % más fuerte, pero camina, salta y ataca más lento, y casi no retrocede al recibir golpes. Su súper, *Furia del i30*, comienza con un agarre cercano: lanza al rival al extremo opuesto, sube a su Hyundai i30, lo atropella en una secuencia arcade y vuelve a su posición con una Monster. Sus 23 animaciones usan 276 cuadros redibujados; dirección visual, prompts y procedencia en `art/cesar-v2/`. Los recursos de la cinemática están documentados en `art/cesar-drive/`.
 
+- **Joako:** rápido y ágil. Su súper conecta un pelotazo, construye pared y escalera y dispara desde la estructura.
+- **Jorell:** movimientos equilibrados; golpe al estómago, teletransporte, transformación dorada y Kamehameha.
+- **Tata:** 165 cm, 110 de vida y movimiento tranquilo. Su súper, *Brindis a pedales*, requiere energía completa y un empujón inicial que puede bloquearse o esquivarse: bebe cerveza, monta su bicicleta, arrolla al rival y vuelve para brindar. Son 60 de daño en una secuencia de 6 segundos con sonidos originales de botella, campanilla, pedales e impacto.
+
 Q / E cambia de luchador en el lado activo. Los colores no cambian las estadísticas. Para sumar un luchador: crea su carpeta en `public/assets/characters/<id>/` con `manifest.json` y agrega una entrada en `src/config/roster.ts`, con su ilustración de portada (`menuArtPath`, PNG transparente 2:3) y su lema (`motto`).
 
-1. Elige luchador con Q / E o con el ratón, y el color con ← / → (A / D). Tab o ↑ / ↓ cambia entre jugador y rival. El botón central alterna el rival: **CPU**, **Práctica** o **Jugador 2**. Contra la CPU, **X** o el botón inferior cambian la dificultad: **Fácil**, **Normal** o **Difícil**.
-2. Confirma con Enter o **Elegir escenario**. Hay seis arenas en dos filas: las miniaturas y ← / → cambian de escenario; ↑ / ↓ o W / S cambian de fila.
+1. Elige luchador con ← / → (o Q / E) o haciendo clic en los retratos centrales. Tab o ↑ / ↓ cambia entre jugador y rival. El botón central alterna el rival: **CPU**, **Práctica** o **Jugador 2**. Contra la CPU, **X** o el botón inferior cambian la dificultad: **Fácil**, **Normal** o **Difícil**.
+2. Confirma con Enter o **Continuar**. Hay seis arenas en dos filas: las miniaturas y ← / → cambian de escenario; ↑ / ↓ o W / S cambian de fila.
 3. Pulsa **¡A pelear!** o Enter: se muestra el versus y comienza el combate. Esc permite volver atrás, incluso durante el versus.
 
-Las elecciones se conservan al volver al menú y reiniciar. **Cambiar selección**, en el menú de pausa, permite modificar el enfrentamiento. El menú principal tiene cuatro opciones: **Elegir luchadores**, **Modo arcade**, **Galería de movimientos** y **Configuración**. El escenario, el rival y la dificultad se eligen en el selector.
+Las elecciones se conservan al volver al menú y reiniciar. **Cambiar selección**, en el menú de pausa, permite modificar el enfrentamiento. El menú principal tiene cinco opciones: **Elegir luchadores**, **Modo arcade**, **Galería de movimientos**, **Configuración** y **Estadísticas**. El escenario, el rival y la dificultad se eligen en el selector.
 
-**Configuración** permite activar la pantalla completa, encender o apagar la música y ajustar el volumen de la música y el volumen general (música y efectos). Se navega con ↑ / ↓, se ajusta con ← / → y se cambia con Enter. Los ajustes se guardan en el navegador. En pantalla completa el juego ocupa toda la pantalla y mantiene la proporción 16:9.
+**Configuración** permite activar la pantalla completa, encender o apagar la música, ajustar volúmenes independientes (música, general, efectos y locutor) y elegir entre las pistas aportadas (*Cinturão de Elite* en el menú y *Hardline Beatdown* en combate) o las pistas originales sintetizadas. Se navega con ↑ / ↓, se ajusta con ← / → y se cambia con Enter. Los ajustes se guardan en el navegador. En pantalla completa el juego ocupa toda la pantalla y mantiene la proporción 16:9.
 
 En **Configuración → Teclas de J1 y J2** se reasigna cada acción de cada jugador: se elige la acción, Enter y la tecla nueva. El juego rechaza teclas repetidas (de cualquiera de los dos jugadores) y las reservadas (Esc, F1, F2, F11, M, Enter, Tab, coma y punto). Los cambios se guardan en el navegador; **Restaurar valores** vuelve a las teclas de fábrica.
 
 - **CPU:** rival con tres dificultades. Cambian el tiempo de reacción, la probabilidad de bloquear, el ritmo de ataque, los anti-aéreos, el castigo a golpes fallados y la frecuencia de combos. Los valores están en `GAME_CONFIG.CPU_DIFFICULTY`.
 - **Modo arcade:** eliges luchador y color y subes una escalera: cada rival del plantel, el combate espejo y un jefe final, de Fácil a Difícil y en escenarios distintos. Al perder puedes continuar desde ese combate o volver al menú. Al ganar el último combate se muestran el final de tu luchador y los créditos.
 - **Jugador 2:** dos personas en el mismo teclado, o con dos mandos. Los carteles anuncian «¡GANA J1!» o «¡GANA J2!».
-- **Muñeco de práctica:** rival pasivo para practicar movimiento, alcance y ataques. En la pausa del modo práctica se activan tres herramientas: **visor de entradas** (últimas 12 entradas con su duración en frames), **datos de frames** del último golpe (inicio, activo, recuperación y ventaja al golpear y al bloquear) y **vida que se recupera** un segundo después de terminar el combo.
-- **Galería de movimientos:** previsualización de las animaciones; no es el modo de combate.
+- **Muñeco de práctica:** rival pasivo en sesión continua (al vaciar la vida se reinicia el asalto sin salir al menú) para practicar movimiento, alcance y combos. En la pausa del modo práctica se activan tres herramientas: **visor de entradas** (últimas 12 entradas con su duración en frames), **datos de frames** del último golpe (inicio, activo, recuperación y ventaja al golpear y al bloquear) y **vida que se recupera** un segundo después de terminar el combo.
+- **Galería de movimientos:** previsualización de todas las animaciones de los cinco luchadores (Q / E o Tab para cambiar de luchador, 1–0 y ← / → para animaciones, F2 para cambiar escenario).
 - **Escenarios de Arica:** Costanera del Morro al atardecer, Playa Chinchorro y Catedral San Marcos en Plaza Colón al anochecer.
 - **Escenarios originales:** Arena Urbana Nocturna, Templo Antiguo y Azotea de Rascacielos.
 
@@ -44,7 +48,7 @@ La portada es una escena animada con efecto 3D sobre la costa de Arica. Al abrir
 
 La portada presenta a los luchadores del plantel en orden aleatorio y los rota cada 6,5 s: el actual gira de canto, y el siguiente entra girando con su nombre, lema y poder. La ilustración de César (`public/assets/menu/cesar-3d-v2.png`) usa el mismo acabado 3D suave de Tilin; fue generada con ImageGen integrado y su procedencia está en `art/cesar-menu-3d/`.
 
-El selector comparte el lenguaje visual. Detrás hay un suelo de rejilla en perspectiva que avanza hacia el jugador, con horizonte luminoso y chispas. En **luchadores**, las tarjetas entran desde los lados, cada personaje está sobre un pedestal con anillos y foco, el VS en relieve cae con sacudida, y el personaje salta al cambiar de luchador o color. En **escenarios**, las miniaturas se levantan una tras otra, la vista grande se abre como una puerta y recorre la arena lentamente sin deformarla. En **combate listo**, los dos luchadores entran corriendo, un VS grande golpea la pantalla y la cruza una hoja de luz. Cada cambio reconstruye la pantalla en su posición final y anima encima, así que ninguna animación bloquea teclas ni clics. Con **Reducir movimiento** todo aparece quieto y completo.
+El selector comparte el lenguaje visual. Detrás hay un suelo de rejilla en perspectiva que avanza hacia el jugador, con horizonte luminoso y chispas. En **luchadores**, el fondo es el video `public/assets/menu/fondo menu personajes.mp4` en bucle y sin sonido: cada luchador elegido aparece grande a su lado (1P a la izquierda, rival a la derecha), cortado por el borde inferior, con su nombre en letras de fuego en la esquina; los retratos del plantel van en una fila arriba al centro con las marcas 1P y CPU, un VS grande en relieve cae solo al centro, y abajo quedan **Rival** y, debajo, **Volver**, **CPU: dificultad** y **Continuar**. En **escenarios**, las miniaturas se levantan una tras otra, la vista grande se abre como una puerta y recorre la arena lentamente sin deformarla. En **combate listo**, los dos luchadores entran corriendo, un VS grande golpea la pantalla y la cruza una hoja de luz. Cada cambio reconstruye la pantalla en su posición final y anima encima, así que ninguna animación bloquea teclas ni clics. Con **Reducir movimiento** todo aparece quieto y completo.
 
 Decisión técnica: el efecto usa solo Phaser (plano con perspectiva `Plane`, filtros `postFX` y proyección propia de partículas), sin añadir un motor 3D ni recursos nuevos. Con el renderizador Canvas la luchadora se dibuja plana y los brillos se omiten. Los efectos viven en `src/ui/menu/MenuEffects.ts` y `src/ui/selection/SelectionBackdrop.ts`, separados de la lógica de `MenuScene` y `SelectionScene`; `tests/menu-3d.spec.ts` y `tests/selection-3d.spec.ts` los verifican.
 
@@ -54,7 +58,7 @@ Los combates son al mejor de 3 rounds de 99 segundos; cada round termina por K.O
 
 ### Combate
 
-- **Bloqueo:** L bloquea solo de frente. Al bloquear, el defensor retrocede y queda unos frames en guardia; un golpe fuerte bloqueado deja al atacante expuesto a un contraataque.
+- **Bloqueo alto/bajo:** L bloquea de frente golpes medios y aéreos estando de pie, y golpes bajos (`↓ + U` y barrido `↓ + I`) manteniendo `↓ + L`. Al bloquear, el defensor retrocede y queda unos frames en guardia; un golpe fuerte bloqueado deja al atacante expuesto a un contraataque.
 - **Impacto:** cada golpe congela a ambos luchadores entre 55 y 120 ms según su fuerza (el reloj sigue corriendo), los golpes fuertes sacuden la cámara y saltan chispas en el punto de contacto: naranjas al golpear y un escudo azul al bloquear. Con *Reducir movimiento* no hay sacudidas y las chispas no se mueven.
 - **Combos:** un golpe suave que toca al rival se puede cancelar en uno más fuerte: puño suave → patada suave, puño o patada fuertes; patada suave → fuertes. Por ejemplo, J y luego K, o J, U, I. Mientras el rival sigue aturdido aparece «N HITS» con el daño total.
 - **Balance:** tabla de frames, ventajas y golpes para ganar en `docs/BALANCE.md`.
@@ -106,9 +110,9 @@ El retrato original está en `public/assets/effects/tilin-super-canto.png`, gene
 
 **César — Furia del i30:** con la barra al 100 %, **O** intenta un agarre de corta distancia. La preparación permite interrumpirlo con un golpe; bloquear de frente con **L**, saltar o alejarse evita la secuencia. Cada intento consume la barra. Al conectar, el agarre causa 4 de daño, el lanzamiento 12 y el atropello 44: **60 en total**. La secuencia dura 5,8 s, detiene el reloj y no recarga energía. César regresa al punto donde agarró; el rival queda aturdido en el extremo opuesto. Incluso un golpe fatal espera al regreso con la Monster antes de cerrar la ronda. Esc pausa también el motor; cancelar o reiniciar elimina el auto y todo daño pendiente. El movimiento reducido elimina las sacudidas y las estelas rápidas.
 
-Los cinco PNG de la secuencia están en `public/assets/effects/cesar-drive/`. `node scripts/generate-drive-sound.mjs` regenera el audio original de agarre, lanzamiento, puerta, motor, atropello y lata. `node scripts/inspect-drive.mjs` revisa ambas direcciones y guarda las capturas y el informe en `artifacts/cesar-drive/`; acepta `GAME_URL` para revisar una compilación de producción.
+Los recursos de la secuencia están en `public/assets/effects/cesar-drive/`, `cesar-drive-fluid/` y `tilin-reaction/` (WebP transparentes). `node scripts/generate-drive-sound.mjs` regenera el audio original de agarre, lanzamiento, puerta, motor, atropello y lata. `node scripts/inspect-drive.mjs` revisa ambas direcciones y guarda las capturas y el informe en `artifacts/cesar-drive/`; acepta `GAME_URL` para revisar una compilación de producción.
 
-La música original tiene dos arreglos en bucle: menú a 96 BPM y combate a 128 BPM. La pausa detiene la música del combate; al cambiar de escena no se superponen pistas. **M** silencia solo la música, manteniendo audibles los golpes y el canto. El volumen y la preferencia se guardan localmente. `node scripts/generate-music.mjs` regenera las dos pistas y el efecto vocal sintetizado, sin grabaciones externas.
+La música de menú reproduce *Cinturão de Elite* y la de combate reproduce *Hardline Beatdown* (ambas configurables desde **Configuración** para volver a las pistas originales sintetizadas de 96 BPM y 128 BPM, que también sirven de respaldo automático). La pausa detiene la música del combate; al cambiar de escena no se superponen pistas. **M** silencia solo la música, manteniendo audibles los golpes, el locutor y los súpers. Las tipografías empaquetadas (Rajdhani, Teko, Anton y Black Ops One) usan licencia SIL OFL. `node scripts/generate-music.mjs` regenera las pistas sintetizadas originales sin grabaciones externas.
 
 ## Verificar
 
@@ -172,3 +176,11 @@ El manifiesto activo sigue en `public/assets/characters/tilin/manifest.json`. De
 Los JPG originales permanecen intactos. El manifiesto anterior está respaldado en `art/tilin-v2/original-manifest.json`; el cargador mantiene compatibilidad con sus hojas de tres cuadros y fondo verde. Si falta `GET_UP`, la recuperación conserva su alternativa segura. Si falla la descarga de recursos, se muestra una opción para reintentar.
 
 `inspect-sprites.mjs` necesita el servidor de desarrollo en el puerto 3000. Guarda capturas, hojas de contacto y mediciones de los 276 cuadros en `artifacts/tilin-v2/`, y falla si encuentra cuadros vacíos, transparencia ausente, recortes en los bordes o errores de ejecución. `inspect-sonic.mjs` ejecuta la inspección actual del súper y guarda la barra cargada, la onda, el retrato, los impactos y la recuperación en `artifacts/super-canto/`.
+
+## Plantel unificado y estaturas
+
+La revisión de noviembre de 2026 unifica el acabado pintado de los cinco luchadores con 1080 poses en 126 animaciones. Las escalas de combate y los retratos del selector usan las estaturas indicadas: Tata 165 cm, Tilin 167 cm, Joako 181 cm, Jorell 182 cm y César 183 cm. Jorell conserva lentes negros, un torso más ancho que Joako, brazos y piernas más delgados, una panza moderada y visible y ambos tatuajes de dragón en el brazo del reloj, incluyendo su transformación y retratos.
+
+Los PNG, prompts y registros de ImageGen están en `art/roster-unified/`; los activos del juego en `public/assets/characters/*-unified/`. Para reconstruir esta revisión se usa `node scripts/pack-roster.mjs`. La auditoría y capturas del plantel se generan con `node scripts/inspect-roster.mjs` y Vite en el puerto 3018.
+
+El reposo de Jorell usa 12 cuadros registrados para mantener los pies en su sitio. Las cinemáticas de César y Sofía/Tilin usan el mismo acabado pintado: entrada al i30, regreso con Monster, canto y reacciones. El canto conserva el escenario elegido. Fuentes y prompts: `art/super-unified/`; inspección de ambos sentidos y el reposo: `node scripts/inspect-super-style.mjs` (preview en 4173 o `GAME_URL`).

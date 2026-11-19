@@ -90,6 +90,17 @@ test.describe('on a touch screen', () => {
     expect(tops.length).toBe(11);
     expect(Math.min(...tops)).toBeGreaterThan(260);
   });
+
+  test('player 2 keyboard input in versus mode does not hide player 1 touch controls', async ({ page }) => {
+    await startFight(page, 'tilin', 'cesar', { mode: 'versus' });
+    await page.evaluate(() => { (window as any).__game.loop.start((window as any).__game.loop.callback); });
+    expect((await state(page)).visible).toBe(true);
+    await page.keyboard.press('ArrowLeft', { delay: 60 });
+    await page.keyboard.press('Insert', { delay: 60 });
+    expect((await state(page)).visible).toBe(true);
+    await page.keyboard.press('d', { delay: 60 });
+    await expect.poll(async () => (await state(page)).visible).toBe(false);
+  });
 });
 
 test('without a touch screen there are no on-screen buttons', async ({ page }) => {

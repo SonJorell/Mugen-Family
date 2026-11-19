@@ -1,0 +1,9 @@
+{
+  "file": "cesar-grab",
+  "refs": [
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/cesar-drive-fluid/grab-throw-sheet.png",
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/cesar/movement.png"
+  ],
+  "prompt": "Reference 1 is the action/layout target. Reference 2 is the authoritative NEW painted character style. Painted 2D arcade fighter sprites matching the SECOND reference exactly: clean dark contours, soft simplified cel shading, warm natural colors, same face and proportions. NOT photorealistic, NOT 3D rendering, NOT pixel art. Cesar is a stocky broad adult man with a visible rounded belly, short dark hair with blond tips, grey T-shirt, black shorts, tattoos on both arms, white socks, blue-white sneakers. Preserve his large body. Redraw the 12-frame grab and throw as a polished 2D animation sprite sheet, 1536x1024, EXACTLY 4 equal columns x 3 equal rows. Full body right-facing, each cell pelvis centered at x=192, floor y=331, standing height about 306px, same physical scale throughout. Twelve consecutive actions: 1 guard/lean forward, 2 step and reach, 3 hands open forward, 4 catch invisible opponent, 5 pull close, 6 crouch and lift, 7 rise and rotate torso, 8 lift arms forward/up, 9 powerful throw release, 10 follow-through, 11 recover arms, 12 guard. Only Cesar, no actual opponent or props. His shirt must remain grey, shorts black, sneakers blue/white. Keep one stable body size and grounded feet. Genuine RGBA transparency, alpha exactly zero everywhere outside subjects and inside limb gaps. No background, haze, ground, shadow, panel borders, text or effects. Every pose fully contained in its cell with clear transparent gutters. ",
+  "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-091fe6c4-a516-4a36-8195-e08f79816c63.png"
+}

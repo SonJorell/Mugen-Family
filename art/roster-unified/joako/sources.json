@@ -1,0 +1,42 @@
+[
+  {
+    "id": "joako",
+    "sheet": "movement",
+    "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-343cdb0c-17a3-401e-8a9b-09aa263c05e7.png"
+  },
+  {
+    "id": "joako",
+    "sheet": "air",
+    "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-8a554bfe-e917-4ad1-b11f-bb43cb58905e.png"
+  },
+  {
+    "id": "joako",
+    "sheet": "attacks",
+    "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-0300f9dd-7d59-4cec-b795-74badf244b31.png"
+  },
+  {
+    "id": "joako",
+    "sheet": "defense",
+    "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-818f552e-3edf-4bdd-be5b-c4acebdb243a.png"
+  },
+  {
+    "id": "joako",
+    "sheet": "recovery",
+    "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-2657d6e1-37d7-41fe-92d9-091f132d839c.png"
+  },
+  {
+    "id": "joako",
+    "sheet": "super",
+    "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-16106c9f-9305-43f6-a80b-1f4a44798f1f.png"
+  },
+  {
+    "id": "joako",
+    "sheet": "doublejump",
+    "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-b523d77e-2a07-4224-be1b-690833d84ab2.png"
+  },
+  {
+    "id": "joako",
+    "sheet": "victory-dance",
+    "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-43192a83-dc10-420f-9ed6-9efb11aa752d.png"
+  }
+]

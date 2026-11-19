@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { confirmSelection } from './selection-helper';
 
-async function fight(page: Page) {
+async function fight(page: Page, training = true) {
   await page.route(/\/src\/main\.ts(?:\?.*)?$/, async route => {
     const response = await route.fetch();
     await route.fulfill({ response, body: (await response.text()).replace('new Phaser.Game(config)', '(window.__game = new Phaser.Game(config))') });
@@ -10,7 +10,7 @@ async function fight(page: Page) {
   await page.waitForFunction(() => (window as any).__game?.scene.isActive('MenuScene'));
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
-  await page.mouse.click(640, 565); // Rival: CPU → Práctica
+  if (training) await page.mouse.click(524, 528); // Rival: CPU → Práctica
   await confirmSelection(page);
 }
 /** Screen-pinned banner lettering currently alive in the fight (Title3D containers). */
@@ -72,10 +72,11 @@ for (const [name, health, verdict, wins, round] of [
   ['a double K.O.', [0, 0], 'EMPATE', { player: 1, opponent: 1 }, 5],
 ] as const) {
   test(`${name} in the deciding round shows K.O. and then ${verdict}`, async ({ page }) => {
-    await fight(page);
+    await fight(page, false);
     await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').roundSystem.phase === 'FIGHT');
     await page.evaluate(([[player, opponent], wins, round]) => {
       const s = (window as any).__game.scene.getScene('FightScene');
+      s.opponent.think = () => {};
       s.roundSystem._wins = { ...wins }; s.roundSystem._round = round;
       s.player.currentHealth = player; s.opponent.currentHealth = opponent;
     }, [health, wins, round] as const);
@@ -86,9 +87,13 @@ for (const [name, health, verdict, wins, round] of [
 }
 
 test('a round that does not decide the match shows the round winner and the score, then the next round', async ({ page }) => {
-  await fight(page);
+  await fight(page, false);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene').roundSystem.phase === 'FIGHT');
-  await page.evaluate(() => { (window as any).__game.scene.getScene('FightScene').opponent.currentHealth = 0; });
+  await page.evaluate(() => {
+    const s = (window as any).__game.scene.getScene('FightScene');
+    s.opponent.think = () => {};
+    s.opponent.currentHealth = 0;
+  });
   await expect.poll(() => banners(page), { timeout: 10000 }).toContain('K.O.');
   await expect.poll(() => banners(page), { timeout: 10000 }).toContain('ROUND TUYO');
   await expect.poll(() => banners(page), { timeout: 15000 }).toContain('ROUND 2');

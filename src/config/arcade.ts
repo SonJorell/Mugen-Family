@@ -53,11 +53,14 @@ export function newRun(player: FighterChoice): ArcadeRun {
 export const CREDITS: readonly { heading: string; lines: string[] }[] = [
   { heading: 'Fighter Family', lines: ['Juego de pelea 2D para navegador'] },
   { heading: 'Creación y dirección', lines: ['Jorell'] },
-  { heading: 'Luchadores', lines: ['Tilin · Canto sónico', 'César · Furia del i30'] },
+  { heading: 'Luchadores', lines: FIGHTER_ROSTER.map(f => `${f.name} · ${f.power}`) },
   { heading: 'Arte de luchadores', lines: [
-    'Hojas de Tilin (v2 y v3) y de César (v2)',
+    'Plantel unificado: 1080 poses en 126 animaciones',
     'generadas con ImageGen integrado a partir de los dibujos originales',
-    'Prompts y procedencia: art/tilin-v2, art/tilin-v3, art/cesar-v2',
+    'Prompts y procedencia: art/roster-unified',
+    'Tilin y César: 276 poses cada uno · Joako: 174 poses',
+    'Jorell: 186 poses, lentes y dos dragones en el mismo brazo',
+    'Tata: 168 poses, brindis, montaje y pedaleo · 165 cm',
   ] },
   { heading: 'Escenarios e ilustraciones', lines: [
     'Costanera del Morro, Playa Chinchorro, Catedral San Marcos y portada:',
@@ -67,10 +70,13 @@ export const CREDITS: readonly { heading: string; lines: string[] }[] = [
   ] },
   { heading: 'Música y sonido', lines: [
     'Música del menú: «Cinturão de Elite», aportada por Jorell (licencia por confirmar antes de publicar)',
-    'Música del combate, golpes, voces y efectos sintetizados por código, sin grabaciones externas',
+    'Música de combate: «Hardline Beatdown», aportada por Jorell (licencia por confirmar antes de publicar)',
+    'Pistas originales alternativas, golpes, voces y efectos sintetizados por código, sin grabaciones externas',
     'scripts/generate-music.mjs · generate-sounds.mjs · generate-menu-sounds.mjs',
-    'generate-super-sound.mjs · generate-drive-sound.mjs',
+    'generate-super-sound.mjs · generate-drive-sound.mjs · generate-build-sound.mjs · generate-kame-sound.mjs',
+    'generate-bike-sound.mjs · botella, pedales, campanilla e impacto de Tata',
   ] },
   { heading: 'Programación', lines: ['TypeScript · Phaser 3 · Vite', 'Pruebas con Playwright', 'Desarrollo asistido por IA (Claude Code y Codex)'] },
   { heading: 'Gracias por jugar', lines: ['Arica, Chile'] },
 ];
+

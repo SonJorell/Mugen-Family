@@ -24,7 +24,7 @@ test('every announcer line is loaded and is a short, audible clip', async ({ pag
   await bootGame(page);
   const clips = await page.evaluate(() => {
     const game = (window as any).__game;
-    const keys = ['round-1', 'round-2', 'round-3', 'round-4', 'round-5', 'fight', 'ko', 'time', 'victory', 'defeat', 'draw', 'p1-wins', 'p2-wins'];
+    const keys = ['round-1', 'round-2', 'round-3', 'round-4', 'round-5', 'fight', 'ko', 'time', 'victory', 'defeat', 'draw', 'p1-wins', 'p2-wins', 'select'];
     return keys.map(k => {
       const buffer = game.cache.audio.get(`announcer-${k}`);
       const data: Float32Array = buffer.getChannelData(0);
@@ -92,4 +92,18 @@ test('the announcer volume in Configuración scales the voice and is saved', asy
   const last = await page.evaluate(() => (window as any).__lines.pop());
   expect(last.key).toBe('announcer-fight');
   expect(last.volume).toBeCloseTo(0.3, 2);
+});
+
+test('the selection screen says «Selecciona a tu luchador» once, not on the stage step', async ({ page }) => {
+  await bootGame(page);
+  await spy(page);
+  await page.evaluate(() => {
+    const g = (window as any).__game;
+    g.scene.getScenes(true).forEach((s: any) => g.scene.stop(s.scene.key));
+    g.scene.start('SelectionScene', { mode: 'cpu' });
+  });
+  await expect.poll(() => lines(page)).toEqual(['announcer-select']);
+  await page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').scene.restart({ mode: 'cpu', selectionPhase: 'stage' }));
+  await page.waitForTimeout(500);
+  expect(await lines(page)).toEqual(['announcer-select']);
 });

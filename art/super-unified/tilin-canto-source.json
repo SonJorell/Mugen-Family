@@ -1,0 +1,9 @@
+{
+  "file": "tilin-canto",
+  "refs": [
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/public/assets/effects/tilin-super-canto.webp",
+    "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/tilin/movement.png"
+  ],
+  "prompt": "Use case: style-transfer. Transparent cinematic cut-in illustration, landscape 1536x1024. Redraw the singing pose of reference 1 using the clean painted arcade 2D character design, natural proportions, face, glasses, hair and olive crop top of reference 2. Sofia/Tilin sings powerfully facing right, one hand at chest and other reaching forward, flowing long brown hair. Waist-up composition, full outstretched hand fully inside frame. Beautiful bold painted shading and clear outlines matching the playable roster, not a plastic 3D render. Warm highlights and subtle teal rim light contained on silhouette only. No text, no streaks, no backgrounds, no halos. Actual transparent alpha outside character. Keep skin natural, same outfit.",
+  "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-b22da7a4-5931-4664-aff7-0232a4b5f961.png"
+}

@@ -16,6 +16,12 @@ export interface ImpactEvent {
   damage: number;
   x: number;
   y: number;
+  /** True when the hit interrupted the defender during an attack. */
+  counterHit?: boolean;
+  /** Set when a low or overhead attack bypassed the wrong guard posture. */
+  openedGuard?: 'low' | 'overhead';
+  /** True when a crouching guard absorbed the hit. */
+  crouchBlock?: boolean;
 }
 
 export class FighterController {
@@ -59,20 +65,24 @@ export class FighterController {
         if (defender.throwable) defender.grabbedFrom(attacker);
         return;
       }
-      if (attackDef.name === 'SPECIAL_ATTACK' && attacker.stats.special === 'drive') {
-        // Airborne opponents escape a grounded grab; frontal guard also stops the opener.
+      if (attackDef.name === 'SPECIAL_ATTACK' && ['drive', 'kame', 'bike'].includes(attacker.stats.special)) {
+        // These close grounded openers must connect before starting their cinematic.
         if (!defender.isGrounded || !defender.canReceiveHit) return;
         attacker.hasHitThisSwing = true;
         attacker.hitbox.active = false;
         if (defender.isGuarding && defender.facingRight === fromRight) {
-          defender.receiveHit(0, 0, 0, false, fromRight);
+          defender.receiveHit(0, 0, 0, false, fromRight, false, attackDef.blockstun, attackDef.blockPushback);
         } else {
           this.onSuperHit?.(attacker, defender);
         }
         return;
       }
+      const guard = attackDef.guard ?? 'mid';
+      const wasAttacking = defender.combatState.state === 'ATTACKING';
+      const wrongGuard = defender.isGuarding && defender.facingRight === fromRight && !defender.blocksAttack(fromRight, guard);
+      const crouchBlock = defender.crouchGuarding;
       const scaled = this.scaleHit?.(attacker, defender, attackDef.damage) ?? { damage: attackDef.damage, endCombo: false };
-      const guarding = defender.isGuarding && defender.facingRight === fromRight;
+      const guarding = defender.blocksAttack(fromRight, guard);
       const result = defender.receiveHit(
         guarding ? attackDef.damage : scaled.damage,
         attackDef.hitstun,
@@ -83,13 +93,21 @@ export class FighterController {
         attackDef.blockstun,
         attackDef.blockPushback,
         !!attackDef.launches && !scaled.endCombo,
+        guard,
       );
       if (result === 'hit') attacker.gainEnergy(attackDef.damage * 2 + 6);
       else if (result === 'blocked') attacker.gainEnergy(4);
       if (result !== 'ignored') {
         const left = Math.max(hitRect.worldX, hurtRect.worldX), right = Math.min(hitRect.worldX + hitRect.width, hurtRect.worldX + hurtRect.width);
         const top = Math.max(hitRect.worldY, hurtRect.worldY), bottom = Math.min(hitRect.worldY + hitRect.height, hurtRect.worldY + hurtRect.height);
-        this.onImpact?.({ attacker, defender, attack: attackDef, result, damage: result === 'hit' ? scaled.damage : 0, x: (left + right) / 2, y: (top + bottom) / 2 });
+        this.onImpact?.({
+          attacker, defender, attack: attackDef, result,
+          damage: result === 'hit' ? scaled.damage : 0,
+          x: (left + right) / 2, y: (top + bottom) / 2,
+          counterHit: result === 'hit' && wasAttacking,
+          openedGuard: result === 'hit' && wrongGuard && (guard === 'low' || guard === 'overhead') ? guard : undefined,
+          crouchBlock: result === 'blocked' && crouchBlock,
+        });
       }
 
       attacker.hasHitThisSwing = true;

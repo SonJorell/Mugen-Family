@@ -11,7 +11,7 @@ async function fight(page: Page, live = false) {
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
   await page.keyboard.press('KeyE');
-  await page.mouse.click(640, 565);
+  await page.mouse.click(524, 528);
   await confirmSelection(page);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
   if (!live) await page.evaluate(() => { (window as any).__game.loop.stop(); });
@@ -73,10 +73,14 @@ for (const right of [true, false]) test(`César throws, enters the i30, hits onc
     const returning = { visible: caster?.visible, texture: caster?.texture?.key, carVisible: car?.visible,
       targetInside: victimBounds?.left >= 0 && victimBounds?.right <= 1280 };
     stepTo(5800);
-    return { start, airborne, entering, earlyCar, lateCar, beforeHit, impact, returning,
-      end: { active: s.superMove.active, health: o.currentHealth, x: p.x, targetX: o.x, grounded: o.isGrounded,
+    const afterEnd = [p.x, o.x];
+    // Step one live combat frame to verify PhysicsSystem does not snap either fighter.
+    s.update(0, 1000 / 60);
+    const snap = [Math.abs(p.x - afterEnd[0]), Math.abs(o.x - afterEnd[1])];
+    return { start, airborne, entering, earlyCar, lateCar, beforeHit, impact, returning, snap,
+      end: { active: s.superMove.active, health: o.currentHealth, x: afterEnd[0], targetX: afterEnd[1], grounded: o.isGrounded,
         energy: [p.energy, o.energy], visible: [p.sprite.visible, o.sprite.visible],
-        onScreen: [p.x, o.x].every(x => x - s.cameras.main.scrollX >= 40 && x - s.cameras.main.scrollX <= 1240),
+        onScreen: afterEnd.every(x => x - s.cameras.main.scrollX >= 40 && x - s.cameras.main.scrollX <= 1240),
         layers: s.children.getAll().filter((c: any) => c.name === 'super-cinematic').length } };
   }, right);
   expect(result.start).toMatchObject({ active: true, energy: 0, health: 96 });
@@ -86,8 +90,10 @@ for (const right of [true, false]) test(`César throws, enters the i30, hits onc
   expect(result.beforeHit).toBe(84);
   expect(result.impact).toEqual({ health: 40, active: true, timer: result.start.timer });
   expect(result.returning).toEqual({ visible: true, texture: 'cesar-drive-celebrate', carVisible: false, targetInside: true });
-  expect(result.end).toEqual({ active: false, health: 40, x: right ? 600 : 1320, targetX: right ? 1740 : 180,
+  expect(result.end).toEqual({ active: false, health: 40, x: right ? 600 : 1320, targetX: right ? 1680 : 240,
     grounded: true, energy: [0, 0], visible: [true, true], onScreen: true, layers: 0 });
+  expect(result.snap[0]).toBeLessThan(1);
+  expect(result.snap[1]).toBeLessThan(8);
 });
 
 test('cancelling the i30 cinematic removes the car and prevents delayed damage or relocation', async ({ page }) => {
@@ -150,4 +156,40 @@ test('pausing the i30 cinematic freezes its soundtrack and damage and restarting
     const s = (window as any).__game.scene.getScene('FightScene');
     return { active: s.superMove.active, health: s.opponent.currentHealth, energy: s.player.energy, layer: !!s.children.getByName('super-cinematic') };
   })).toEqual({ active: false, health: 100, energy: 0, layer: false });
+});
+
+test('non-Tilin opponents play animated combat reaction poses during César\'s i30 cinematic', async ({ page }) => {
+  await page.route(/\/src\/main\.ts(?:\?.*)?$/, async route => {
+    const response = await route.fetch();
+    await route.fulfill({ response, body: (await response.text()).replace('new Phaser.Game(config)', '(window.__game = new Phaser.Game(config))') });
+  });
+  await page.goto('/');
+  await page.waitForFunction(() => (window as any).__game?.scene.isActive('MenuScene'));
+  await page.evaluate(() => {
+    const g = (window as any).__game;
+    g.scene.stop('MenuScene');
+    g.scene.start('FightScene', { mode: 'training', stageIndex: 0,
+      playerChoice: { characterId: 'cesar', paletteId: 'original' },
+      opponentChoice: { characterId: 'joako', paletteId: 'original' } });
+  });
+  await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 15000 });
+  const keys = await page.evaluate(() => {
+    const g = (window as any).__game, s = g.scene.getScene('FightScene');
+    g.loop.stop();
+    s.player.resetForRound(600); s.opponent.resetForRound(715);
+    s.superMove.start(s.player, s.opponent);
+    const victim = s.children.getByName('super-cinematic').getByName('drive-victim');
+    const seen: string[] = [];
+    for (const at of [300, 1000, 2600, 3600, 4800]) {
+      s.superMove.update(at - s.superMove.elapsed);
+      seen.push(victim.texture.key);
+    }
+    s.superMove.cancel();
+    return seen;
+  });
+  expect(keys[0]).toContain('joako_HIT_REACTION');
+  expect(keys[1]).toContain('joako_KNOCKDOWN');
+  expect(keys[2]).toContain('joako_STUN');
+  expect(keys[3]).toContain('joako_KNOCKDOWN');
+  expect(keys[4]).toContain('joako_GET_UP');
 });

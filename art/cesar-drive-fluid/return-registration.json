@@ -1,0 +1,497 @@
+{
+  "algorithm": "Bounded alpha-mask phase cross-correlation, maximum silhouette overlap; median offsets at alpha thresholds 64,128,192. dx/dy describe candidate relative to original. Add these offsets to sprite origins in source pixels to keep original on-screen registration.",
+  "originalSize": [
+    1448,
+    1086
+  ],
+  "candidateSize": [
+    1448,
+    1086
+  ],
+  "cellSize": [
+    362,
+    362
+  ],
+  "frames": [
+    {
+      "frame": 0,
+      "dx": 0,
+      "dy": 0,
+      "rowContourMedianDx": 0.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.986521
+        },
+        {
+          "threshold": 128,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.986322
+        },
+        {
+          "threshold": 192,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.986452
+        }
+      ],
+      "originalBounds": [
+        97,
+        10,
+        280,
+        352
+      ],
+      "candidateBounds": [
+        97,
+        8,
+        282,
+        352
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 1,
+      "dx": -30,
+      "dy": 0,
+      "rowContourMedianDx": -30.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": -30,
+          "dy": 0,
+          "dice": 0.982824
+        },
+        {
+          "threshold": 128,
+          "dx": -30,
+          "dy": 0,
+          "dice": 0.982572
+        },
+        {
+          "threshold": 192,
+          "dx": -30,
+          "dy": 0,
+          "dice": 0.982901
+        }
+      ],
+      "originalBounds": [
+        103,
+        11,
+        288,
+        352
+      ],
+      "candidateBounds": [
+        72,
+        9,
+        258,
+        352
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 2,
+      "dx": 0,
+      "dy": 0,
+      "rowContourMedianDx": 0.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.988024
+        },
+        {
+          "threshold": 128,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.987857
+        },
+        {
+          "threshold": 192,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.987807
+        }
+      ],
+      "originalBounds": [
+        93,
+        11,
+        289,
+        352
+      ],
+      "candidateBounds": [
+        94,
+        10,
+        291,
+        352
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 3,
+      "dx": 1,
+      "dy": 0,
+      "rowContourMedianDx": 1.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 1,
+          "dy": 0,
+          "dice": 0.988382
+        },
+        {
+          "threshold": 128,
+          "dx": 1,
+          "dy": 0,
+          "dice": 0.988265
+        },
+        {
+          "threshold": 192,
+          "dx": 1,
+          "dy": 0,
+          "dice": 0.987776
+        }
+      ],
+      "originalBounds": [
+        81,
+        11,
+        280,
+        352
+      ],
+      "candidateBounds": [
+        81,
+        8,
+        282,
+        352
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 4,
+      "dx": 0,
+      "dy": 0,
+      "rowContourMedianDx": 0.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.988089
+        },
+        {
+          "threshold": 128,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.988223
+        },
+        {
+          "threshold": 192,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.987756
+        }
+      ],
+      "originalBounds": [
+        92,
+        10,
+        281,
+        352
+      ],
+      "candidateBounds": [
+        93,
+        11,
+        283,
+        352
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 5,
+      "dx": -31,
+      "dy": 0,
+      "rowContourMedianDx": -31.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": -31,
+          "dy": 0,
+          "dice": 0.987369
+        },
+        {
+          "threshold": 128,
+          "dx": -31,
+          "dy": 0,
+          "dice": 0.98714
+        },
+        {
+          "threshold": 192,
+          "dx": -31,
+          "dy": 0,
+          "dice": 0.986393
+        }
+      ],
+      "originalBounds": [
+        102,
+        11,
+        282,
+        352
+      ],
+      "candidateBounds": [
+        70,
+        10,
+        253,
+        353
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 1
+    },
+    {
+      "frame": 6,
+      "dx": 0,
+      "dy": 0,
+      "rowContourMedianDx": 0.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.988106
+        },
+        {
+          "threshold": 128,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.988243
+        },
+        {
+          "threshold": 192,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.987701
+        }
+      ],
+      "originalBounds": [
+        108,
+        11,
+        283,
+        353
+      ],
+      "candidateBounds": [
+        107,
+        10,
+        285,
+        353
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 7,
+      "dx": 0,
+      "dy": 0,
+      "rowContourMedianDx": 0.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.989922
+        },
+        {
+          "threshold": 128,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.990727
+        },
+        {
+          "threshold": 192,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.990472
+        }
+      ],
+      "originalBounds": [
+        106,
+        11,
+        283,
+        354
+      ],
+      "candidateBounds": [
+        105,
+        11,
+        284,
+        353
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": -1
+    },
+    {
+      "frame": 8,
+      "dx": 0,
+      "dy": 0,
+      "rowContourMedianDx": 0.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.986712
+        },
+        {
+          "threshold": 128,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.986735
+        },
+        {
+          "threshold": 192,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.986599
+        }
+      ],
+      "originalBounds": [
+        104,
+        10,
+        283,
+        355
+      ],
+      "candidateBounds": [
+        104,
+        10,
+        284,
+        355
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 9,
+      "dx": -33,
+      "dy": 0,
+      "rowContourMedianDx": -33.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": -32,
+          "dy": 0,
+          "dice": 0.984542
+        },
+        {
+          "threshold": 128,
+          "dx": -33,
+          "dy": 0,
+          "dice": 0.984903
+        },
+        {
+          "threshold": 192,
+          "dx": -33,
+          "dy": 0,
+          "dice": 0.984309
+        }
+      ],
+      "originalBounds": [
+        98,
+        10,
+        279,
+        355
+      ],
+      "candidateBounds": [
+        64,
+        9,
+        247,
+        355
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 10,
+      "dx": 0,
+      "dy": 0,
+      "rowContourMedianDx": 0.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.988139
+        },
+        {
+          "threshold": 128,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.988549
+        },
+        {
+          "threshold": 192,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.988155
+        }
+      ],
+      "originalBounds": [
+        93,
+        10,
+        282,
+        355
+      ],
+      "candidateBounds": [
+        91,
+        10,
+        282,
+        355
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    },
+    {
+      "frame": 11,
+      "dx": 0,
+      "dy": 0,
+      "rowContourMedianDx": 0.0,
+      "correlations": [
+        {
+          "threshold": 64,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.990035
+        },
+        {
+          "threshold": 128,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.989917
+        },
+        {
+          "threshold": 192,
+          "dx": 0,
+          "dy": 0,
+          "dice": 0.989508
+        }
+      ],
+      "originalBounds": [
+        83,
+        11,
+        287,
+        355
+      ],
+      "candidateBounds": [
+        82,
+        9,
+        289,
+        355
+      ],
+      "candidateEdgePixels": 0,
+      "feetDy": 0
+    }
+  ]
+}

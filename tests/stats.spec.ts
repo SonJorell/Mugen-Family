@@ -62,11 +62,11 @@ test('matches, the best combo and arcade clears are saved and shown in the stats
   expect(saved.byFighter.tilin).toEqual({ wins: 1, losses: 0, draws: 0 });
   expect(saved.bestCombo).toEqual({ hits: 2, damage: 17, fighter: 'tilin' });
 
-  // An arcade clear with one continue.
+  // Win the sixth and final fight of the five-fighter roster with one continue.
   await page.evaluate(() => {
     const g = (window as any).__game;
     g.scene.getScenes(true).forEach((s: any) => g.scene.stop(s.scene.key));
-    g.scene.start('ArcadeScene', { run: { player: { characterId: 'cesar', paletteId: 'original' }, step: 2, continues: 1 }, result: 'player' });
+    g.scene.start('ArcadeScene', { run: { player: { characterId: 'cesar', paletteId: 'original' }, step: 5, continues: 1 }, result: 'player' });
   });
   await page.waitForFunction(() => (window as any).__game.scene.isActive('ArcadeScene'));
   expect((await stats(page)).arcade).toEqual({ cesar: { clears: 1, fewestContinues: 1 } });
@@ -82,11 +82,25 @@ test('matches, the best combo and arcade clears are saved and shown in the stats
   for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('StatsScene'));
-  const text = await page.evaluate(() => (window as any).__game.scene.getScene('StatsScene').content.list.map((c: any) => c.text).join('\n'));
-  expect(text).toContain('1 combate · 1 victoria · 0 derrotas · 0 empates');
-  expect(text).toContain('2 golpes · 17 de daño · con Tilin');
-  expect(text).toContain('César: completado 1 vez · mejor: 1 continuación');
-  expect(text).toContain('Tilin: sin completar');
+  const statsScreen = await page.evaluate(() => {
+    const s = (window as any).__game.scene.getScene('StatsScene');
+    const items = s.content.list;
+    const help = items.find((c: any) => c.name === 'stats-help');
+    const maxBottom = Math.max(...items.filter((c: any) => c !== help).map((c: any) => c.getBounds().bottom));
+    return {
+      text: items.map((c: any) => c.text).filter(Boolean).join('\n'),
+      maxBottom,
+      helpTop: help.getBounds().top,
+      helpBottom: help.getBounds().bottom,
+    };
+  });
+  expect(statsScreen.text).toContain('1 combate · 1 victoria · 0 derrotas · 0 empates');
+  expect(statsScreen.text).toContain('2 golpes · 17 de daño · con Tilin');
+  expect(statsScreen.text).toContain('César: completado 1 vez · mejor: 1 continuación');
+  expect(statsScreen.text).toContain('Tilin: sin completar');
+  expect(statsScreen.text).toContain('Tata: sin completar');
+  expect(statsScreen.maxBottom).toBeLessThan(statsScreen.helpTop);
+  expect(statsScreen.helpBottom).toBeLessThanOrEqual(716);
 
   // Delete asks for confirmation.
   await page.keyboard.press('Delete');

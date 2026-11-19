@@ -1,11 +1,19 @@
-// Simulates Tilin vs César with the CPU driving both sides, to check the roster balance.
+// Simulates all roster matchups (5×5) with the CPU driving both sides, to check roster balance.
 // Usage (dev server running): node scripts/simulate-balance.mjs [rounds-per-side] [difficulty]
 // Each round starts from full health; sides are swapped so the left/right start does not bias it.
 import { chromium } from '@playwright/test';
 
-const ROUNDS = Number(process.argv[2] ?? 30);
+const FIGHTERS = ['tilin', 'cesar', 'joako', 'jorell', 'tata'];
+const ROUNDS = Number(process.argv[2] ?? 10);
 const DIFFICULTIES = process.argv[3] ? [process.argv[3]] : ['normal', 'hard'];
 const URL = process.env.GAME_URL ?? 'http://127.0.0.1:3000';
+
+const pairs = [];
+for (let i = 0; i < FIGHTERS.length; i++) {
+  for (let j = i + 1; j < FIGHTERS.length; j++) {
+    pairs.push([FIGHTERS[i], FIGHTERS[j]], [FIGHTERS[j], FIGHTERS[i]]);
+  }
+}
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
@@ -20,7 +28,7 @@ await page.waitForFunction(() => window.__game?.scene.isActive('MenuScene'), nul
 
 const results = [];
 for (const difficulty of DIFFICULTIES) {
-  for (const [left, right] of [['tilin', 'cesar'], ['cesar', 'tilin']]) {
+  for (const [left, right] of pairs) {
     await page.evaluate(({ left, right, difficulty }) => {
       const game = window.__game;
       if (!game.loop.running) game.loop.start(game.loop.callback);
@@ -55,21 +63,34 @@ for (const difficulty of DIFFICULTIES) {
     }, { rounds: ROUNDS, difficulty });
     for (const r of batch) {
       const winnerId = r.winner === 'player' ? left : r.winner === 'opponent' ? right : 'draw';
-      results.push({ difficulty, winner: winnerId, reason: r.reason, seconds: r.seconds,
+      results.push({ difficulty, left, right, winner: winnerId, reason: r.reason, seconds: r.seconds,
         hp: { [left]: r.left, [right]: r.right } });
     }
   }
 }
 await browser.close();
 
+const avg = list => list.length ? Math.round(list.reduce((a, b) => a + b, 0) / list.length) : 0;
 for (const difficulty of DIFFICULTIES) {
   const rows = results.filter(r => r.difficulty === difficulty);
-  const wins = id => rows.filter(r => r.winner === id).length;
-  const avg = list => list.length ? Math.round(list.reduce((a, b) => a + b, 0) / list.length) : 0;
-  const winnerHp = id => avg(rows.filter(r => r.winner === id).map(r => r.hp[id]));
-  console.log(`\n${difficulty.toUpperCase()} · ${rows.length} rounds`);
-  console.log(`  Tilin: ${wins('tilin')} wins (${Math.round(wins('tilin') / rows.length * 100)} %), health left when winning ${winnerHp('tilin')} %`);
-  console.log(`  César: ${wins('cesar')} wins (${Math.round(wins('cesar') / rows.length * 100)} %), health left when winning ${winnerHp('cesar')} %`);
-  console.log(`  Draws: ${wins('draw')} · K.O.: ${rows.filter(r => r.reason === 'ko').length} · average ${avg(rows.map(r => r.seconds))} s`);
+  console.log(`\n${difficulty.toUpperCase()} · ${rows.length} rounds (${ROUNDS} per side per matchup)`);
+  for (const id of FIGHTERS) {
+    const played = rows.filter(r => r.left === id || r.right === id);
+    const won = played.filter(r => r.winner === id);
+    const pct = played.length ? Math.round(won.length / played.length * 100) : 0;
+    console.log(`  ${id.padEnd(7)} ${String(won.length).padStart(3)}/${played.length} wins (${String(pct).padStart(2)} %) · avg winner HP ${avg(won.map(r => r.hp[id]))} %`);
+  }
+  console.log(`  Draws: ${rows.filter(r => r.winner === 'draw').length} · K.O.: ${rows.filter(r => r.reason === 'ko').length} · avg ${avg(rows.map(r => r.seconds))} s`);
+  console.log('  Matchups (row wins % vs col):');
+  console.log('           ' + FIGHTERS.map(f => f.padStart(7)).join(''));
+  for (const a of FIGHTERS) {
+    const cells = FIGHTERS.map(b => {
+      if (a === b) return '    —  ';
+      const m = rows.filter(r => (r.left === a && r.right === b) || (r.left === b && r.right === a));
+      const w = m.filter(r => r.winner === a).length;
+      return `${Math.round(w / m.length * 100)}%`.padStart(7);
+    });
+    console.log(`  ${a.padEnd(8)} ${cells.join('')}`);
+  }
 }
 if (errors.length) { console.error('\nPage errors:', errors); process.exitCode = 1; }

@@ -5,12 +5,9 @@
 // Three roles:
 //   UI      Rajdhani for menus and interface text; Teko for fighter names over the health bars.
 //   NUMBER  Anton for the clock, health values and the combo counter.
-//   IMPACT  Edo SZ, a brush face, for the big announcements (ROUND, ¡PELEA!, K.O., victory) and titles.
+//   IMPACT  Black Ops One, an arcade display face, for big announcements (ROUND, ¡PELEA!, K.O., victory) and titles.
 //
-// Licences: Rajdhani, Teko, Anton and Black Ops One are SIL OFL (see the OFL-*.txt files). Edo SZ
-// (Vic Fieger) is freeware with no written redistribution terms: settle its licence before the game
-// is published. Black Ops One stays in the folder as the open replacement: add its face below and
-// put it first in FONT_IMPACT to switch.
+// Licences: Rajdhani, Teko, Anton and Black Ops One are all SIL OFL (see the OFL-*.txt files).
 //
 // Phaser draws text on a canvas, so a face must be loaded before the first text that uses it is
 // created; BootScene waits for `loadGameFonts()` before the game goes on.
@@ -18,7 +15,7 @@
 export const FONT_UI = "Rajdhani, 'Trebuchet MS', sans-serif";
 export const FONT_NAME = "Teko, Impact, 'Arial Narrow', sans-serif";
 export const FONT_NUMBER = "Anton, Impact, 'Arial Black', sans-serif";
-export const FONT_IMPACT = "'Edo SZ', Impact, 'Arial Black', sans-serif";
+export const FONT_IMPACT = "'Black Ops One', Impact, 'Arial Black', sans-serif";
 
 const FACES: { family: string; file: string; weight: string }[] = [
   // Rajdhani's Regular is thin on a busy background; Medium stands in as the normal weight.
@@ -26,7 +23,7 @@ const FACES: { family: string; file: string; weight: string }[] = [
   { family: 'Rajdhani', file: 'Rajdhani-Bold.ttf', weight: '700' },
   { family: 'Teko', file: 'Teko[wght].ttf', weight: '300 700' },
   { family: 'Anton', file: 'Anton-Regular.ttf', weight: '400' },
-  { family: 'Edo SZ', file: 'edosz.ttf', weight: '400' },
+  { family: 'Black Ops One', file: 'BlackOpsOne-Regular.ttf', weight: '400' },
 ];
 
 let loading: Promise<void> | null = null;

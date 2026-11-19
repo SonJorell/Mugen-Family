@@ -2,10 +2,11 @@ import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 
-const output = 'artifacts/cesar-drive';
+const output = process.env.OUTPUT_DIR ?? 'artifacts/cesar-drive';
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+page.setDefaultTimeout(90000);
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('response', r => { if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`); });
@@ -18,7 +19,7 @@ try {
   await page.waitForFunction(() => window.__game?.scene.isActive('MenuScene'));
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => window.__game.scene.isActive('SelectionScene'));
-  await page.keyboard.press('KeyE'); await page.mouse.click(640, 565);
+  await page.keyboard.press('KeyE'); await page.mouse.click(524, 528);
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => window.__game.scene.getScene('SelectionScene').phase === 'stage');
   await page.keyboard.press('Enter');
@@ -35,7 +36,9 @@ try {
       for (let i = 0; i < 120 && !s.superMove.active; i++) { p.update(1000 / 60); s.fighterController.checkCollisions(p, o); }
       s.sys.pause();
     }, right);
-    for (const [name, time] of [['grab', 300], ['throw', 1000], ['enter', 2050], ['accelerate', 3080], ['impact', 3350], ['monster', 4800], ['returned', 5800]]) {
+    for (const [name, time] of [['grab', 300], ['throw', 1000], ['boarding-step', 1750], ['enter', 2050],
+      ['boarding-close', 2320], ['accelerate', 3080], ['impact', 3350], ['return-step', 4320],
+      ['grounded', 4350], ['monster', 4800], ['toast', 5100], ['recovered', 5700], ['returned', 5800]]) {
       const state = await page.evaluate(time => {
         const g = window.__game, s = g.scene.getScene('FightScene');
         while (s.superMove.active && s.superMove.elapsed + 0.01 < time) s.update(0, Math.min(1000 / 60, time - s.superMove.elapsed));

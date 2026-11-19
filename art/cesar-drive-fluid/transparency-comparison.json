@@ -1,0 +1,268 @@
+{
+  "original": {
+    "size": [
+      1448,
+      1086
+    ],
+    "alpha0": 649,
+    "alpha1to8": 1032658,
+    "alpha9to64": 94443,
+    "alpha65to254": 443909,
+    "opaque": 869,
+    "frames": [
+      {
+        "frame": 0,
+        "bounds": [
+          97,
+          10,
+          280,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "bounds": [
+          103,
+          11,
+          288,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "bounds": [
+          93,
+          11,
+          289,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "bounds": [
+          81,
+          11,
+          280,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "bounds": [
+          92,
+          10,
+          281,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "bounds": [
+          102,
+          11,
+          282,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "bounds": [
+          108,
+          11,
+          283,
+          353
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "bounds": [
+          106,
+          11,
+          283,
+          354
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "bounds": [
+          104,
+          10,
+          283,
+          355
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "bounds": [
+          98,
+          10,
+          279,
+          355
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "bounds": [
+          93,
+          10,
+          282,
+          355
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "bounds": [
+          83,
+          11,
+          287,
+          355
+        ],
+        "edgePixels": 0
+      }
+    ]
+  },
+  "cleaned": {
+    "size": [
+      1448,
+      1086
+    ],
+    "alpha0": 1021089,
+    "alpha1to8": 94314,
+    "alpha9to64": 10300,
+    "alpha65to254": 444720,
+    "opaque": 2105,
+    "frames": [
+      {
+        "frame": 0,
+        "bounds": [
+          97,
+          8,
+          282,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "bounds": [
+          72,
+          9,
+          258,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "bounds": [
+          94,
+          10,
+          291,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "bounds": [
+          81,
+          8,
+          282,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "bounds": [
+          93,
+          11,
+          283,
+          352
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "bounds": [
+          70,
+          10,
+          253,
+          353
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "bounds": [
+          107,
+          10,
+          285,
+          353
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "bounds": [
+          105,
+          11,
+          284,
+          353
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "bounds": [
+          104,
+          10,
+          284,
+          355
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "bounds": [
+          64,
+          9,
+          247,
+          355
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "bounds": [
+          91,
+          10,
+          282,
+          355
+        ],
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "bounds": [
+          82,
+          9,
+          289,
+          355
+        ],
+        "edgePixels": 0
+      }
+    ]
+  }
+}

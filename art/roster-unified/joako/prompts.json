@@ -1,0 +1,75 @@
+[
+  {
+    "id": "joako",
+    "sheet": "movement",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/movement.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ],
+    "prompt": "Production sprite atlas style harmonization EDIT. Image1 EXACT target, Image2 STYLE reference only. Preserve Joako's identity, white tee/blue emblem, denim rippedshorts, pink/whitesneakers, socks and wristband. Match smooth detailed2Darcade illustration, cleanfineoutline, soft3tone shading, upper-leftlight of Image2. Make natural youngADULT181cm proportions, modest head, longlegs and SLENDER body, visibly narrower than Jorell and much narrowerthanCesar. NOT child/chibi, NO muscles. Preserve EXACT image1 canvas1536x1024, grid, posecount, sequence, actions, limb directions and cell anchors. Standing sourceheight238, floorlocaly248. 6columns4rows24poses,4separateanimations6poses each. Preserve gesture and footpositions, only refine anatomy/style.  TRUE RGBA alpha0 transparent background everywhereempty, NO whitegraymatte, checkerboard, shadow, text, grid or scene. White clothingopaque. Allbodypartswithinowncell6pxgutter."
+  },
+  {
+    "id": "joako",
+    "sheet": "air",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/air-clean.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ],
+    "prompt": "Production sprite atlas style harmonization EDIT. Image1 EXACT target, Image2 STYLE reference only. Preserve Joako's identity, white tee/blue emblem, denim rippedshorts, pink/whitesneakers, socks and wristband. Match smooth detailed2Darcade illustration, cleanfineoutline, soft3tone shading, upper-leftlight of Image2. Make natural youngADULT181cm proportions, modest head, longlegs and SLENDER body, visibly narrower than Jorell and much narrowerthanCesar. NOT child/chibi, NO muscles. Preserve EXACT image1 canvas1536x1024, grid, posecount, sequence, actions, limb directions and cell anchors. Standing sourceheight238, floorlocaly248. 6columns4rows24poses,4separateanimations6poses each. Preserve gesture and footpositions, only refine anatomy/style.  TRUE RGBA alpha0 transparent background everywhereempty, NO whitegraymatte, checkerboard, shadow, text, grid or scene. White clothingopaque. Allbodypartswithinowncell6pxgutter."
+  },
+  {
+    "id": "joako",
+    "sheet": "attacks",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/attacks.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ],
+    "prompt": "Production sprite atlas style harmonization EDIT. Image1 EXACT target, Image2 STYLE reference only. Preserve Joako's identity, white tee/blue emblem, denim rippedshorts, pink/whitesneakers, socks and wristband. Match smooth detailed2Darcade illustration, cleanfineoutline, soft3tone shading, upper-leftlight of Image2. Make natural youngADULT181cm proportions, modest head, longlegs and SLENDER body, visibly narrower than Jorell and much narrowerthanCesar. NOT child/chibi, NO muscles. Preserve EXACT image1 canvas1536x1024, grid, posecount, sequence, actions, limb directions and cell anchors. Standing sourceheight238, floorlocaly248. 6columns4rows24poses,4separateanimations6poses each. Preserve gesture and footpositions, only refine anatomy/style.  TRUE RGBA alpha0 transparent background everywhereempty, NO whitegraymatte, checkerboard, shadow, text, grid or scene. White clothingopaque. Allbodypartswithinowncell6pxgutter."
+  },
+  {
+    "id": "joako",
+    "sheet": "defense",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/defense.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ],
+    "prompt": "Production sprite atlas style harmonization EDIT. Image1 EXACT target, Image2 STYLE reference only. Preserve Joako's identity, white tee/blue emblem, denim rippedshorts, pink/whitesneakers, socks and wristband. Match smooth detailed2Darcade illustration, cleanfineoutline, soft3tone shading, upper-leftlight of Image2. Make natural youngADULT181cm proportions, modest head, longlegs and SLENDER body, visibly narrower than Jorell and much narrowerthanCesar. NOT child/chibi, NO muscles. Preserve EXACT image1 canvas1536x1024, grid, posecount, sequence, actions, limb directions and cell anchors. Standing sourceheight238, floorlocaly248. 6columns4rows24poses,4separateanimations6poses each. Preserve gesture and footpositions, only refine anatomy/style.  TRUE RGBA alpha0 transparent background everywhereempty, NO whitegraymatte, checkerboard, shadow, text, grid or scene. White clothingopaque. Allbodypartswithinowncell6pxgutter."
+  },
+  {
+    "id": "joako",
+    "sheet": "recovery",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/recovery.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ],
+    "prompt": "Production sprite atlas style harmonization EDIT. Image1 EXACT target, Image2 STYLE reference only. Preserve Joako's identity, white tee/blue emblem, denim rippedshorts, pink/whitesneakers, socks and wristband. Match smooth detailed2Darcade illustration, cleanfineoutline, soft3tone shading, upper-leftlight of Image2. Make natural youngADULT181cm proportions, modest head, longlegs and SLENDER body, visibly narrower than Jorell and much narrowerthanCesar. NOT child/chibi, NO muscles. Preserve EXACT image1 canvas1536x1024, grid, posecount, sequence, actions, limb directions and cell anchors. Standing sourceheight238, floorlocaly248. 6columns4rows24poses,4separateanimations6poses each. Preserve gesture and footpositions, only refine anatomy/style.  TRUE RGBA alpha0 transparent background everywhereempty, NO whitegraymatte, checkerboard, shadow, text, grid or scene. White clothingopaque. Allbodypartswithinowncell6pxgutter."
+  },
+  {
+    "id": "joako",
+    "sheet": "super",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/super.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/rifle-reference.png"
+    ],
+    "prompt": "Production sprite atlas style harmonization EDIT. Image1 EXACT target, Image2 STYLE reference only. Preserve Joako's identity, white tee/blue emblem, denim rippedshorts, pink/whitesneakers, socks and wristband. Match smooth detailed2Darcade illustration, cleanfineoutline, soft3tone shading, upper-leftlight of Image2. Make natural youngADULT181cm proportions, modest head, longlegs and SLENDER body, visibly narrower than Jorell and much narrowerthanCesar. NOT child/chibi, NO muscles. Preserve EXACT image1 canvas1536x1024, grid, posecount, sequence, actions, limb directions and cell anchors. Standing sourceheight238, floorlocaly248. 6columns4rows24poses,4separateanimations6poses each. Preserve gesture and footpositions, only refine anatomy/style. ROW3 ONLY: replace ALL blue guns with the TAN SCAR rifle in Image3. Draw rifle INTEGRATED with body: butt in shoulder, right handonpistolgrip, left handunderforeend, fingerswrappingweapon. Aim RIGHT levelchestheight, muzzle nearcellx235,y70 inpose3, noflash. Otherrows unchanged footballthrow,blueprint/hammerbuild,landing. TRUE RGBA alpha0 transparent background everywhereempty, NO whitegraymatte, checkerboard, shadow, text, grid or scene. White clothingopaque. Allbodypartswithinowncell6pxgutter."
+  },
+  {
+    "id": "joako",
+    "sheet": "doublejump",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/doublejump.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ],
+    "prompt": "Production sprite atlas style harmonization EDIT. Image1 EXACT target, Image2 STYLE reference only. Preserve Joako's identity, white tee/blue emblem, denim rippedshorts, pink/whitesneakers, socks and wristband. Match smooth detailed2Darcade illustration, cleanfineoutline, soft3tone shading, upper-leftlight of Image2. Make natural youngADULT181cm proportions, modest head, longlegs and SLENDER body, visibly narrower than Jorell and much narrowerthanCesar. NOT child/chibi, NO muscles. Preserve EXACT image1 canvas1536x1024, grid, posecount, sequence, actions, limb directions and cell anchors. Standing sourceheight318, floorlocaly330. 4columns3rows12poses,retainforwardflip progression. Preserve gesture and footpositions, only refine anatomy/style.  TRUE RGBA alpha0 transparent background everywhereempty, NO whitegraymatte, checkerboard, shadow, text, grid or scene. White clothingopaque. Allbodypartswithinowncell6pxgutter."
+  },
+  {
+    "id": "joako",
+    "sheet": "victory-dance",
+    "refs": [
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/joako/victory-dance.png",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/jorell-v2/movement.png"
+    ],
+    "prompt": "Production sprite atlas style harmonization EDIT. Image1 EXACT target, Image2 STYLE reference only. Preserve Joako's identity, white tee/blue emblem, denim rippedshorts, pink/whitesneakers, socks and wristband. Match smooth detailed2Darcade illustration, cleanfineoutline, soft3tone shading, upper-leftlight of Image2. Make natural youngADULT181cm proportions, modest head, longlegs and SLENDER body, visibly narrower than Jorell and much narrowerthanCesar. NOT child/chibi, NO muscles. Preserve EXACT image1 canvas1536x1024, grid, posecount, sequence, actions, limb directions and cell anchors. Standing sourceheight202, floorlocaly250. 6columns4rows24poses are ONE seamless Take-the-L victory dance,keepLhandonforehead and alternatingsidekicks. Preserve gesture and footpositions, only refine anatomy/style.  TRUE RGBA alpha0 transparent background everywhereempty, NO whitegraymatte, checkerboard, shadow, text, grid or scene. White clothingopaque. Allbodypartswithinowncell6pxgutter."
+  }
+]

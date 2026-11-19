@@ -94,14 +94,12 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     isolateSceneKeyboard(this);
-    const video = document.getElementById('menu-video-bg') as HTMLVideoElement | null;
-    if (video) { video.pause(); video.style.display = 'none'; }
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.drawBackground();
     const credit = this.add.text(68, 35, 'Creado por Jorell', { fontFamily: FONT_UI, fontSize: '17px', color: '#d3dce2' }).setDepth(10);
     this.title = new Title3D(this, 62, 69, ['FIGHTER', 'FAMILY'], 10);
     const tagline = this.add.text(67, 278, 'Arica es tu escenario.', {
-      fontFamily: FONT_UI, fontSize: '22px', color: '#f5bd75',
+      fontFamily: FONT_UI, fontSize: '22px', color: '#ffb02e',
     }).setDepth(10);
     const heroTexts = this.createHero();
     this.buildMenu();
@@ -150,23 +148,23 @@ export class MenuScene extends Phaser.Scene {
       const texture = this.textures.createCanvas('menu_arica_shade', 1280, 720)!;
       const ctx = texture.context;
       const shade = ctx.createLinearGradient(0, 0, 1120, 0);
-      shade.addColorStop(0, 'rgba(6,17,27,0.94)');
-      shade.addColorStop(0.46, 'rgba(6,17,27,0.8)');
-      shade.addColorStop(0.72, 'rgba(6,17,27,0.14)');
-      shade.addColorStop(1, 'rgba(6,17,27,0)');
+      shade.addColorStop(0, 'rgba(16,78,180,0.7)');
+      shade.addColorStop(0.46, 'rgba(16,78,180,0.55)');
+      shade.addColorStop(0.72, 'rgba(16,78,180,0.1)');
+      shade.addColorStop(1, 'rgba(16,78,180,0)');
       ctx.fillStyle = shade; ctx.fillRect(0, 0, 1280, 720);
       const vignette = ctx.createLinearGradient(0, 540, 0, 720);
-      vignette.addColorStop(0, 'rgba(6,17,27,0)'); vignette.addColorStop(1, 'rgba(6,17,27,0.9)');
+      vignette.addColorStop(0, 'rgba(16,78,180,0)'); vignette.addColorStop(1, 'rgba(16,78,180,0.75)');
       ctx.fillStyle = vignette; ctx.fillRect(0, 540, 1280, 180);
       texture.refresh();
     }
     this.add.image(640, 360, 'menu_arica_shade').setDepth(2);
-    this.add.rectangle(640, 695, 1280, 50, 0x08121b, 0.85).setDepth(8);
-    this.add.rectangle(640, 670, 1152, 1, 0x9fe8e1, 0.25).setDepth(8);
+    this.add.rectangle(640, 695, 1280, 50, 0x1257c4, 0.85).setDepth(8);
+    this.add.rectangle(640, 670, 1152, 1, 0x7fd4ff, 0.25).setDepth(8);
   }
 
   private createHero(): Phaser.GameObjects.Text[] {
-    this.shadow = this.add.ellipse(HERO_X, HERO_FOOT - 9, 310, 28, 0x040b12, 0.55).setDepth(3);
+    this.shadow = this.add.ellipse(HERO_X, HERO_FOOT - 9, 310, 28, 0x0e4fb4, 0.55).setDepth(3);
     const art = menuArtKey(this.featured.id);
     if (this.renderer.type === Phaser.WEBGL) {
       const plane = this.add.plane(HERO_X, HERO_FOOT - HERO_H / 2, art);
@@ -178,14 +176,14 @@ export class MenuScene extends Phaser.Scene {
     this.hero.setName('menu-fighter').setDepth(4);
     this.heroTexts = [
       this.add.text(650, 123, '', {
-        fontFamily: FONT_IMPACT, fontSize: '66px', color: '#fff3d8', stroke: '#143a51', strokeThickness: 2,
+        fontFamily: FONT_IMPACT, fontSize: '66px', color: '#fff7ec', stroke: '#0e3a80', strokeThickness: 2,
       }).setDepth(12),
       this.add.text(654, 207, '', {
-        fontFamily: FONT_UI, fontSize: '23px', color: '#fff3d8', lineSpacing: 3,
-        shadow: { offsetX: 1, offsetY: 2, color: '#08121b', blur: 6, fill: true },
+        fontFamily: FONT_UI, fontSize: '23px', color: '#fff7ec', lineSpacing: 3,
+        shadow: { offsetX: 1, offsetY: 2, color: '#0e3a80', blur: 6, fill: true },
       }).setDepth(12),
-      this.add.text(654, 583, '', { fontFamily: FONT_UI, fontSize: '23px', fontStyle: 'bold', color: '#9fe8e1' }).setDepth(13),
-      this.add.text(654, 617, '', { fontFamily: FONT_UI, fontSize: '17px', color: '#fff3d8', wordWrap: { width: 230 } }).setDepth(13),
+      this.add.text(654, 583, '', { fontFamily: FONT_UI, fontSize: '23px', fontStyle: 'bold', color: '#7fd4ff' }).setDepth(13),
+      this.add.text(654, 617, '', { fontFamily: FONT_UI, fontSize: '17px', color: '#fff7ec', wordWrap: { width: 230 } }).setDepth(13),
     ];
     this.describeFeatured();
     return this.heroTexts;
@@ -307,19 +305,19 @@ export class MenuScene extends Phaser.Scene {
     this.rows = []; this.menuItems = []; this.rowBackgrounds = [];
     const positions = [380, 462, 516, 570, 624];
     this.cursor?.destroy();
-    this.cursor = this.add.rectangle(52, positions[0], 6, 64, 0x9fe8e1, 1).setDepth(16)
+    this.cursor = this.add.rectangle(52, positions[0], 6, 64, 0x7fd4ff, 1).setDepth(16)
       .setBlendMode(Phaser.BlendModes.ADD).setName('menu-cursor');
     this.options.forEach((option, i) => {
       const row = this.add.container(64, positions[i]).setDepth(15).setData('baseY', positions[i]);
       if (i === 0) row.add(this.add.rectangle(5, 6, 516, 64, 0x754a30).setOrigin(0, 0.5));
-      const bg = this.add.rectangle(0, 0, 516, i === 0 ? 64 : 48, 0x143a51, 0.2).setOrigin(0, 0.5)
+      const bg = this.add.rectangle(0, 0, 516, i === 0 ? 64 : 48, 0x1f6fd6, 0.2).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
       const text = this.add.text(20, 0, option.label, {
         fontFamily: i === 0 ? FONT_IMPACT : FONT_UI,
-        fontSize: i === 0 ? '36px' : '23px', color: '#fae8cb',
+        fontSize: i === 0 ? '36px' : '23px', color: '#fff7ec',
       }).setOrigin(0, 0.5);
       row.add([bg, text]);
-      if (i === 0) row.add(this.add.text(484, 0, '▶', { fontSize: '25px', color: '#241a35' }).setOrigin(1, 0.5));
+      if (i === 0) row.add(this.add.text(484, 0, '▶', { fontSize: '25px', color: '#0e3a80' }).setOrigin(1, 0.5));
       bg.on('pointerover', () => { this.selectedIndex = i; this.updateSelection(); });
       bg.on('pointerdown', () => { this.selectedIndex = i; this.options[i].action(); });
       this.rows.push(row); this.menuItems.push(text); this.rowBackgrounds.push(bg);
@@ -335,9 +333,9 @@ export class MenuScene extends Phaser.Scene {
   private updateSelection(): void {
     this.rowBackgrounds.forEach((bg, i) => {
       const selected = i === this.selectedIndex;
-      bg.setFillStyle(i === 0 ? 0xf5bd75 : 0x143a51, i === 0 ? 1 : selected ? 0.94 : 0.38);
-      if (selected) bg.setStrokeStyle(2, 0x9fe8e1); else bg.setStrokeStyle();
-      this.menuItems[i].setColor(i === 0 ? '#132938' : selected ? '#9fe8e1' : '#fff3d8');
+      bg.setFillStyle(i === 0 ? 0xffb02e : 0x1f6fd6, i === 0 ? 1 : selected ? 0.94 : 0.38);
+      if (selected) bg.setStrokeStyle(2, 0x7fd4ff); else bg.setStrokeStyle();
+      this.menuItems[i].setColor(i === 0 ? '#0e3a80' : selected ? '#7fd4ff' : '#fff7ec');
       const row = this.rows[i];
       // A light sweep runs across the chosen row (WebGL only; Canvas simply skips it).
       row.postFX?.clear();

@@ -1,10 +1,14 @@
 /** Original transparent cutouts generated for César's i30 cinematic. */
 export const DRIVE_ASSETS = {
-  'cesar-drive-car': '/assets/effects/cesar-drive/i30-drive.png',
-  'cesar-drive-entry': '/assets/effects/cesar-drive/i30-enter.png',
-  'cesar-drive-grab': '/assets/effects/cesar-drive/cesar-grab.png',
-  'cesar-drive-throw': '/assets/effects/cesar-drive/cesar-throw.png',
-  'cesar-drive-celebrate': '/assets/effects/cesar-drive/cesar-monster.png',
+  'cesar-drive-car': '/assets/effects/cesar-drive/i30-drive.webp',
+  'cesar-drive-entry': '/assets/effects/super-unified/cesar-boarding-scaled.webp',
+  'cesar-drive-grab': '/assets/effects/super-unified/cesar-grab.webp',
+  'cesar-drive-celebrate': '/assets/effects/super-unified/cesar-return.webp',
+  'tilin-drive-flight': '/assets/effects/super-unified/tilin-flight.webp',
+  'tilin-drive-recover': '/assets/effects/super-unified/tilin-recover.webp',
+  'tilin-drive-impact': '/assets/effects/super-unified/tilin-impact.webp',
+  'tilin-drive-airborne': '/assets/effects/super-unified/tilin-airborne.webp',
+  'tilin-drive-landing': '/assets/effects/super-unified/tilin-landing.webp',
 } as const;
 
 export const DRIVE_DURATION = 5800;

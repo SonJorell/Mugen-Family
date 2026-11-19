@@ -1,0 +1,18 @@
+# Joako
+
+Personaje creado a partir de `reference.jpg`, aportado por el usuario. Arte generado con la herramienta integrada ImageGen; los prompts completos están en `prompts.md`.
+
+- Ocho atlas originales transparentes: 174 dibujos activos para 25 animaciones (la fila de victoria antigua se conserva como fuente histórica).
+- `victory-dance.png`: 24 poses nuevas del baile Take the L, basado en `take-the-l-reference.gif` proporcionado por el usuario. La victoria repite el ciclo a 18 fps, con mano en L, patadas alternadas y saltos. Conserva la escala del cuerpo y el anclaje de los pies; el lienzo de esta animación tiene espacio adicional para la mano levantada.
+- `portrait.png`: ilustración 3D para la portada y el súper.
+- `node scripts/pack-joako.mjs`: empaqueta las filas como WebP y genera el manifiesto en `public/assets/characters/joako/`, conservando el canal alfa.
+- `air-clean.png`: corrección con ImageGen de la transparencia del atlas aéreo. Conserva las poses y la ropa blanca; sustituye el fondo gris semitransparente del original `air.png`, que se mantiene como referencia. El empaquetador usa siempre el atlas limpio para agacharse, salto y ataques aéreos. `scripts/inspect-joako-jumps.mjs` comprueba los 18 fotogramas de salto/doble salto, la opacidad de la ropa y las capturas en ambos sentidos.
+- `node scripts/generate-build-sound.mjs`: sonido original de pelota, construcción, pasos y ráfaga.
+- `rifle-reference.png`: arma proporcionada por el usuario, empaquetada como WebP sin modificar en `public/assets/characters/joako/rifle.webp`. `JoakoRiflePose` separa el cuerpo, el arma y las manos mediante máscaras de geometría: excluye el prop azul, ajusta el rifle al hombro y dibuja las manos delante del receptor. El conjunto comparte un retroceso continuo, se invierte al disparar hacia la izquierda y calcula el destello desde la transformación del cañón. Este recurso no fue generado por IA ni cambia el daño del súper.
+- `JoakoConstruction` dibuja el plano azul, tablones que encajan por separado, caras con profundidad, tornillos, travesaños y una escalera abierta con plataforma para ambos pies. `JOAKO_FORT` comparte la huella, altura y profundidad entre pared, peldaños, zancas dentadas, plataforma y subida del personaje: Joako llega al descansillo antes de caminar al punto de disparo. Los postes tienen apoyos y placas de unión. La construcción y el retroceso siguen el reloj del combate; la preferencia de movimiento reducido elimina los desplazamientos de montaje y el balanceo.
+
+Joako tiene 90 de vida, velocidad de marcha ×1.30, salto ×1.12, velocidad de ataque ×1.25 y daño normal ×0.88 respecto de Tilin. Conserva los controles del juego y el especial de comando Paso veloz.
+
+**Cancha y construcción (O, energía al 100 %):** una pelota a la altura de la cabeza confirma el súper. Puede bloquearse de frente, esquivarse saltando o agachándose, o evitarse fuera de alcance. La preparación se puede interrumpir. Sólo un impacto confirmado inicia los 5.2 segundos de cinemática: 10 de daño del pelotazo, construcción de muralla y escalera, ascenso y cinco disparos (50 de daño). La barra se consume al intentar el poder, incluso si falla. La secuencia no recarga energía; se pausa con el combate y limpia sus objetos y sonido al cancelar o reiniciar.
+
+Verificación: `tests/joako.spec.ts`, regresión general con `npm test`, y capturas reproducibles mediante `node scripts/inspect-joako.mjs` (GAME_URL, OUTPUT_DIR y REDUCED_MOTION opcionales). Las capturas incluyen plano, montaje, agarre, retroceso y retorno desde ambos lados. `node scripts/record-joako.mjs` graba el súper activado con el teclado.

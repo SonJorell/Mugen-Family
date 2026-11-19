@@ -8,6 +8,7 @@ import { Timer } from './Timer';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { Fighter } from '../characters/Fighter';
 import { FONT_UI } from './fonts';
+import { ensureFaceTexture } from './selection/fighterFaces';
 
 export class HUD {
   private scene: Phaser.Scene;
@@ -25,16 +26,49 @@ export class HUD {
   /** Round-win markers: [player pips, opponent pips], filled as rounds are won. */
   private roundPips: Phaser.GameObjects.Arc[][] = [[], []];
 
-  private readonly BAR_MARGIN = 28;
-  private readonly BAR_WIDTH = (GAME_CONFIG.WIDTH / 2) - 80;
+  private readonly BAR_MARGIN = 92;
+  private readonly BAR_WIDTH = (GAME_CONFIG.WIDTH / 2) - 148;
   private readonly BAR_Y = 48;
 
-  constructor(scene: Phaser.Scene, playerName: string, opponentName: string, playerMaxHealth = GAME_CONFIG.MAX_HEALTH, opponentMaxHealth = GAME_CONFIG.MAX_HEALTH) {
+  constructor(
+    scene: Phaser.Scene,
+    playerName: string,
+    opponentName: string,
+    playerMaxHealth = GAME_CONFIG.MAX_HEALTH,
+    opponentMaxHealth = GAME_CONFIG.MAX_HEALTH,
+    portraits?: [string, string],
+    tints: [number, number] = [0xffffff, 0xffffff],
+  ) {
     this.scene = scene;
-    this.decor.push(
-      scene.add.rectangle(GAME_CONFIG.WIDTH / 2, 43, GAME_CONFIG.WIDTH, 86, 0x0b0d16, 0.9).setDepth(49).setScrollFactor(0),
-      scene.add.rectangle(GAME_CONFIG.WIDTH / 2, 86, GAME_CONFIG.WIDTH, 2, 0xf5bd75, 0.55).setDepth(49).setScrollFactor(0),
-    );
+    const header = scene.add.graphics().setDepth(49).setScrollFactor(0);
+    header.fillStyle(0x081c42, 0.88).fillRect(0, 0, GAME_CONFIG.WIDTH, 86);
+    header.fillStyle(0x133f91, 0.35).fillRect(0, 0, GAME_CONFIG.WIDTH, 26);
+    header.lineStyle(2, 0xffb02e, 0.7).lineBetween(0, 86, GAME_CONFIG.WIDTH, 86);
+    this.decor.push(header);
+
+    // Framed fighter face medallions flanking both health bars.
+    if (portraits) {
+      portraits.forEach((id, side) => {
+        const px = side === 0 ? 46 : GAME_CONFIG.WIDTH - 46, py = 44;
+        const accent = side === 0 ? 0xff6a1f : 0x7fd4ff;
+        const frame = scene.add.rectangle(px, py, 64, 64, 0x0b2559, 0.95)
+          .setStrokeStyle(3, accent, 0.95).setDepth(52).setScrollFactor(0);
+        this.decor.push(frame);
+        const key = ensureFaceTexture(scene, id);
+        if (key) {
+          const face = scene.add.image(px, py, key).setDisplaySize(58, 58)
+            .setFlipX(side === 1).setTint(tints[side]).setDepth(53).setScrollFactor(0)
+            .setName(`hud-portrait-${side}`);
+          this.decor.push(face);
+        }
+        const corner = scene.add.graphics().setDepth(54).setScrollFactor(0);
+        corner.lineStyle(2, 0xffb02e, 0.9);
+        const cx = side === 0 ? px - 32 : px + 32, dir = side === 0 ? 1 : -1;
+        corner.lineBetween(cx, py - 32, cx + dir * 12, py - 32);
+        corner.lineBetween(cx, py - 32, cx, py - 20);
+        this.decor.push(corner);
+      });
+    }
 
     this.playerBar = new HealthBar(
       scene,
@@ -43,7 +77,7 @@ export class HUD {
       playerMaxHealth,
       playerName,
       false,
-      0xef709d,
+      0xff6a1f,
     );
 
     this.opponentBar = new HealthBar(
@@ -53,7 +87,7 @@ export class HUD {
       opponentMaxHealth,
       opponentName,
       true,
-      0x9fe8e1,
+      0x7fd4ff,
     );
 
     this.timer = new Timer(scene);
@@ -63,23 +97,28 @@ export class HUD {
         const x = side === 0
           ? this.BAR_MARGIN + this.BAR_WIDTH - 8 - r * 22
           : GAME_CONFIG.WIDTH - this.BAR_MARGIN - this.BAR_WIDTH + 8 + r * 22;
-        this.roundPips[side].push(scene.add.circle(x, this.BAR_Y - 14, 7, 0x1b2b3b)
-          .setStrokeStyle(2, 0xf5bd75, 0.9).setDepth(56).setScrollFactor(0));
+        this.roundPips[side].push(scene.add.circle(x, this.BAR_Y - 14, 7, 0x1f6fd6)
+          .setStrokeStyle(2, 0xffb02e, 0.9).setDepth(56).setScrollFactor(0));
       }
     }
-    for (const x of [28, 700]) {
+    // Left energy bar fills left→right from x=92; right bar sits clear of «Pausa · Esc» and fills right→left.
+    const energyAnchors = [
+      { left: 92, anchor: 92, origin: 0 },
+      { left: 846, anchor: 1106, origin: 1 },
+    ];
+    for (const { left, anchor, origin } of energyAnchors) {
       this.decor.push(
-        scene.add.rectangle(x - 3, 88, 266, 16, 0x07090f).setOrigin(0, 0).setStrokeStyle(1, 0x9fe8e1, 0.6).setDepth(55).setScrollFactor(0),
-        scene.add.rectangle(x, 91, 260, 10, 0x1b2b3b).setOrigin(0, 0).setDepth(55).setScrollFactor(0),
+        scene.add.rectangle(left - 3, 88, 266, 16, 0x081c42, 0.94).setOrigin(0, 0).setStrokeStyle(1, 0x7fd4ff, 0.7).setDepth(55).setScrollFactor(0),
+        scene.add.rectangle(left, 91, 260, 10, 0x16418a).setOrigin(0, 0).setDepth(55).setScrollFactor(0),
       );
-      this.chantBars.push(scene.add.rectangle(x, 91, 260, 10, 0x9fe8e1).setOrigin(0, 0).setDepth(56).setScrollFactor(0));
-      this.chantGlows.push(scene.add.rectangle(x, 91, 260, 10, 0xffffff, 0).setOrigin(0, 0).setDepth(57).setScrollFactor(0)
+      this.chantBars.push(scene.add.rectangle(anchor, 91, 260, 10, 0x7fd4ff).setOrigin(origin, 0).setDepth(56).setScrollFactor(0));
+      this.chantGlows.push(scene.add.rectangle(anchor, 91, 260, 10, 0xffffff, 0).setOrigin(origin, 0).setDepth(57).setScrollFactor(0)
         .setBlendMode(Phaser.BlendModes.ADD));
-      const quarters = scene.add.graphics().setDepth(57).setScrollFactor(0).lineStyle(2, 0x07090f, 0.6);
-      for (let q = 1; q < 4; q++) quarters.lineBetween(x + 65 * q, 91, x + 65 * q, 101);
+      const quarters = scene.add.graphics().setDepth(57).setScrollFactor(0).lineStyle(2, 0x081c42, 0.75);
+      for (let q = 1; q < 4; q++) quarters.lineBetween(left + 65 * q, 91, left + 65 * q, 101);
       this.decor.push(quarters);
-      this.chantLabels.push(scene.add.text(x, 108, '', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#fae8cb',
-        backgroundColor: '#0b0d16', padding: { x: 6, y: 3 } }).setDepth(56).setScrollFactor(0));
+      this.chantLabels.push(scene.add.text(anchor, 108, '', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#fff7ec',
+        backgroundColor: '#081c42', padding: { x: 6, y: 3 } }).setOrigin(origin, 0).setDepth(56).setScrollFactor(0));
     }
 
     {
@@ -116,12 +155,12 @@ export class HUD {
         this.scene.tweens.add({ targets: label, scale: 1, duration: 380, ease: 'Back.easeOut' });
       }
       this.wasReady[i] = fighter.superReady;
-      this.chantBars[i].setDisplaySize(260 * fighter.energy / 100, 10).setFillStyle(fighter.superReady ? 0xf5bd75 : 0x9fe8e1);
+      this.chantBars[i].setDisplaySize(260 * fighter.energy / 100, 10).setFillStyle(fighter.superReady ? 0xffb02e : 0x7fd4ff);
       this.chantLabels[i].setText(fighter.inSuper ? 'Súper en curso'
         : fighter.combatState.state === 'STUNNED' ? 'Aturdido'
         : fighter.superReady ? (i === 0 ? 'O · ' : '') + 'SÚPER LISTO'
         : 'Energía ' + Math.floor(fighter.energy) + '% · Carga al combatir');
-      this.chantLabels[i].setColor(fighter.superReady ? '#f5bd75' : '#fae8cb');
+      this.chantLabels[i].setColor(fighter.superReady ? '#ffb02e' : '#fff7ec');
     });
     const showDebug = GAME_CONFIG.DEBUG_MODE && GAME_CONFIG.SHOW_DEBUG_TEXT;
     this.debugPanel?.setVisible(showDebug);
@@ -146,7 +185,7 @@ export class HUD {
   /** Fills one pip per round won by each side. */
   setRoundWins(player: number, opponent: number): void {
     [player, opponent].forEach((wins, side) => this.roundPips[side].forEach((pip, r) =>
-      pip.setFillStyle(r < wins ? 0xffc93c : 0x1b2b3b)));
+      pip.setFillStyle(r < wins ? 0xffc93c : 0x1f6fd6)));
   }
 
   destroy(): void {

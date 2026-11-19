@@ -1,0 +1,219 @@
+{
+  "characterId": "tata",
+  "name": "Tata",
+  "assetPath": "/assets/characters/tata-unified/",
+  "spriteSheet": {
+    "columns": 6,
+    "rows": 1,
+    "frameCount": 6,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "animations": {
+      "IDLE": {
+        "frameRate": 8,
+        "repeat": -1
+      },
+      "WALK_FORWARD": {
+        "frameRate": 12,
+        "repeat": -1
+      },
+      "WALK_BACKWARD": {
+        "frameRate": 11,
+        "repeat": -1
+      },
+      "DASH": {
+        "frameRate": 20,
+        "repeat": 0
+      },
+      "CROUCH": {
+        "frameRate": 30,
+        "repeat": 0
+      },
+      "JUMP": {
+        "frameRate": 10,
+        "repeat": 0
+      },
+      "AIR_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "AIR_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "LIGHT_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "HEAVY_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "LIGHT_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "HEAVY_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "BLOCK": {
+        "frameRate": 30,
+        "repeat": 0
+      },
+      "HIT_REACTION": {
+        "frameRate": 22,
+        "repeat": 0
+      },
+      "STUN": {
+        "frameRate": 10,
+        "repeat": -1
+      },
+      "GET_UP": {
+        "frameRate": 12,
+        "repeat": 0
+      },
+      "KNOCKDOWN": {
+        "frameRate": 14,
+        "repeat": 0
+      },
+      "DEFEAT": {
+        "frameRate": 12,
+        "repeat": 0
+      },
+      "VICTORY": {
+        "frameRate": 10,
+        "repeat": -1
+      },
+      "TAUNT": {
+        "frameRate": 10,
+        "repeat": 0
+      },
+      "SPECIAL_ATTACK": {
+        "frameRate": 15,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4
+      },
+      "DOUBLE_JUMP": {
+        "frameRate": 16,
+        "repeat": 0
+      },
+      "LANDING": {
+        "frameRate": 24,
+        "repeat": 0
+      },
+      "DRINK": {
+        "frameRate": 10,
+        "repeat": 0
+      },
+      "CELEBRATE": {
+        "frameRate": 10,
+        "repeat": 0
+      },
+      "CYCLE": {
+        "frameRate": 18,
+        "repeat": -1
+      },
+      "MOUNT_BIKE": {
+        "frameRate": 10,
+        "repeat": 0
+      }
+    }
+  },
+  "animations": {
+    "IDLE": [
+      "/assets/characters/tata-unified/IDLE.webp"
+    ],
+    "WALK_FORWARD": [
+      "/assets/characters/tata-unified/WALK_FORWARD.webp"
+    ],
+    "WALK_BACKWARD": [
+      "/assets/characters/tata-unified/WALK_BACKWARD.webp"
+    ],
+    "DASH": [
+      "/assets/characters/tata-unified/DASH.webp"
+    ],
+    "CROUCH": [
+      "/assets/characters/tata-unified/CROUCH.webp"
+    ],
+    "JUMP": [
+      "/assets/characters/tata-unified/JUMP.webp"
+    ],
+    "AIR_PUNCH": [
+      "/assets/characters/tata-unified/AIR_PUNCH.webp"
+    ],
+    "AIR_KICK": [
+      "/assets/characters/tata-unified/AIR_KICK.webp"
+    ],
+    "LIGHT_PUNCH": [
+      "/assets/characters/tata-unified/LIGHT_PUNCH.webp"
+    ],
+    "HEAVY_PUNCH": [
+      "/assets/characters/tata-unified/HEAVY_PUNCH.webp"
+    ],
+    "LIGHT_KICK": [
+      "/assets/characters/tata-unified/LIGHT_KICK.webp"
+    ],
+    "HEAVY_KICK": [
+      "/assets/characters/tata-unified/HEAVY_KICK.webp"
+    ],
+    "BLOCK": [
+      "/assets/characters/tata-unified/BLOCK.webp"
+    ],
+    "HIT_REACTION": [
+      "/assets/characters/tata-unified/HIT_REACTION.webp"
+    ],
+    "STUN": [
+      "/assets/characters/tata-unified/STUN.webp"
+    ],
+    "GET_UP": [
+      "/assets/characters/tata-unified/GET_UP.webp"
+    ],
+    "KNOCKDOWN": [
+      "/assets/characters/tata-unified/KNOCKDOWN.webp"
+    ],
+    "DEFEAT": [
+      "/assets/characters/tata-unified/DEFEAT.webp"
+    ],
+    "VICTORY": [
+      "/assets/characters/tata-unified/VICTORY.webp"
+    ],
+    "TAUNT": [
+      "/assets/characters/tata-unified/TAUNT.webp"
+    ],
+    "SPECIAL_ATTACK": [
+      "/assets/characters/tata-unified/SPECIAL_ATTACK.webp"
+    ],
+    "DRINK": [
+      "/assets/characters/tata-unified/DRINK.webp"
+    ],
+    "CELEBRATE": [
+      "/assets/characters/tata-unified/CELEBRATE.webp"
+    ],
+    "LANDING": [
+      "/assets/characters/tata-unified/LANDING.webp"
+    ],
+    "DOUBLE_JUMP": [
+      "/assets/characters/tata-unified/DOUBLE_JUMP.webp"
+    ],
+    "CYCLE": [
+      "/assets/characters/tata-unified/CYCLE.webp"
+    ],
+    "MOUNT_BIKE": [
+      "/assets/characters/tata-unified/MOUNT_BIKE.webp"
+    ]
+  }
+}

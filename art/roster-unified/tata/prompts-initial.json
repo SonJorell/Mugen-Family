@@ -1,0 +1,26 @@
+[
+  {
+    "sheet": "movement",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/jorell/movement.png"
+    ],
+    "prompt": "TATA is the older man from Image 1: balding with gray hair at sides, warm tan skin, recognizable elderly face with forehead and smile wrinkles, thick eyebrows, no beard, no glasses. Dark forest-green cable-knit pullover sweater with ribbed collar, cuffs and hem, full-length blue jeans on BOTH legs, dark navy walking sneakers. Medium stocky ordinary older body, softly rounded stomach, natural limbs, no bodybuilder muscles. Retain his face and clothes in all poses. Polished painted 2D arcade fighting-game art, clean dark contours, warm volumetric cel shading, same rendering style and anatomical proportions as the existing fighters in Image 2, NOT pixel art. Facing RIGHT in 3/4 profile unless specified. No text, no watermark, no floor shadows, no scenery, no green screen, no checkerboard. Genuine transparent RGBA PNG, alpha exactly zero outside figures. Create Tata's MOVEMENT SPRITE SHEET, exact 1536x1024. STRICT 6 equal columns x 4 equal rows, 24 distinct poses, each 256x256 cell. Figure root x128 of EACH cell, feet baseline y248, standing height238 pixels, clear 12px margins and gaps. Never let one figure cross a cell border. Row1 IDLE six gentle breathing/guard weight shifts, loop. Row2 WALK_FORWARD six natural forward walking cycle poses with alternating heel/toe contact. Row3 WALK_BACKWARD six careful backward steps in fighting guard. Row4 DASH six anticipatory crouch, push-off, long step, gliding low stride, deceleration, recovery poses. Both hands guard chest, elderly but capable and determined. Keep head/body size perfectly consistent through all 24 poses. No beer or bike in this sheet."
+  },
+  {
+    "sheet": "portrait",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/jorell/portrait.png"
+    ],
+    "prompt": "Use Image1 as Tata identity and clothing reference; Image2 ONLY for polished 3D character-select portrait rendering style, not identity or clothes. Create full-body isolated 3D arcade fighter portrait TATA, exact 1024x1536, feet fully visible with margins, gently smiling determined fighting stance, three-quarter view facing right. TATA is the older man from Image 1: balding with gray hair at sides, warm tan skin, recognizable elderly face with forehead and smile wrinkles, thick eyebrows, no beard, no glasses. Dark forest-green cable-knit pullover sweater with ribbed collar, cuffs and hem, full-length blue jeans on BOTH legs, dark navy walking sneakers. Medium stocky ordinary older body, softly rounded stomach, natural limbs, no bodybuilder muscles. Retain his face and clothes in all poses. High quality stylized 3D game cinematic render with realistic knit and denim materials, soft cool rim light and warm face lighting like Image2, not pixel art.  No text, no watermark, no floor shadows, no scenery, no green screen, no checkerboard. Genuine transparent RGBA PNG, alpha exactly zero outside figures. One whole figure, no props, no type, no landscape. Real transparent background, preserve clear silhouette."
+  },
+  {
+    "sheet": "cycling",
+    "refs": [
+      "C:/Users/Jorell/Downloads/Tata MAIN.jpg",
+      "D:/TODO/DOCUMENTOS/MUGEN/mugen-web-fighter/art/roster-unified/jorell/movement.png"
+    ],
+    "prompt": "TATA is the older man from Image 1: balding with gray hair at sides, warm tan skin, recognizable elderly face with forehead and smile wrinkles, thick eyebrows, no beard, no glasses. Dark forest-green cable-knit pullover sweater with ribbed collar, cuffs and hem, full-length blue jeans on BOTH legs, dark navy walking sneakers. Medium stocky ordinary older body, softly rounded stomach, natural limbs, no bodybuilder muscles. Retain his face and clothes in all poses. Polished painted 2D arcade fighting-game art, clean dark contours, warm volumetric cel shading, same rendering style and anatomical proportions as the existing fighters in Image 2, NOT pixel art. Facing RIGHT in 3/4 profile unless specified. No text, no watermark, no floor shadows, no scenery, no green screen, no checkerboard. Genuine transparent RGBA PNG, alpha exactly zero outside figures. Create 6 complete sprites of Tata RIDING HIS BICYCLE in a fluid six-phase PEDAL CYCLE. Exact canvas1536x1024, STRICT 3 equal columns x 2 equal rows, each cell512x512. Classic red city bicycle, thin red diamond frame, two equal black tires and silver wire spokes, silver fenders, black saddle and curved silver handlebar; Tata sits on saddle, grips handlebars with BOTH hands, EACH foot attached to its pedal. Knees alternate and crank rotates consistently across all six poses; torso leans forward slightly. Keep EXACT bike geometry and wheel centers (rear x120,y412; front x420,y412), wheel radius75, tire contact baseline y487; both wheels in frame, entire figure+bike within cell x25..490. Tata's head around y130, hands around y245. All6sprites same side view facing right, consistent vehicle dimensions, slight body bounce only. NO green floor/no beige backdrop/no ground shadow; actual transparent cutouts. Don't render a standing man above bike, body must physically ride naturally."
+  }
+]

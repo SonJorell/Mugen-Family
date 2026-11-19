@@ -77,20 +77,24 @@ test('confirming twice during the exit transition opens the next screen only onc
 });
 
 test('the title screen starts on a roster fighter and rotates through the rest', async ({ page }) => {
+  test.setTimeout(60000);
   await menu(page);
   const featured = () => page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('MenuScene');
     return { id: s.featured.id as string, art: s.hero.texture.key as string, name: s.heroTexts[0].text as string, order: s.showcase.map((f: any) => f.id) as string[] };
   });
   const first = await featured();
-  expect([...first.order].sort()).toEqual(['cesar', 'tilin']);
+  expect([...first.order].sort()).toEqual(['cesar', 'joako', 'jorell', 'tata', 'tilin']);
   expect(first.art).toBe(`menu_${first.id}_3d`);
   await expect.poll(async () => (await state(page)).introDone, { timeout: 15000 }).toBe(true);
   await page.evaluate(() => (window as any).__game.scene.getScene('MenuScene').nextFighter());
-  const other = first.id === 'tilin' ? 'cesar' : 'tilin';
-  await expect.poll(async () => (await featured()).art, { timeout: 10000 }).toBe(`menu_${other}_3d`);
-  expect((await featured()).name).toBe(other === 'cesar' ? 'CÉSAR' : 'TILIN');
-  // The automatic timer brings the first fighter back without any input.
+  const names: Record<string, string> = { cesar: 'CÉSAR', joako: 'JOAKO', jorell: 'JORELL', tata: 'TATA', tilin: 'TILIN' };
+  for (const other of first.order.slice(1)) {
+    // The second entry follows the manual turn; the timer advances to the third.
+    await expect.poll(async () => (await featured()).art, { timeout: 15000 }).toBe(`menu_${other}_3d`);
+    expect((await featured()).name).toBe(names[other]);
+  }
+  // The automatic timer completes the cycle without skipping any fighter.
   await expect.poll(async () => (await featured()).art, { timeout: 20000 }).toBe(`menu_${first.id}_3d`);
 });
 

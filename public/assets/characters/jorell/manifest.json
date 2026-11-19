@@ -1,0 +1,396 @@
+{
+  "characterId": "jorell",
+  "name": "Jorell",
+  "assetPath": "/assets/characters/jorell-unified/",
+  "spriteSheet": {
+    "columns": 6,
+    "rows": 1,
+    "frameCount": 6,
+    "sourceBodyHeight": 238,
+    "groundY": 248,
+    "animations": {
+      "IDLE": {
+        "frameRate": 8,
+        "repeat": -1,
+        "columns": 4,
+        "rows": 3,
+        "frameCount": 12,
+        "sourceBodyHeight": 320,
+        "groundY": 333,
+        "alignFeet": true
+      },
+      "WALK_FORWARD": {
+        "frameRate": 12,
+        "repeat": -1,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 252,
+        "alignFeet": true
+      },
+      "WALK_BACKWARD": {
+        "frameRate": 11,
+        "repeat": -1,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 252,
+        "alignFeet": true
+      },
+      "DASH": {
+        "frameRate": 20,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 252,
+        "alignFeet": true
+      },
+      "CROUCH": {
+        "frameRate": 30,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 255,
+        "alignFeet": true
+      },
+      "JUMP": {
+        "frameRate": 10,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 255,
+        "alignFeet": false
+      },
+      "AIR_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 248,
+        "alignFeet": false
+      },
+      "AIR_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 248,
+        "alignFeet": false
+      },
+      "LIGHT_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 255,
+        "alignFeet": true
+      },
+      "HEAVY_PUNCH": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 255,
+        "alignFeet": true
+      },
+      "LIGHT_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 255,
+        "alignFeet": true
+      },
+      "HEAVY_KICK": {
+        "frameRate": 22,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 255,
+        "alignFeet": true
+      },
+      "BLOCK": {
+        "frameRate": 30,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 254,
+        "alignFeet": true
+      },
+      "HIT_REACTION": {
+        "frameRate": 22,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 254,
+        "alignFeet": true
+      },
+      "STUN": {
+        "frameRate": 10,
+        "repeat": -1,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 254,
+        "alignFeet": true
+      },
+      "GET_UP": {
+        "frameRate": 12,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 254,
+        "alignFeet": true
+      },
+      "KNOCKDOWN": {
+        "frameRate": 14,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 252,
+        "alignFeet": true
+      },
+      "DEFEAT": {
+        "frameRate": 12,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 249,
+        "alignFeet": true
+      },
+      "VICTORY": {
+        "frameRate": 10,
+        "repeat": -1,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 253,
+        "alignFeet": false
+      },
+      "TAUNT": {
+        "frameRate": 10,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 255,
+        "alignFeet": false
+      },
+      "SPECIAL_ATTACK": {
+        "frameRate": 15,
+        "repeat": 0,
+        "impactStart": 3,
+        "impactEnd": 4,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 254,
+        "alignFeet": false
+      },
+      "TELEPORT": {
+        "frameRate": 12,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 256,
+        "alignFeet": false
+      },
+      "TRANSFORM": {
+        "columns": 4,
+        "rows": 3,
+        "frameCount": 12,
+        "sourceBodyHeight": 311.1428571428571,
+        "groundY": 341,
+        "frameRate": 9,
+        "repeat": 0,
+        "alignFeet": false
+      },
+      "CHARGE": {
+        "frameRate": 10,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 256,
+        "alignFeet": false
+      },
+      "BEAM": {
+        "columns": 4,
+        "rows": 3,
+        "frameCount": 12,
+        "sourceBodyHeight": 311.1428571428571,
+        "groundY": 341,
+        "frameRate": 24,
+        "repeat": 0,
+        "alignFeet": false
+      },
+      "POWER_RETURN": {
+        "frameRate": 10,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 253,
+        "alignFeet": false
+      },
+      "DOUBLE_JUMP": {
+        "frameRate": 16,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 253,
+        "alignFeet": false
+      },
+      "LANDING": {
+        "frameRate": 24,
+        "repeat": 0,
+        "columns": 6,
+        "rows": 1,
+        "frameCount": 6,
+        "sourceBodyHeight": 242,
+        "groundY": 252,
+        "alignFeet": true
+      }
+    }
+  },
+  "animations": {
+    "IDLE": [
+      "/assets/characters/jorell-unified/IDLE.webp"
+    ],
+    "WALK_FORWARD": [
+      "/assets/characters/jorell-unified/WALK_FORWARD.webp"
+    ],
+    "WALK_BACKWARD": [
+      "/assets/characters/jorell-unified/WALK_BACKWARD.webp"
+    ],
+    "DASH": [
+      "/assets/characters/jorell-unified/DASH.webp"
+    ],
+    "CROUCH": [
+      "/assets/characters/jorell-unified/CROUCH.webp"
+    ],
+    "JUMP": [
+      "/assets/characters/jorell-unified/JUMP.webp"
+    ],
+    "AIR_PUNCH": [
+      "/assets/characters/jorell-unified/AIR_PUNCH.webp"
+    ],
+    "AIR_KICK": [
+      "/assets/characters/jorell-unified/AIR_KICK.webp"
+    ],
+    "LIGHT_PUNCH": [
+      "/assets/characters/jorell-unified/LIGHT_PUNCH.webp"
+    ],
+    "HEAVY_PUNCH": [
+      "/assets/characters/jorell-unified/HEAVY_PUNCH.webp"
+    ],
+    "LIGHT_KICK": [
+      "/assets/characters/jorell-unified/LIGHT_KICK.webp"
+    ],
+    "HEAVY_KICK": [
+      "/assets/characters/jorell-unified/HEAVY_KICK.webp"
+    ],
+    "BLOCK": [
+      "/assets/characters/jorell-unified/BLOCK.webp"
+    ],
+    "HIT_REACTION": [
+      "/assets/characters/jorell-unified/HIT_REACTION.webp"
+    ],
+    "STUN": [
+      "/assets/characters/jorell-unified/STUN.webp"
+    ],
+    "GET_UP": [
+      "/assets/characters/jorell-unified/GET_UP.webp"
+    ],
+    "KNOCKDOWN": [
+      "/assets/characters/jorell-unified/KNOCKDOWN.webp"
+    ],
+    "DEFEAT": [
+      "/assets/characters/jorell-unified/DEFEAT.webp"
+    ],
+    "VICTORY": [
+      "/assets/characters/jorell-unified/VICTORY.webp"
+    ],
+    "TAUNT": [
+      "/assets/characters/jorell-unified/TAUNT.webp"
+    ],
+    "SPECIAL_ATTACK": [
+      "/assets/characters/jorell-unified/SPECIAL_ATTACK.webp"
+    ],
+    "TELEPORT": [
+      "/assets/characters/jorell-unified/TELEPORT.webp"
+    ],
+    "TRANSFORM": [
+      "/assets/characters/jorell-unified/TRANSFORM.webp"
+    ],
+    "CHARGE": [
+      "/assets/characters/jorell-unified/CHARGE.webp"
+    ],
+    "BEAM": [
+      "/assets/characters/jorell-unified/BEAM.webp"
+    ],
+    "POWER_RETURN": [
+      "/assets/characters/jorell-unified/POWER_RETURN.webp"
+    ],
+    "DOUBLE_JUMP": [
+      "/assets/characters/jorell-unified/DOUBLE_JUMP.webp"
+    ],
+    "LANDING": [
+      "/assets/characters/jorell-unified/LANDING.webp"
+    ]
+  },
+  "visualStyle": "painted-arcade-2026",
+  "version": 4
+}

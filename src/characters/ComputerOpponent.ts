@@ -101,8 +101,10 @@ export class ComputerOpponent extends Fighter {
         this.judgedAttack = target.attackSerial;
         if (this.chance(this.profile.blockChance)) {
           this.velocityX = 0;
+          this.crouchGuarding = targetAttack.guard === 'low';
+          this.hurtbox.rect = this.crouchGuarding ? this.crouchHurtbox : this.standingHurtbox;
           this.combatState.setState('BLOCKING');
-          this.playAnimation('BLOCK');
+          this.playAnimation(this.crouchGuarding && this.registry.has('CROUCH') ? 'CROUCH' : 'BLOCK');
           return;
         }
         // Otherwise it may slip out with a back dash (invulnerable at the start).

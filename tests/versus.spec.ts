@@ -21,8 +21,8 @@ test('selection cycles CPU → Práctica → Jugador 2 and starts a two-player m
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('SelectionScene'));
   const mode = () => page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').mode);
-  await page.mouse.click(640, 565); await expect.poll(mode).toBe('training');
-  await page.mouse.click(640, 565); await expect.poll(mode).toBe('versus');
+  await page.mouse.click(524, 528); await expect.poll(mode).toBe('training');
+  await page.mouse.click(524, 528); await expect.poll(mode).toBe('versus');
   const labels = await page.evaluate(() => (window as any).__game.scene.getScene('SelectionScene').content.list.map((c: any) => c.text).filter(Boolean));
   expect(labels).toContain('Rival: Jugador 2');
   expect(labels).not.toContain('CPU: Normal');
@@ -119,4 +119,15 @@ test('the pause move list shows both players\' keys in a two-player match', asyn
   expect(text).toContain('J');
   // Player 1 lost the arrows to player 2.
   expect(text).toContain('A D');
+  // Page 2 (COMBOS) also uses P2's own keys for the second fighter.
+  await page.keyboard.press('ArrowRight');
+  const combosText = await page.evaluate(() => {
+    const texts: string[] = [];
+    const walk = (items: any[]) => items.forEach(c => { if (!c.visible) return; if (typeof c.text === 'string') texts.push(c.text); if (c.list) walk(c.list); });
+    walk((window as any).__game.scene.getScene('PauseScene').children.list);
+    return texts.join('\n');
+  });
+  expect(combosText).toContain('TILIN · J1');
+  expect(combosText).toContain('CÉSAR · J2');
+  expect(combosText).toContain('Insert → Supr → Fin');
 });

@@ -127,3 +127,15 @@ test('the real keyboard performs the motion, and the move list explains it', asy
   expect(text).toContain('Paso veloz  ·  ↓ ↘ → + Puño');
   expect(text).toContain('Pisotón sísmico  ·  ↓ ↘ → + Puño');
 });
+
+test('a punch in the air after ↓ → performs an air punch instead of swallowing it, and ↓ + K stays launcher', async ({ page }) => {
+  await startFight(page, 'tilin', 'tilin', { mode: 'training' });
+  const air = await run(page, [
+    [2, { crouch: true }], [2, { moveRight: true }], [1, { jump: true }], [3, {}], [1, { lightPunch: true }],
+  ]);
+  expect(air.started).toEqual(['LIGHT_PUNCH']);
+  const launcher = await run(page, [
+    [2, { crouch: true }], [2, { moveRight: true }], [1, { crouch: true, heavyPunch: true }],
+  ], { gap: 110 });
+  expect(launcher.started).toEqual(['LAUNCHER']);
+});

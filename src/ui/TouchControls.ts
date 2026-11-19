@@ -29,7 +29,7 @@ export class TouchControls {
   private held = new Set<HeldAction>();
   private previous = new Set<HeldAction>();
 
-  constructor(private readonly scene: Phaser.Scene) {
+  constructor(private readonly scene: Phaser.Scene, hideOnKey: (event: KeyboardEvent) => boolean = () => true) {
     const layout = GAME_CONFIG.TOUCH;
     scene.input.addPointer(layout.EXTRA_POINTERS);
     const make = (action: HeldAction, x: number, y: number, label: string, color: number, r: number = layout.BUTTON_RADIUS) => {
@@ -53,7 +53,7 @@ export class TouchControls {
     // Dash with the d-pad direction held; a double tap on ◀ or ▶ also dashes.
     make('dash', act.x - act.gap, act.y + act.gap, 'DS', 0x5a4b8a, layout.BUTTON_RADIUS * 0.85);
 
-    const keyboardHides = () => this.setVisible(false);
+    const keyboardHides = (event: KeyboardEvent) => { if (hideOnKey(event)) this.setVisible(false); };
     const touchShows = (pointer: Phaser.Input.Pointer) => { if (pointer.wasTouch) this.setVisible(true); };
     scene.input.keyboard?.on('keydown', keyboardHides);
     scene.input.on('pointerdown', touchShows);

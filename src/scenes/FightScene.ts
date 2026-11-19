@@ -4,10 +4,11 @@
 
 import Phaser from 'phaser';
 import { CpuDifficulty, GAME_CONFIG, GameMode, normalizeDifficulty, normalizeMode } from '../config/gameConfig';
-import { activeKeys, loadBindings } from '../input/Bindings';
+import { activeKeys, keyNameFromCode, loadBindings, REMAPPABLE } from '../input/Bindings';
 import { describeKeys } from '../input/InputMapping';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
+import { prepareDriveAtlas } from '../animation/DriveSpriteAtlas';
 import { PlayerFighter } from '../characters/PlayerFighter';
 import { TrainingOpponent } from '../characters/TrainingOpponent';
 import { ComputerOpponent } from '../characters/ComputerOpponent';
@@ -17,6 +18,8 @@ import { InputManager } from '../input/InputManager';
 import { FacingSystem } from '../systems/FacingSystem';
 import { FighterController, ImpactEvent } from '../systems/FighterController';
 import { ImpactEffects } from '../ui/ImpactEffects';
+import { CombatJuice } from '../ui/CombatJuice';
+import { StageAtmosphere } from '../ui/StageAtmosphere';
 import { TouchControls, isTouchDevice } from '../ui/TouchControls';
 import { ComboTracker } from '../systems/ComboTracker';
 import { ComboDisplay } from '../ui/ComboDisplay';
@@ -70,10 +73,14 @@ export class FightScene extends Phaser.Scene {
   private fighterController = new FighterController();
   private superMove!: SuperMove;
   private impacts!: ImpactEffects;
+  private juice!: CombatJuice;
+  private atmosphere!: StageAtmosphere;
   private combos = new ComboTracker();
   private comboDisplay!: ComboDisplay;
   /** Remaining freeze after a hit connects (ms). Fighters stand still; the clock runs. */
   private hitstopMs = 0;
+  /** Remaining presentation slowdown right after a K.O. (ms). */
+  private koSlowMs = 0;
   private roundSystem!: RoundSystem;
   private hud!: HUD;
   private messages!: FightMessages;
@@ -119,11 +126,6 @@ export class FightScene extends Phaser.Scene {
       this.events.off(Phaser.Scenes.Events.RESUME, audio.resume, audio);
       audio.stop();
     });
-    const htmlVideo = document.getElementById('menu-video-bg') as HTMLVideoElement | null;
-    if (htmlVideo) {
-      htmlVideo.style.display = 'none';
-      htmlVideo.pause();
-    }
 
     if (!this.playerManifest || !this.opponentManifest) {
       console.error('[FightScene] No manifest found — returning to menu.');
@@ -138,7 +140,7 @@ export class FightScene extends Phaser.Scene {
       this.add.ellipse(fighter.x, GAME_CONFIG.FLOOR_Y + 2, 150, 16, 0x09121a, 0.26).setDepth(1));
     this.createSystems();
     this.add.text(GAME_CONFIG.WIDTH / 2, 682, this.controlsHint(),
-      { fontFamily: FONT_UI, fontSize: '16px', color: '#eee8d9', backgroundColor: '#12151c', padding: { x: 16, y: 10 } }
+      { fontFamily: FONT_UI, fontSize: '16px', color: '#fff7ec', backgroundColor: '#1757c2', padding: { x: 16, y: 10 } }
     ).setOrigin(0.5).setDepth(60).setScrollFactor(0).setName('fight-controls');
     // The keyboard footer would sit under the touch buttons: show one or the other.
     const footer = this.children.getByName('fight-controls') as Phaser.GameObjects.Text;
@@ -146,7 +148,7 @@ export class FightScene extends Phaser.Scene {
     this.events.on('touch-controls-visible', (visible: boolean) => footer.setVisible(!visible));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('touch-controls-visible'));
     this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
-      fontFamily: FONT_UI, fontSize: '18px', color: '#ffdd77', backgroundColor: '#12151c', padding: { x: 12, y: 8 },
+      fontFamily: FONT_UI, fontSize: '18px', color: '#fff7ec', backgroundColor: '#ff6a1f', padding: { x: 12, y: 8 },
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(60).setInteractive({ useHandCursor: true })
       .on('pointerdown', () => this.pauseFight());
 
@@ -155,7 +157,7 @@ export class FightScene extends Phaser.Scene {
       GAME_CONFIG.DEBUG_MODE = !GAME_CONFIG.DEBUG_MODE;
       GAME_CONFIG.SHOW_DEBUG_TEXT = GAME_CONFIG.DEBUG_MODE;
     });
-    this.input.keyboard!.on('keydown-F2', () => this.cycleStage());
+    this.input.keyboard!.on('keydown-F2', () => { if (!this.arcade) this.cycleStage(); });
     this.input.keyboard!.on('keydown-F11', () => {
       if (!this.scale.isFullscreen) this.scale.startFullscreen();
       else this.scale.stopFullscreen();
@@ -168,6 +170,10 @@ export class FightScene extends Phaser.Scene {
       this.inputManager2?.destroy();
       this.touchControls?.destroy();
       this.touchControls = null;
+      this.roundSystem = undefined!;
+      this.player = undefined!;
+      this.opponent = undefined!;
+      this.arcade = undefined;
     });
   }
 
@@ -186,9 +192,11 @@ export class FightScene extends Phaser.Scene {
       this.drawCityBackground(W, H);
     }
 
-    // Stage boundary indicators
-    this.add.rectangle(40, GAME_CONFIG.FLOOR_Y - 100, 6, 200, 0xcc3333, 0.4).setDepth(3);
-    this.add.rectangle(W - 40, GAME_CONFIG.FLOOR_Y - 100, 6, 200, 0xcc3333, 0.4).setDepth(3);
+    // Subtle stage-edge floor markers
+    this.add.rectangle(40, GAME_CONFIG.FLOOR_Y - 12, 4, 28, 0xffb02e, 0.25).setDepth(3);
+    this.add.rectangle(W - 40, GAME_CONFIG.FLOOR_Y - 12, 4, 28, 0xffb02e, 0.25).setDepth(3);
+    this.atmosphere = new StageAtmosphere(this, this.stageIndex);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.atmosphere.destroy());
 
     // Debug grid
     if (GAME_CONFIG.DEBUG_MODE) {
@@ -219,6 +227,7 @@ export class FightScene extends Phaser.Scene {
       this.stageBgImage.setTexture(currentStage.textureKey);
       this.stageBgImage.setDisplaySize(GAME_CONFIG.STAGE_WIDTH, GAME_CONFIG.STAGE_HEIGHT);
     }
+    this.atmosphere?.setStage(this.stageIndex);
     console.log(`[FightScene] Switched stage to: ${currentStage.name}`);
   }
 
@@ -279,6 +288,9 @@ export class FightScene extends Phaser.Scene {
     const rival = createAliasLoader(this, `${this.opponentManifest.characterId}_rival`, this.opponentManifest);
     this.opponentRegistry = rival.registry;
     this.opponentLoader = rival.loader;
+    if (this.playerChoice.characterId === 'cesar' || this.opponentChoice.characterId === 'cesar') {
+      prepareDriveAtlas(this);
+    }
 
     console.log(`[FightScene] Available animations: ${this.registry2.getAvailable().join(', ')}`);
   }
@@ -302,7 +314,13 @@ export class FightScene extends Phaser.Scene {
 
   private createFighters(): void {
     const bindings = loadBindings(), versus = this.mode === 'versus';
-    this.touchControls = isTouchDevice(this.game) ? new TouchControls(this) : null;
+    const p2KeySet = versus ? new Set(REMAPPABLE.flatMap(a => bindings.p2[a])) : null;
+    const hideOnKey = (event: KeyboardEvent) => {
+      if (!p2KeySet) return true;
+      const name = keyNameFromCode(event.keyCode, Phaser.Input.Keyboard.KeyCodes as unknown as Record<string, number>);
+      return !name || !p2KeySet.has(name);
+    };
+    this.touchControls = isTouchDevice(this.game) ? new TouchControls(this, hideOnKey) : null;
     this.inputManager = new InputManager(this, activeKeys(bindings, 'p1', versus), 0, this.touchControls);
     this.inputManager2 = versus ? new InputManager(this, activeKeys(bindings, 'p2', true), 1) : null;
 
@@ -322,7 +340,7 @@ export class FightScene extends Phaser.Scene {
       scene: this,
       registry: this.opponentRegistry,
       loader: this.opponentLoader,
-      characterId: 'dummy',
+      characterId: this.opponentChoice.characterId,
       x: OPPONENT_START_X,
       y: GAME_CONFIG.FLOOR_Y,
       maxHealth: rosterEntry(this.opponentChoice.characterId).stats.maxHealth,
@@ -345,6 +363,7 @@ export class FightScene extends Phaser.Scene {
       () => GAME_CONFIG.STAGES[this.stageIndex].textureKey);
     this.fighterController.onSuperHit = (attacker, defender) => {
       this.hitstopMs = 0; this.combos.reset(); this.comboDisplay.clear();
+      this.juice.clearFlashes([this.player, this.opponent]);
       this.superMove.start(attacker, defender);
     };
     this.comboDisplay = new ComboDisplay(this);
@@ -361,18 +380,29 @@ export class FightScene extends Phaser.Scene {
     this.seenAttackSerial = this.player.attackSerial;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.trainingOverlay?.destroy(); this.trainingOverlay = null; });
     this.impacts = new ImpactEffects(this);
+    this.juice = new CombatJuice(this);
+    this.juice.register(this.player);
+    this.juice.register(this.opponent);
+    this.player.onThrowTech = () => this.juice.showCallout(0, '¡AGARRE ROTO!', '#7fd4ff');
+    this.opponent.onThrowTech = () => this.juice.showCallout(1, '¡AGARRE ROTO!', '#7fd4ff');
     this.fighterController.onImpact = event => this.onImpact(event);
     this.fighterController.scaleHit = (attacker, defender, damage) => this.scaleComboHit(attacker, defender, damage);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.impacts.destroy());
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.impacts.destroy(); this.juice.destroy(); });
     this.roundSystem = new RoundSystem(this);
     this.roundSystem.onRoundEnd = (winner, reason) => this.onRoundEnd(winner, reason);
 
     const playerName = rosterEntry(this.playerChoice.characterId).name.toUpperCase();
     const opponentName = rosterEntry(this.opponentChoice.characterId).name.toUpperCase();
-    this.hud = new HUD(this, `${playerName} · ${this.mode === 'versus' ? 'JUGADOR 1' : 'JUGADOR'}`,
+    this.hud = new HUD(
+      this,
+      `${playerName} · ${this.mode === 'versus' ? 'JUGADOR 1' : 'JUGADOR'}`,
       this.mode === 'training' ? 'MUÑECO · PRÁCTICA' : this.mode === 'versus' ? `${opponentName} · JUGADOR 2`
-      : `${opponentName} · CPU ${GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label.toUpperCase()}`,
-      this.player.maxHealth, this.opponent.maxHealth);
+        : `${opponentName} · CPU ${GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label.toUpperCase()}`,
+      this.player.maxHealth,
+      this.opponent.maxHealth,
+      [this.playerChoice.characterId, this.opponentChoice.characterId],
+      [fighterPalette(this.playerChoice).tint, fighterPalette(this.opponentChoice).tint],
+    );
     this.messages = new FightMessages(this, this.mode === 'versus');
     this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
 
@@ -419,7 +449,12 @@ export class FightScene extends Phaser.Scene {
     if (this.trainingOverlay && event.attacker === this.player) {
       this.trainingOverlay.recordContact(event.attack, Math.floor(event.attacker.combatState.stateTimer * 60 / 1000 + 1e-6));
     }
-    this.impacts.spawn(event.x, event.y, strength === 'knockdown' ? 'heavy' : strength, event.defender.facingRight);
+    this.impacts.spawn(event.x, event.y, strength === 'knockdown' ? 'heavy' : strength, event.defender.facingRight, !!event.crouchBlock);
+    this.juice.flashHit(event.defender, event.result === 'blocked');
+    const attackerSide: 0 | 1 = event.attacker === this.player ? 0 : 1;
+    if (event.counterHit) this.juice.showCallout(attackerSide, '¡CONTRAATAQUE!', '#ff8533');
+    else if (event.openedGuard === 'low') this.juice.showCallout(attackerSide, '¡GOLPE BAJO!', '#ffd166');
+    else if (event.openedGuard === 'overhead') this.juice.showCallout(attackerSide, '¡AÉREO!', '#ffd166');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!reduced && (strength === 'heavy' || strength === 'knockdown')) {
       const shake = feel.SHAKE[strength];
@@ -475,12 +510,25 @@ export class FightScene extends Phaser.Scene {
   private onRoundEnd(winner: RoundWinner, reason: RoundEndReason): void {
     this.superMove.cancel();
     this.hitstopMs = 0;
+    this.juice.clearFlashes([this.player, this.opponent]);
     this.combos.reset();
     this.comboDisplay.end(0); this.comboDisplay.end(1);
+    if (reason === 'ko') {
+      this.koSlowMs = 380;
+      const fallen = winner === 'player' ? this.opponent : this.player;
+      this.juice.spawnKoFlash(fallen.x, fallen.y);
+    }
     const wins = this.roundSystem.wins;
     this.hud.setRoundWins(wins.player, wins.opponent);
     this.player.finishRound(winner === 'draw' ? 'IDLE' : winner === 'player' ? 'VICTORY' : 'DEFEAT');
     this.opponent.finishRound(winner === 'draw' ? 'IDLE' : winner === 'opponent' ? 'VICTORY' : 'DEFEAT');
+
+    if (this.mode === 'training') {
+      // Practice mode never ends the session: briefly show the K.O. / timeout and reset cleanly.
+      this.messages.showRoundResult(winner, reason, { player: 0, opponent: 0 });
+      this.time.delayedCall(GAME_CONFIG.ROUND_TRANSITION_MS, () => this.resetPracticeRound());
+      return;
+    }
 
     if (this.roundSystem.matchOver) {
       // Best of 3 decided (or round cap reached): announce the match and return to the menu.
@@ -513,6 +561,16 @@ export class FightScene extends Phaser.Scene {
     this.roundSystem.nextRound();
   }
 
+  /** Resets both fighters and round counters in place so practice mode continues indefinitely. */
+  private resetPracticeRound(): void {
+    this.player.resetForRound(PLAYER_START_X);
+    this.opponent.resetForRound(OPPONENT_START_X);
+    this.facingSystem.update(this.player, this.opponent);
+    this.hud.setRoundWins(0, 0);
+    this.hud.update(this.player, this.opponent, GAME_CONFIG.ROUND_TIME);
+    this.roundSystem.reset();
+  }
+
   // ── Pause ─────────────────────────────────────────────────
 
   private pauseFight(): void {
@@ -542,8 +600,16 @@ export class FightScene extends Phaser.Scene {
 
     // During round end, keep advancing animations so VICTORY and DEFEAT play out completely
     if (this.roundSystem.phase === 'END') {
-      this.player.updatePresentation(delta);
-      this.opponent.updatePresentation(delta);
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let animDelta = delta;
+      if (this.koSlowMs > 0) {
+        this.koSlowMs = Math.max(0, this.koSlowMs - delta);
+        if (!reduced) animDelta = delta * 0.35;
+      }
+      this.player.updatePresentation(animDelta);
+      this.opponent.updatePresentation(animDelta);
+      this.atmosphere?.update(animDelta);
+      this.juice?.update(delta, [this.player, this.opponent]);
       this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
       this.updateCamera();
       return;
@@ -554,6 +620,7 @@ export class FightScene extends Phaser.Scene {
       this.roundSystem.update(delta, this.healthPct(this.player), this.healthPct(this.opponent));
       this.player.updatePresentation(delta);
       this.opponent.updatePresentation(delta);
+      this.atmosphere?.update(delta);
       this.facingSystem.update(this.player, this.opponent);
       this.updateCamera();
       return;
@@ -563,6 +630,8 @@ export class FightScene extends Phaser.Scene {
       // Hitstop: fighters and their timers hold still while the round clock keeps its pace.
       this.hitstopMs = Math.max(0, this.hitstopMs - delta);
       this.roundSystem.update(delta, this.healthPct(this.player), this.healthPct(this.opponent));
+      this.atmosphere?.update(delta);
+      this.juice?.update(delta, [this.player, this.opponent]);
       this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);
       this.updateCamera();
       return;
@@ -574,6 +643,8 @@ export class FightScene extends Phaser.Scene {
     this.player.update(delta);
     this.opponent.update(delta);
     this.bodyPhysics.resolve(this.player, this.opponent);
+    this.atmosphere?.update(delta);
+    this.juice?.update(delta, [this.player, this.opponent]);
 
     // Facing
     this.facingSystem.update(this.player, this.opponent);

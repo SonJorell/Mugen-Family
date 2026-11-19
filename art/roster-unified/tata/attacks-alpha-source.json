@@ -1,0 +1,4 @@
+{
+  "source": "C:\\Users\\Jorell\\.codex\\generated_images\\01a1b11a-d863-7e11-8fd6-16cc1a8f873f\\exec-520a1d2e-674c-4a68-a6c1-3f257eb1e0a3.png",
+  "prompt": "Edit target: the attached 1536x1024 Tata attack sprite sheet. Background-extraction ONLY. Preserve ALL 24 painted character poses exactly, their identity, green knit sweater, blue jeans, navy shoes, size, position, colors and 6-column x 4-row layout. Remove EVERY bit of the cloudy gray/brown background and its faint translucent veil, including between legs and arms. Genuine RGBA PNG transparent background with alpha exactly 0 throughout all empty space and cell gutters; fully opaque character interiors with clean antialiased silhouette. No added effects, shadows, haze, checkerboards, ground or text. Do not change character or redraw poses. Output exactly 1536x1024."
+}

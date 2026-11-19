@@ -9,7 +9,7 @@ import { AnimationDefinition } from '../animation/AnimationDefinition';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { CombatState } from '../combat/CombatState';
 import { Hitbox, Hurtbox, DEFAULT_HURTBOX } from '../combat/Hitbox';
-import { AttackDefinition, ATTACK_DEFINITIONS, COMMAND_MOVES, DRIVE_GRAB_ATTACK } from '../combat/AttackDefinition';
+import { AttackDefinition, ATTACK_DEFINITIONS, COMMAND_MOVES, DRIVE_GRAB_ATTACK, GuardHeight, JORELL_STOMACH_ATTACK, TATA_SHOVE_ATTACK } from '../combat/AttackDefinition';
 import { SonicWave } from '../combat/SonicWave';
 import { DEFAULT_STATS, FighterStats } from '../config/roster';
 
@@ -40,6 +40,8 @@ export class Fighter {
   velocityY: number = 0;
   isGrounded: boolean = true;
   private jumpsUsed = 0;
+  /** Number of jumps taken since leaving the floor (read-only for presentation effects). */
+  get jumpCount(): number { return this.jumpsUsed; }
 
   // Combat state machine
   combatState: CombatState = new CombatState();
@@ -58,11 +60,9 @@ export class Fighter {
   hurtbox: Hurtbox;
   hitbox: Hitbox | null = null;
 
-  // Attack frame counters
-  protected attackStartup: number = 0;
-  protected attackActive: number = 0;
-  protected attackRecovery: number = 0;
   protected currentAttackDef: AttackDefinition | null = null;
+  /** True while holding block from a crouch (blocks mids and lows, beaten by overheads). */
+  crouchGuarding = false;
   private stunDuration = 0;
   private knockdownDuration = 0;
   sonicWaves: SonicWave[] = [];
@@ -73,6 +73,8 @@ export class Fighter {
   get inSuper(): boolean { return this.combatState.state === 'SPECIAL' || this.combatState.state === 'SUPER_CAUGHT'; }
   /** Who holds this fighter in a throw, while GRABBED. */
   grabbedBy: Fighter | null = null;
+  /** Optional presentation callback when this fighter breaks a throw. */
+  onThrowTech?: (breaker: Fighter, thrower: Fighter) => void;
 
   /** Can a throw take this fighter now? Not in the air, nor while stunned, guarding a hit or down. */
   get throwable(): boolean {
@@ -101,6 +103,7 @@ export class Fighter {
     thrower.endAttack();
     thrower.velocityX = -away * GAME_CONFIG.GRAB.TECH_PUSH;
     this.playImpactSound('hit-block');
+    this.onThrowTech?.(this, thrower);
     return true;
   }
 
@@ -136,8 +139,7 @@ export class Fighter {
   }
   private stunArt!: Phaser.GameObjects.Graphics;
 
-  // Hit cooldown (prevent multi-hit per swing)
-  protected hitCooldown: number = 0;
+  // Prevent multi-hit per swing
   hasHitThisSwing: boolean = false;
   /** Increases with every attack started, so observers can tell back-to-back attacks apart. */
   attackSerial = 0;
@@ -348,11 +350,13 @@ export class Fighter {
     if (attackName === 'SPECIAL_ATTACK' && (!this.superReady || !this.isGrounded)) return;
 
     const driveGrab = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'drive';
+    const stomachPunch = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'kame';
+    const bicycleShove = attackName === 'SPECIAL_ATTACK' && this.stats.special === 'bike';
     const command = attackName === 'COMMAND_SPECIAL';
     if (command && !this.isGrounded) return;
     // Punches and kicks in the air use the jump-attack data.
     const airborne = !this.isGrounded && ['LIGHT_PUNCH', 'HEAVY_PUNCH', 'LIGHT_KICK', 'HEAVY_KICK'].includes(attackName);
-    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : command ? COMMAND_MOVES[this.stats.commandMove]
+    const baseDef = driveGrab ? DRIVE_GRAB_ATTACK : stomachPunch ? JORELL_STOMACH_ATTACK : bicycleShove ? TATA_SHOVE_ATTACK : command ? COMMAND_MOVES[this.stats.commandMove]
       : airborne ? ATTACK_DEFINITIONS[attackName.includes('KICK') ? 'AIR_KICK' : 'AIR_PUNCH'] : ATTACK_DEFINITIONS[attackName];
     if (!baseDef) return;
     if (baseDef.crouch && !this.isGrounded) return;
@@ -362,9 +366,6 @@ export class Fighter {
     this.attackSerial++;
     this.hurtbox.rect = baseDef.crouch ? this.crouchHurtbox : this.standingHurtbox;
     if (this.isGrounded) this.velocityX = 0;
-    this.attackStartup = attackDef.startup;
-    this.attackActive = attackDef.active;
-    this.attackRecovery = attackDef.recovery;
     this.hasHitThisSwing = false;
     this.sonicReleased = false;
     if (attackName === 'SPECIAL_ATTACK') this.energyValue = 0;
@@ -374,7 +375,7 @@ export class Fighter {
       ? (attackName.includes('KICK') ? 'AIR_KICK' : 'AIR_PUNCH') : attackName);
     this.playAnimation(this.registry.has(aerial) ? aerial : attackName, true);
 
-    if (attackName === 'SPECIAL_ATTACK' && !driveGrab) { this.hitbox = null; return; }
+    if (attackName === 'SPECIAL_ATTACK' && !driveGrab && !stomachPunch && !bicycleShove) { this.hitbox = null; return; }
 
     // Create hitbox (Hitbox.getWorldRect handles facing direction cleanly without double inversion)
     this.hitbox = new Hitbox(this.characterId, {
@@ -390,11 +391,12 @@ export class Fighter {
     if (!this.currentAttackDef) return;
     const { startup, active, recovery } = this.currentAttackDef;
     const elapsedFrames = this.combatState.stateTimer * 60 / 1000;
-    if (this.currentAttackDef.name === 'SPECIAL_ATTACK' && this.stats.special === 'sonic' && !this.sonicReleased && elapsedFrames + 1e-6 >= startup) {
+    if (this.currentAttackDef.name === 'SPECIAL_ATTACK' && (this.stats.special === 'sonic' || this.stats.special === 'build') && !this.sonicReleased && elapsedFrames + 1e-6 >= startup) {
       this.sonicReleased = true;
       const direction = this.facingRight ? 1 : -1;
-      this.sonicWaves.push(new SonicWave(this.scene, this.x + direction * 65, this.y - 215, direction));
-      this.playImpactSound('voice-canto');
+      const ball = this.stats.special === 'build';
+      this.sonicWaves.push(new SonicWave(this.scene, this.x + direction * 65, this.y - (ball ? 225 : 215), direction, ball ? 'ball' : 'sonic'));
+      this.playImpactSound(ball ? 'hit-light' : 'voice-canto');
     }
     if (elapsedFrames + 1e-6 >= startup + active + recovery) {
       this.endAttack();
@@ -414,9 +416,6 @@ export class Fighter {
       this.hitbox.active = false;
       this.hitbox = null;
     }
-    this.attackStartup = 0;
-    this.attackActive = 0;
-    this.attackRecovery = 0;
     this.hasHitThisSwing = false;
   }
 
@@ -431,6 +430,14 @@ export class Fighter {
   /** True while the fighter guards: holding block or still locked in blockstun. */
   get isGuarding(): boolean {
     return this.combatState.state === 'BLOCKING' || this.combatState.state === 'BLOCKSTUN';
+  }
+
+  /** True when the fighter's current guard posture blocks an attack from `fromRight` at `guard` height. */
+  blocksAttack(fromRight: boolean, guard: GuardHeight = 'mid'): boolean {
+    if (!this.isGuarding || this.facingRight !== fromRight) return false;
+    if (guard === 'low') return this.crouchGuarding;
+    if (guard === 'overhead') return !this.crouchGuarding;
+    return true;
   }
 
   /** Starts a forward dash or a back dash from the ground. Returns whether it started. */
@@ -458,11 +465,11 @@ export class Fighter {
   }
 
   receiveHit(damage: number, hitstun: number, knockback: number, causesKnockdown: boolean, fromRight: boolean, sonic = false,
-    blockstun = 0, blockPushback = 0, launch = false): 'hit' | 'blocked' | 'ignored' {
+    blockstun = 0, blockPushback = 0, launch = false, guard: GuardHeight = 'mid'): 'hit' | 'blocked' | 'ignored' {
     if (!this.canReceiveHit) return 'ignored';
     const wasJuggled = this.combatState.state === 'JUGGLED';
 
-    if (this.isGuarding && this.facingRight === fromRight) {
+    if (this.blocksAttack(fromRight, guard)) {
       this.playImpactSound('hit-block');
       this.gainEnergy(8);
       // Chip damage
@@ -471,12 +478,15 @@ export class Fighter {
       if (blockstun > 0) {
         // The guard holds for the blockstun and the defender slides away from the attacker.
         this.combatState.setState('BLOCKSTUN');
-        this.playAnimation('BLOCK');
+        this.hurtbox.rect = this.crouchGuarding ? this.crouchHurtbox : this.standingHurtbox;
+        this.playAnimation(this.crouchGuarding && this.registry.has('CROUCH') ? 'CROUCH' : 'BLOCK');
         this.stunDuration = blockstun * (1000 / 60);
         this.velocityX = (fromRight ? -1 : 1) * blockPushback / this.stats.weight;
       }
       return 'blocked';
     }
+
+    this.crouchGuarding = false;
 
     this.cancelAttack();
     this.clearSonicWaves();
@@ -575,7 +585,6 @@ export class Fighter {
     this.currentHealth = this.maxHealth;
     this.stunDuration = 0;
     this.knockdownDuration = 0;
-    this.hitCooldown = 0;
     this.hasHitThisSwing = false;
     this.x = x;
     this.finishRound('IDLE');
@@ -585,6 +594,7 @@ export class Fighter {
     this.cancelAttack();
     this.clearSonicWaves();
     this.stunArt.clear();
+    this.crouchGuarding = false;
     this.velocityX = 0;
     this.velocityY = 0;
     this.y = GAME_CONFIG.FLOOR_Y;
@@ -678,6 +688,8 @@ export class Fighter {
     this.sonicWaves = this.sonicWaves.filter(wave => wave.active);
     this.combatState.tick(delta);
     if (['HIT', 'STUNNED', 'BLOCKSTUN'].includes(this.combatState.state) && this.combatState.stateTimer >= this.stunDuration) {
+      this.crouchGuarding = false;
+      this.hurtbox.rect = this.standingHurtbox;
       this.combatState.setState(this.isGrounded ? 'IDLE' : 'JUMPING');
       this.playAnimation(this.isGrounded ? 'IDLE' : 'JUMP');
     } else if (this.combatState.state === 'KNOCKED_DOWN' && this.combatState.stateTimer >= this.knockdownDuration) {

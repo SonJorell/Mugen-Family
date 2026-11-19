@@ -6,8 +6,8 @@ framework completo, las reglas útiles de Claude-Code-Game-Studios (MIT) a este 
 ## Qué es
 
 Juego de pelea 2D para navegador. Phaser 3 (3.87), TypeScript, Vite, pruebas Playwright.
-Plantel actual: Tilin (canto sónico) y César (pisotón sísmico). Escenarios en
-`GAME_CONFIG.STAGES`. Público: jugador de teclado en escritorio.
+Plantel actual: Tilin, César, Joako, Jorell y Tata (escala real por estatura en `FIGHTER_HEIGHT_CM`).
+Escenarios en `GAME_CONFIG.STAGES`. Público: jugador de teclado, mando o pantalla táctil.
 
 ## Comandos
 

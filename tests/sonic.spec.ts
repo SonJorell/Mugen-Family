@@ -95,12 +95,12 @@ test('music switches with scenes, pauses with combat, and mute survives restart'
   await page.keyboard.press('ArrowUp'); await page.keyboard.press('Enter');
   await confirmSelection(page);
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT');
-  await expect.poll(currentMusic).toEqual([{ key: 'music-fight', playing: true, paused: false, mute: true }]);
+  await expect.poll(currentMusic).toEqual([{ key: 'music-hardline', playing: true, paused: false, mute: true }]);
   await page.keyboard.press('Escape');
   await expect.poll(async () => (await currentMusic())[0]?.paused).toBe(true);
   await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
   await page.waitForFunction(() => (window as any).__game.scene.isActive('FightScene'));
-  await expect.poll(currentMusic).toEqual([{ key: 'music-fight', playing: true, paused: false, mute: true }]);
+  await expect.poll(currentMusic).toEqual([{ key: 'music-hardline', playing: true, paused: false, mute: true }]);
   await page.keyboard.press('KeyM');
   await expect.poll(async () => (await currentMusic())[0]?.mute).toBe(false);
 });
