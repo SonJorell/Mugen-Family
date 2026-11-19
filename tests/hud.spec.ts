@@ -62,7 +62,7 @@ test('the countdown ring follows the clock and turns urgent in the last ten seco
     timer.setTime(-3); const over = timer.text.text;
     return { calm, urgent, over };
   });
-  expect(result).toEqual({ calm: ['57', '#ffffff'], urgent: ['10', '#ff5a5a'], over: '00' });
+  expect(result).toEqual({ calm: ['57', '#121114'], urgent: ['10', '#d60029'], over: '00' });
 });
 
 // Best of 3: each case is the deciding round (one round already won each way; the double K.O. at the round cap).

@@ -33,6 +33,7 @@ import { SuperMove } from '../combat/SuperMove';
 import type { ArcadeRun } from '../config/arcade';
 import { recordCombo, recordMatch } from '../systems/Stats';
 import { FONT_UI } from '../ui/fonts';
+import { CHIP, CHIP_PRIMARY } from '../ui/theme';
 
 /** Starting marks, reused at the start of every round. */
 const PLAYER_START_X = GAME_CONFIG.STAGE_WIDTH * 0.35;
@@ -139,7 +140,7 @@ export class FightScene extends Phaser.Scene {
       this.add.ellipse(fighter.x, GAME_CONFIG.FLOOR_Y + 2, 150, 16, 0x09121a, 0.26).setDepth(1));
     this.createSystems();
     this.add.text(GAME_CONFIG.WIDTH / 2, 682, this.controlsHint(),
-      { fontFamily: FONT_UI, fontSize: '16px', color: '#fff7ec', backgroundColor: '#1757c2', padding: { x: 16, y: 10 } }
+      { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', ...CHIP, padding: { x: 16, y: 9 } }
     ).setOrigin(0.5).setDepth(60).setScrollFactor(0).setName('fight-controls');
     // The keyboard footer would sit under the touch buttons: show one or the other.
     const footer = this.children.getByName('fight-controls') as Phaser.GameObjects.Text;
@@ -147,7 +148,7 @@ export class FightScene extends Phaser.Scene {
     this.events.on('touch-controls-visible', (visible: boolean) => footer.setVisible(!visible));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('touch-controls-visible'));
     this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
-      fontFamily: FONT_UI, fontSize: '18px', color: '#fff7ec', backgroundColor: '#ff6a1f', padding: { x: 12, y: 8 },
+      fontFamily: FONT_UI, fontSize: '16px', fontStyle: 'bold', ...CHIP_PRIMARY, padding: { x: 12, y: 8 },
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(60).setInteractive({ useHandCursor: true })
       .on('pointerdown', () => this.pauseFight());
 

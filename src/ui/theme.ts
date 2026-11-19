@@ -76,7 +76,16 @@ export function drawGlass(g: Phaser.GameObjects.Graphics, x: number, y: number, 
   const pts = glassPoints(x, y, w, h, o.chamfer ?? 0, o.skew ?? 0);
   const shadow = o.shadow ?? GLASS.shadow;
   if (shadow > 0) {
-    g.fillStyle(C.ink, 0.9).fillPoints(pts.map(p => new Phaser.Math.Vector2(p.x + shadow, p.y + shadow)), true);
+    // Hard offset shadow along the right and bottom edges only: filling the whole shifted shape
+    // would show through the translucent glass and turn it grey.
+    const right = pts.reduce((m, p) => Math.max(m, p.x), -Infinity), bottom = pts.reduce((m, p) => Math.max(m, p.y), -Infinity);
+    g.lineStyle(shadow, C.ink, 0.9);
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i], b = pts[(i + 1) % pts.length];
+      // Edges facing down or right: the right side, the bottom chamfer and the bottom.
+      const facing = (b.y - a.y) * 1 + (a.x - b.x) * 1 > 0 || (a.y === bottom && b.y === bottom) || (a.x === right && b.x === right);
+      if (facing) g.lineBetween(a.x + shadow / 2, a.y + shadow / 2, b.x + shadow / 2, b.y + shadow / 2);
+    }
   }
   g.fillStyle(o.fill ?? C.ivory, o.alpha ?? GLASS.fill).fillPoints(pts, true);
   // A brighter sheen along the top edge sells the glass.
@@ -94,6 +103,13 @@ export function fillSlanted(g: Phaser.GameObjects.Graphics, x: number, y: number
     : [[x + s, y], [x + w + s, y], [x + w, y + h], [x, y + h]];
   g.fillStyle(color, alpha).fillPoints(pts.map(([px, py]) => new Phaser.Math.Vector2(px, py)), true);
 }
+
+/** Text chips (buttons, labels): ink on ivory glass. Phaser text cannot draw a border, so the glass does the work. */
+export const CHIP = { color: CSS.ink, backgroundColor: 'rgba(253, 251, 247, 0.78)' } as const;
+/** Focused / call-to-action chip: inverted ink fill with ivory text. */
+export const CHIP_ACTIVE = { color: CSS.ivory, backgroundColor: 'rgba(18, 17, 20, 0.86)' } as const;
+/** Accent chip for the main action on screen (pause, continue). */
+export const CHIP_PRIMARY = { color: CSS.white, backgroundColor: CSS.primary } as const;
 
 /** Standard text strokes on glass: ink outline for light text, none for ink text. */
 export const TEXT_ON_GLASS = { color: CSS.ink } as const;

@@ -8,6 +8,7 @@ import { Timer } from './Timer';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { Fighter } from '../characters/Fighter';
 import { FONT_UI } from './fonts';
+import { C, CSS, drawGlass } from './theme';
 
 export class HUD {
   private scene: Phaser.Scene;
@@ -23,7 +24,7 @@ export class HUD {
   private wasReady = [false, false];
   private debugBg: Phaser.GameObjects.Rectangle | null = null;
   /** Round-win markers: [player pips, opponent pips], filled as rounds are won. */
-  private roundPips: Phaser.GameObjects.Arc[][] = [[], []];
+  private roundPips: Phaser.GameObjects.Polygon[][] = [[], []];
 
   private readonly BAR_MARGIN = 28;
   private readonly BAR_WIDTH = (GAME_CONFIG.WIDTH / 2) - 80;
@@ -31,10 +32,7 @@ export class HUD {
 
   constructor(scene: Phaser.Scene, playerName: string, opponentName: string, playerMaxHealth = GAME_CONFIG.MAX_HEALTH, opponentMaxHealth = GAME_CONFIG.MAX_HEALTH) {
     this.scene = scene;
-    this.decor.push(
-      scene.add.rectangle(GAME_CONFIG.WIDTH / 2, 43, GAME_CONFIG.WIDTH, 86, 0x0e3a80, 0.9).setDepth(49).setScrollFactor(0),
-      scene.add.rectangle(GAME_CONFIG.WIDTH / 2, 86, GAME_CONFIG.WIDTH, 2, 0xffb02e, 0.55).setDepth(49).setScrollFactor(0),
-    );
+ // No full-width band: each side has its own glass plate (HealthBar) so the stage shows through.
 
     this.playerBar = new HealthBar(
       scene,
@@ -43,7 +41,7 @@ export class HUD {
       playerMaxHealth,
       playerName,
       false,
-      0xff6a1f,
+      C.primary,
     );
 
     this.opponentBar = new HealthBar(
@@ -53,33 +51,35 @@ export class HUD {
       opponentMaxHealth,
       opponentName,
       true,
-      0x7fd4ff,
+      C.tertiary,
     );
 
     this.timer = new Timer(scene);
-    // Round-win pips on the name line, next to the timer (inner end of each bar).
+    // Round-win chips: diamonds on the name line, next to the timer (inner end of each bar).
+    // Empty: ink outline at 30%; won: solid gold with an ink edge.
     for (let side = 0; side < 2; side++) {
       for (let r = 0; r < GAME_CONFIG.ROUNDS_TO_WIN; r++) {
         const x = side === 0
           ? this.BAR_MARGIN + this.BAR_WIDTH - 8 - r * 22
           : GAME_CONFIG.WIDTH - this.BAR_MARGIN - this.BAR_WIDTH + 8 + r * 22;
-        this.roundPips[side].push(scene.add.circle(x, this.BAR_Y - 14, 7, 0x1f6fd6)
-          .setStrokeStyle(2, 0xffb02e, 0.9).setDepth(56).setScrollFactor(0));
+        this.roundPips[side].push(scene.add.polygon(x, this.BAR_Y - 16, [0, -9, 8, 0, 0, 9, -8, 0], C.ivory, 0.35)
+          .setStrokeStyle(2, C.ink, 0.6).setDepth(56).setScrollFactor(0));
       }
     }
     for (const x of [28, 700]) {
+      // Energy gauge: ink track on a strip of glass, filled orange, gold once the super is ready.
       this.decor.push(
-        scene.add.rectangle(x - 3, 88, 266, 16, 0x0e3a80).setOrigin(0, 0).setStrokeStyle(1, 0x7fd4ff, 0.6).setDepth(55).setScrollFactor(0),
-        scene.add.rectangle(x, 91, 260, 10, 0x1f6fd6).setOrigin(0, 0).setDepth(55).setScrollFactor(0),
+        drawGlass(scene.add.graphics(), x - 5, 88, 270, 16, { chamfer: 5, shadow: 2 }).setDepth(55).setScrollFactor(0),
+        scene.add.rectangle(x, 91, 260, 10, C.ink, 0.85).setOrigin(0, 0).setDepth(55).setScrollFactor(0),
       );
-      this.chantBars.push(scene.add.rectangle(x, 91, 260, 10, 0x7fd4ff).setOrigin(0, 0).setDepth(56).setScrollFactor(0));
+      this.chantBars.push(scene.add.rectangle(x, 91, 260, 10, C.primary).setOrigin(0, 0).setDepth(56).setScrollFactor(0));
       this.chantGlows.push(scene.add.rectangle(x, 91, 260, 10, 0xffffff, 0).setOrigin(0, 0).setDepth(57).setScrollFactor(0)
         .setBlendMode(Phaser.BlendModes.ADD));
-      const quarters = scene.add.graphics().setDepth(57).setScrollFactor(0).lineStyle(2, 0x0e3a80, 0.6);
+      const quarters = scene.add.graphics().setDepth(57).setScrollFactor(0).lineStyle(2, C.ivory, 0.9);
       for (let q = 1; q < 4; q++) quarters.lineBetween(x + 65 * q, 91, x + 65 * q, 101);
       this.decor.push(quarters);
-      this.chantLabels.push(scene.add.text(x, 108, '', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: '#fff7ec',
-        backgroundColor: '#0e3a80', padding: { x: 6, y: 3 } }).setDepth(56).setScrollFactor(0));
+      this.chantLabels.push(scene.add.text(x, 110, '', { fontFamily: FONT_UI, fontSize: '13px', fontStyle: 'bold', color: CSS.ink,
+        backgroundColor: 'rgba(253, 251, 247, 0.72)', padding: { x: 6, y: 3 } }).setDepth(56).setScrollFactor(0));
     }
 
     {
@@ -116,12 +116,12 @@ export class HUD {
         this.scene.tweens.add({ targets: label, scale: 1, duration: 380, ease: 'Back.easeOut' });
       }
       this.wasReady[i] = fighter.superReady;
-      this.chantBars[i].setDisplaySize(260 * fighter.energy / 100, 10).setFillStyle(fighter.superReady ? 0xffb02e : 0x7fd4ff);
+      this.chantBars[i].setDisplaySize(260 * fighter.energy / 100, 10).setFillStyle(fighter.superReady ? C.gold : C.primary);
       this.chantLabels[i].setText(fighter.inSuper ? 'Súper en curso'
         : fighter.combatState.state === 'STUNNED' ? 'Aturdido'
         : fighter.superReady ? (i === 0 ? 'O · ' : '') + 'SÚPER LISTO'
         : 'Energía ' + Math.floor(fighter.energy) + '% · Carga al combatir');
-      this.chantLabels[i].setColor(fighter.superReady ? '#ffb02e' : '#fff7ec');
+      this.chantLabels[i].setColor(fighter.superReady ? CSS.secondary : CSS.ink);
     });
     const showDebug = GAME_CONFIG.DEBUG_MODE && GAME_CONFIG.SHOW_DEBUG_TEXT;
     this.debugPanel?.setVisible(showDebug);
@@ -146,7 +146,7 @@ export class HUD {
   /** Fills one pip per round won by each side. */
   setRoundWins(player: number, opponent: number): void {
     [player, opponent].forEach((wins, side) => this.roundPips[side].forEach((pip, r) =>
-      pip.setFillStyle(r < wins ? 0xffc93c : 0x1f6fd6)));
+      pip.setFillStyle(r < wins ? C.gold : C.ivory, r < wins ? 1 : 0.35).setStrokeStyle(2, C.ink, r < wins ? 1 : 0.6)));
   }
 
   destroy(): void {

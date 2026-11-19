@@ -47,7 +47,7 @@ test('a KO wins the round, resets both fighters and starts round 2', async ({ pa
       player: [s.player.currentHealth, s.player.maxHealth, Math.round(s.player.x), s.player.combatState.state],
       opponent: [s.opponent.currentHealth, s.opponent.maxHealth, s.opponent.combatState.state],
       time: s.roundSystem.timeLeft,
-      pips: s.hud.roundPips.map((side: any[]) => side.map(p => p.fillColor === 0xffc93c)),
+      pips: s.hud.roundPips.map((side: any[]) => side.map(p => p.fillColor === 0xffb800)),
     };
   });
   expect(state.wins).toEqual({ player: 1, opponent: 0 });

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { FONT_UI } from '../ui/fonts';
+import { CHIP } from '../ui/theme';
 
 /** Which track the menu screens play: the supplied song or the original synthesized one. */
 export type MenuTrack = 'cinturao' | 'original';
@@ -198,7 +199,7 @@ export class GameAudio {
 
 export function musicControls(scene: Phaser.Scene, x = 1250, y = 24): void {
   const audio = GameAudio.for(scene);
-  const style = { fontFamily: FONT_UI, fontSize: '16px', color: '#fff7ec', backgroundColor: '#1f6fd6', padding: { x: 8, y: 6 } };
+  const style = { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', ...CHIP, padding: { x: 8, y: 6 } };
   const label = scene.add.text(x - 62, y, '', style).setOrigin(1, 0).setDepth(240).setScrollFactor(0)
     .setInteractive({ useHandCursor: true }).on('pointerdown', () => audio.toggle());
   const refresh = () => label.setText(audio.muted ? 'M · Música apagada' : `M · Música ${Math.round(audio.volume * 100)}%`);

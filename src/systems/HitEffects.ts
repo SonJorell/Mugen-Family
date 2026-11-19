@@ -100,6 +100,8 @@ export class HitEffects {
 
   private layer(key: string, frame: FxFrame, name: string): Layer {
     const texture = this.scene.textures.createCanvas(key, frame.w, frame.h)!;
+    // Crisp pixels even when the game renders with smoothing (pixelArt: false).
+    texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
     const pixels = texture.context.createImageData(frame.w, frame.h);
     const image = this.scene.add.image(frame.ox * SCALE(), frame.oy * SCALE(), key)
       .setOrigin(0, 0).setScale(SCALE()).setDepth(40).setName(name);

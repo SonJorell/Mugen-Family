@@ -6,6 +6,7 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { Combo } from '../systems/ComboTracker';
 import { FONT_UI, FONT_NUMBER } from './fonts';
+import { CSS, CHIP } from './theme';
 
 /** One label per side (0 = player, 1 = opponent). Shown from the second hit of a combo. */
 export class ComboDisplay {
@@ -18,10 +19,10 @@ export class ComboDisplay {
     for (const side of [0, 1]) {
       const x = side === 0 ? 34 : GAME_CONFIG.WIDTH - 34, origin = side === 0 ? 0 : 1;
       this.hits.push(scene.add.text(x, 176, '', {
-        fontFamily: FONT_NUMBER, fontSize: '48px', color: '#ffd166', stroke: '#2a0d16', strokeThickness: 7,
+        fontFamily: FONT_NUMBER, fontSize: '48px', color: CSS.ink, stroke: CSS.ivory, strokeThickness: 6,
       }).setOrigin(origin, 0).setDepth(58).setScrollFactor(0).setVisible(false).setName(`combo-hits-${side}`));
-      this.damage.push(scene.add.text(x, 230, '', {
-        fontFamily: FONT_UI, fontSize: '18px', fontStyle: 'bold', color: '#fff7ec', stroke: '#0e3a80', strokeThickness: 4,
+      this.damage.push(scene.add.text(x, 242, '', {
+        fontFamily: FONT_UI, fontSize: '16px', fontStyle: 'bold', ...CHIP, padding: { x: 8, y: 3 },
       }).setOrigin(origin, 0).setDepth(58).setScrollFactor(0).setVisible(false).setName(`combo-damage-${side}`));
     }
   }
@@ -35,6 +36,9 @@ export class ComboDisplay {
     const hits = this.hits[side], damage = this.damage[side];
     this.scene.tweens.killTweensOf([hits, damage]);
     hits.setText(`${combo.hits} HITS`).setVisible(true).setAlpha(1).setScale(1);
+    // 1–9 hits in ink, 10–29 in Electric Orange, 30+ in Neon Cyan edged in gold.
+    hits.setColor(combo.hits >= 30 ? CSS.tertiary : combo.hits >= 10 ? CSS.primary : CSS.ink)
+      .setStroke(combo.hits >= 30 ? CSS.gold : CSS.ivory, 6);
     damage.setText(`${combo.damage} de daño`).setVisible(true).setAlpha(1);
     if (!this.motion.matches) {
       hits.setScale(1.35);
