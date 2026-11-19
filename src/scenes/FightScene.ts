@@ -5,7 +5,6 @@
 import Phaser from 'phaser';
 import { CpuDifficulty, GAME_CONFIG, GameMode, normalizeDifficulty, normalizeMode } from '../config/gameConfig';
 import { activeKeys, keyNameFromCode, loadBindings, REMAPPABLE } from '../input/Bindings';
-import { describeKeys } from '../input/InputMapping';
 import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { prepareDriveAtlas } from '../animation/DriveSpriteAtlas';
@@ -20,6 +19,7 @@ import { FighterController, ImpactEvent } from '../systems/FighterController';
 import { ImpactEffects } from '../ui/ImpactEffects';
 import { CombatJuice } from '../ui/CombatJuice';
 import { StageAtmosphere } from '../ui/StageAtmosphere';
+import { HitEffects } from '../systems/HitEffects';
 import { TouchControls, isTouchDevice } from '../ui/TouchControls';
 import { ComboTracker } from '../systems/ComboTracker';
 import { ComboDisplay } from '../ui/ComboDisplay';
@@ -28,13 +28,14 @@ import { RoundSystem, RoundWinner, RoundEndReason } from '../systems/RoundSystem
 import { HUD } from '../ui/HUD';
 import { FightMessages } from '../ui/FightMessages';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
-import { GameAudio, musicControls } from '../systems/GameAudio';
+import { GameAudio } from '../systems/GameAudio';
 import { FighterChoice, fighterPalette, normalizeChoice, rosterEntry } from '../config/roster';
 import { CharacterManifest, createAliasLoader, createCharacterLoader, getManifest } from '../config/characters';
 import { SuperMove } from '../combat/SuperMove';
 import type { ArcadeRun } from '../config/arcade';
 import { recordCombo, recordMatch } from '../systems/Stats';
 import { FONT_UI } from '../ui/fonts';
+import { CHIP_PRIMARY } from '../ui/theme';
 
 /** Starting marks, reused at the start of every round. */
 const PLAYER_START_X = GAME_CONFIG.STAGE_WIDTH * 0.35;
@@ -72,7 +73,7 @@ export class FightScene extends Phaser.Scene {
   private facingSystem = new FacingSystem();
   private fighterController = new FighterController();
   private superMove!: SuperMove;
-  private impacts!: ImpactEffects;
+  private impacts!: ImpactEffects | HitEffects;
   private juice!: CombatJuice;
   private atmosphere!: StageAtmosphere;
   private combos = new ComboTracker();
@@ -118,7 +119,6 @@ export class FightScene extends Phaser.Scene {
     isolateSceneKeyboard(this);
     const audio = GameAudio.for(this);
     audio.play('music-fight');
-    musicControls(this, 1250, 138);
     this.events.on(Phaser.Scenes.Events.PAUSE, audio.pause, audio);
     this.events.on(Phaser.Scenes.Events.RESUME, audio.resume, audio);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -139,16 +139,9 @@ export class FightScene extends Phaser.Scene {
     this.fighterShadows = [this.player, this.opponent].map(fighter =>
       this.add.ellipse(fighter.x, GAME_CONFIG.FLOOR_Y + 2, 150, 16, 0x09121a, 0.26).setDepth(1));
     this.createSystems();
-    this.add.text(GAME_CONFIG.WIDTH / 2, 682, this.controlsHint(),
-      { fontFamily: FONT_UI, fontSize: '16px', color: '#fff7ec', backgroundColor: '#1757c2', padding: { x: 16, y: 10 } }
-    ).setOrigin(0.5).setDepth(60).setScrollFactor(0).setName('fight-controls');
-    // The keyboard footer would sit under the touch buttons: show one or the other.
-    const footer = this.children.getByName('fight-controls') as Phaser.GameObjects.Text;
-    footer.setVisible(!this.touchControls?.visible);
-    this.events.on('touch-controls-visible', (visible: boolean) => footer.setVisible(!visible));
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('touch-controls-visible'));
+    // No keyboard footer during the fight (Jorell): the keys are in the pause menu's move list.
     this.add.text(GAME_CONFIG.WIDTH - 26, 92, 'Pausa · Esc', {
-      fontFamily: FONT_UI, fontSize: '18px', color: '#fff7ec', backgroundColor: '#ff6a1f', padding: { x: 12, y: 8 },
+      fontFamily: FONT_UI, fontSize: '16px', fontStyle: 'bold', ...CHIP_PRIMARY, padding: { x: 12, y: 8 },
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(60).setInteractive({ useHandCursor: true })
       .on('pointerdown', () => this.pauseFight());
 
@@ -297,20 +290,6 @@ export class FightScene extends Phaser.Scene {
 
   // ── Fighters ──────────────────────────────────────────────
 
-  /** Footer with the keys in use; in a two-player match, a short line for each player. */
-  private controlsHint(): string {
-    const set = loadBindings();
-    const k = (slot: 'p1' | 'p2', action: Parameters<typeof describeKeys>[0]) => describeKeys(action, activeKeys(set, slot, this.mode === 'versus'));
-    if (this.mode !== 'versus') {
-      return `${k('p1', 'MOVE_LEFT')}  Mover    ${k('p1', 'JUMP')} ×2  Doble salto    ${k('p1', 'CROUCH')}  Agacharse    `
-        + `${k('p1', 'LIGHT_PUNCH')} ${k('p1', 'HEAVY_PUNCH')}  Puños    ${k('p1', 'LIGHT_KICK')} ${k('p1', 'HEAVY_KICK')}  Patadas    `
-        + `${k('p1', 'BLOCK')}  Bloquear    ${k('p1', 'SPECIAL')}  Poder`;
-    }
-    const line = (slot: 'p1' | 'p2') => `${slot === 'p1' ? 'J1' : 'J2'}: ${k(slot, 'MOVE_LEFT')} ${k(slot, 'JUMP')} ${k(slot, 'CROUCH')} · `
-      + `Puños ${k(slot, 'LIGHT_PUNCH')} ${k(slot, 'HEAVY_PUNCH')} · Patadas ${k(slot, 'LIGHT_KICK')} ${k(slot, 'HEAVY_KICK')} · `
-      + `Bloq. ${k(slot, 'BLOCK')} · Poder ${k(slot, 'SPECIAL')}`;
-    return `${line('p1')}     ${line('p2')}`;
-  }
 
   private createFighters(): void {
     const bindings = loadBindings(), versus = this.mode === 'versus';
@@ -379,7 +358,9 @@ export class FightScene extends Phaser.Scene {
     this.trainingOverlay = this.mode === 'training' ? new TrainingOverlay(this, this.training) : null;
     this.seenAttackSerial = this.player.attackSerial;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.trainingOverlay?.destroy(); this.trainingOverlay = null; });
-    this.impacts = new ImpactEffects(this);
+    // Contact sparks: pixel-art pixelfx bursts (GAME_CONFIG.HIT_EFFECTS) or the vector ones. CombatJuice adds the
+    // rest (dust, afterimages, hit flash, callouts) and never draws contact sparks, so nothing is doubled.
+    this.impacts = GAME_CONFIG.HIT_EFFECTS ? new HitEffects(this) : new ImpactEffects(this);
     this.juice = new CombatJuice(this);
     this.juice.register(this.player);
     this.juice.register(this.opponent);
@@ -591,6 +572,8 @@ export class FightScene extends Phaser.Scene {
   update(_time: number, delta: number): void {
     if (!this.roundSystem || !this.player || !this.opponent) return;
     delta = Math.min(Math.max(delta, 0), 50);
+    // Pixel sparks keep playing through hitstop, supers and the round end.
+    if (this.impacts instanceof HitEffects) this.impacts.update(delta);
     if (this.superMove.active) {
       this.superMove.update(delta);
       this.hud.update(this.player, this.opponent, this.roundSystem.timeLeft);

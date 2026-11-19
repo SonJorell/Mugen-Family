@@ -12,7 +12,7 @@ const up = (cdp: CDPSession) => cdp.send('Input.dispatchTouchEvent', { type: 'to
 const state = (page: Page) => page.evaluate(() => {
   const s = (window as any).__game.scene.getScene('FightScene');
   return { x: s.player.x, attack: s.player.combatState.attackName, jumping: !s.player.isGrounded,
-    visible: s.touchControls?.visible ?? null, footer: s.children.getByName('fight-controls').visible };
+    visible: s.touchControls?.visible ?? null };
 });
 
 test.describe('on a touch screen', () => {
@@ -23,7 +23,6 @@ test.describe('on a touch screen', () => {
     await page.evaluate(() => { (window as any).__game.loop.start((window as any).__game.loop.callback); });
     const s0 = await state(page);
     expect(s0.visible).toBe(true);
-    expect(s0.footer).toBe(false);
     const cdp = await touch(page);
 
     // Hold ▶ (pad x 190 + 88, y 575).
@@ -54,7 +53,6 @@ test.describe('on a touch screen', () => {
     await page.evaluate(() => { (window as any).__game.loop.start((window as any).__game.loop.callback); });
     await page.keyboard.press('d', { delay: 60 });
     await expect.poll(async () => (await state(page)).visible).toBe(false);
-    expect((await state(page)).footer).toBe(true);
     const cdp = await touch(page);
     await down(cdp, [{ x: 640, y: 400, id: 1 }]);
     await up(cdp);
@@ -107,5 +105,4 @@ test('without a touch screen there are no on-screen buttons', async ({ page }) =
   await startFight(page, 'tilin', 'tilin', { mode: 'training' });
   const s = await state(page);
   expect(s.visible).toBeNull();
-  expect(s.footer).toBe(true);
 });

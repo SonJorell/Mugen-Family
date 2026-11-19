@@ -15,7 +15,7 @@ async function fight(page: Page, training = true) {
 }
 /** Screen-pinned banner lettering currently alive in the fight (Title3D containers). */
 const banners = (page: Page) => page.evaluate(() => (window as any).__game.scene.getScene('FightScene').children.list
-  .filter((o: any) => o.type === 'Container' && o.scrollFactorX === 0 && o.list.some((c: any) => c.type === 'Text'))
+  .filter((o: any) => o.type === 'Container' && o.scrollFactorX === 0 && !String(o.name).startsWith('combo-') && o.list.some((c: any) => c.type === 'Text'))
   .map((o: any) => o.list[o.list.length - 1].text as string));
 
 test('round and fight banners announce the start and clean up without delaying the fight', async ({ page }) => {
@@ -62,7 +62,7 @@ test('the countdown ring follows the clock and turns urgent in the last ten seco
     timer.setTime(-3); const over = timer.text.text;
     return { calm, urgent, over };
   });
-  expect(result).toEqual({ calm: ['57', '#ffffff'], urgent: ['10', '#ff5a5a'], over: '00' });
+  expect(result).toEqual({ calm: ['57', '#121114'], urgent: ['10', '#d60029'], over: '00' });
 });
 
 // Best of 3: each case is the deciding round (one round already won each way; the double K.O. at the round cap).

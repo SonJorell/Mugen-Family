@@ -10,7 +10,7 @@ import { AnimationRegistry } from '../animation/AnimationRegistry';
 import { SpriteSheetLoader } from '../animation/SpriteSheetLoader';
 import { Fighter } from '../characters/Fighter';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
-import { GameAudio, musicControls } from '../systems/GameAudio';
+import { GameAudio } from '../systems/GameAudio';
 import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 
@@ -47,7 +47,6 @@ export class CharacterTestScene extends Phaser.Scene {
   create(): void {
     isolateSceneKeyboard(this);
     GameAudio.for(this).play('music-menu');
-    musicControls(this, 1250, 24);
 
     if (!this.manifest) {
       this.scene.start('MenuScene');

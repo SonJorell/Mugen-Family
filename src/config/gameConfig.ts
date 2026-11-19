@@ -206,7 +206,7 @@ export const GAME_CONFIG = {
    * at MAX_HITS (the last hit knocks down) and never takes more than DAMAGE_CAP of the defender's
    * maximum health (supers excluded), so there are no infinite loops.
    */
-  COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 900, FREE_HITS: 2, SCALE_STEP: 0.15, MIN_SCALE: 0.3, MAX_HITS: 8, DAMAGE_CAP: 0.45 },
+  COMBO: { MIN_HITS_SHOWN: 2, LINGER_MS: 1000, FREE_HITS: 2, SCALE_STEP: 0.15, MIN_SCALE: 0.3, MAX_HITS: 8, DAMAGE_CAP: 0.45 },
 
   /**
    * Throw (light punch + light kick up close). The two presses may be PRESS_WINDOW_MS apart (a light
@@ -224,6 +224,13 @@ export const GAME_CONFIG = {
   JUGGLE: { LAUNCH_VELOCITY: 760, POP_VELOCITY: 380, CARRY_SPEED: 60, MAX_HITS: 3, GRAVITY_STEP: 0.35 },
 
   /** Hit feel: freeze on contact, camera shake and sparks. Times in ms. */
+  /** Prototype: pixel-art hit sparks from pixelfx (src/systems/HitEffects.ts); false keeps the vector sparks. */
+  HIT_EFFECTS: true,
+  /** Screen pixels per effect pixel (integer). 2 keeps the sparks from covering the fighters. */
+  HIT_EFFECT_SCALE: 2,
+  /** Strength of the effects' additive glow (pixelfx default 1). */
+  HIT_EFFECT_GLOW: 0.7,
+
   HIT_FEEL: {
     /** Both fighters freeze this long when a hit connects; the round clock keeps running. */
     HITSTOP_MS: { light: 55, heavy: 90, knockdown: 120, block: 50 },

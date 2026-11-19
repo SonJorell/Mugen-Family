@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { FONT_UI } from '../ui/fonts';
 
 /** Which track the menu screens play: the supplied song or the original synthesized one. */
 export type MenuTrack = 'cinturao' | 'original';
@@ -31,6 +30,17 @@ export class GameAudio {
   announcerVolume = 1;
   /** Level of hits, interface and super effects, 0–1, applied on top of the overall level. */
   sfxVolume = 1;
+  /**
+   * Sets the overall level. Phaser's Web Audio setter schedules the change with setValueAtTime,
+   * which a suspended AudioContext (a reloaded page before the first key press) never applies:
+   * the saved level was lost until then. Writing the gain's value as well applies it at once.
+   */
+  private applyMaster(): void {
+    this.game.sound.volume = this.masterVolume;
+    const node = (this.game.sound as Partial<Phaser.Sound.WebAudioSoundManager>).masterVolumeNode;
+    if (node) node.gain.value = this.masterVolume;
+  }
+
   static for(scene: Phaser.Scene): GameAudio {
     let audio = instances.get(scene.game);
     if (!audio) { audio = new GameAudio(scene.game); instances.set(scene.game, audio); }
@@ -47,7 +57,7 @@ export class GameAudio {
       if (settings.menuTrack === 'original' || settings.menuTrack === 'cinturao') this.menuTrack = settings.menuTrack;
       if (settings.fightTrack === 'original' || settings.fightTrack === 'hardline') this.fightTrack = settings.fightTrack;
     } catch { /* Audio still works when browser storage is unavailable. */ }
-    game.sound.volume = this.masterVolume;
+    this.applyMaster();
     this.scaleByCategory(game.sound);
     game.events.once(Phaser.Core.Events.DESTROY, () => this.stop());
   }
@@ -201,7 +211,7 @@ export class GameAudio {
   private applySettings(): void {
     this.music?.setMute(this.muted);
     this.music?.setVolume(this.volume);
-    this.game.sound.volume = this.masterVolume;
+    this.applyMaster();
     try {
       localStorage.setItem('tilin-audio', JSON.stringify({
         muted: this.muted, volume: this.volume, master: this.masterVolume,
@@ -212,18 +222,3 @@ export class GameAudio {
   }
 }
 
-export function musicControls(scene: Phaser.Scene, x = 1250, y = 24): void {
-  const audio = GameAudio.for(scene);
-  const style = { fontFamily: FONT_UI, fontSize: '16px', color: '#fff7ec', backgroundColor: '#1f6fd6', padding: { x: 8, y: 6 } };
-  const label = scene.add.text(x - 62, y, '', style).setOrigin(1, 0).setDepth(240).setScrollFactor(0)
-    .setInteractive({ useHandCursor: true }).on('pointerdown', () => audio.toggle());
-  const refresh = () => label.setText(audio.muted ? 'M · Música apagada' : `M · Música ${Math.round(audio.volume * 100)}%`);
-  refresh();
-  scene.add.text(x - 52, y, '−', style).setDepth(240).setScrollFactor(0).setInteractive({ useHandCursor: true }).on('pointerdown', () => audio.changeVolume(-0.1));
-  scene.add.text(x - 19, y, '+', style).setDepth(240).setScrollFactor(0).setInteractive({ useHandCursor: true }).on('pointerdown', () => audio.changeVolume(0.1));
-  scene.input.keyboard?.on('keydown-M', (e: KeyboardEvent) => { if (!e.repeat) audio.toggle(); });
-  scene.input.keyboard?.on('keydown-COMMA', () => audio.changeVolume(-0.1));
-  scene.input.keyboard?.on('keydown-PERIOD', () => audio.changeVolume(0.1));
-  scene.game.events.on('music-settings', refresh);
-  scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => scene.game.events.off('music-settings', refresh));
-}

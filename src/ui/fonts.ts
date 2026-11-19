@@ -2,26 +2,25 @@
 // fonts — The game's typefaces, bundled in public/assets/fonts
 // ============================================================
 //
-// Three roles:
-//   UI      Rajdhani for menus and interface text; Teko for fighter names over the health bars.
-//   NUMBER  Anton for the clock, health values and the combo counter.
+// Roles ("Arcade Impact HUD"):
+//   UI      Chivo for menus, data and interface text.
+//   NAME    Black Ops One for fighter names (Edo SZ was dropped from the project: its licence was unclear).
+//   NUMBER  Anton for the clock, health values, combo counter and button callouts.
 //   IMPACT  Black Ops One, an arcade display face, for big announcements (ROUND, ¡PELEA!, K.O., victory) and titles.
 //
-// Licences: Rajdhani, Teko, Anton and Black Ops One are all SIL OFL (see the OFL-*.txt files).
+// Licences: Chivo, Bebas Neue, Rajdhani, Teko, Anton and Black Ops One are all SIL OFL (see the OFL-*.txt files).
+// Bebas Neue, Rajdhani and Teko stay in the folder but are not loaded.
 //
 // Phaser draws text on a canvas, so a face must be loaded before the first text that uses it is
 // created; BootScene waits for `loadGameFonts()` before the game goes on.
 
-export const FONT_UI = "Rajdhani, 'Trebuchet MS', sans-serif";
-export const FONT_NAME = "Teko, Impact, 'Arial Narrow', sans-serif";
+export const FONT_UI = "Chivo, 'Trebuchet MS', sans-serif";
+export const FONT_NAME = "'Black Ops One', Impact, 'Arial Narrow', sans-serif";
 export const FONT_NUMBER = "Anton, Impact, 'Arial Black', sans-serif";
 export const FONT_IMPACT = "'Black Ops One', Impact, 'Arial Black', sans-serif";
 
 const FACES: { family: string; file: string; weight: string }[] = [
-  // Rajdhani's Regular is thin on a busy background; Medium stands in as the normal weight.
-  { family: 'Rajdhani', file: 'Rajdhani-Medium.ttf', weight: '400' },
-  { family: 'Rajdhani', file: 'Rajdhani-Bold.ttf', weight: '700' },
-  { family: 'Teko', file: 'Teko[wght].ttf', weight: '300 700' },
+  { family: 'Chivo', file: 'Chivo[wght].ttf', weight: '100 900' },
   { family: 'Anton', file: 'Anton-Regular.ttf', weight: '400' },
   { family: 'Black Ops One', file: 'BlackOpsOne-Regular.ttf', weight: '400' },
 ];

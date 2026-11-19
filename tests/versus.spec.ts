@@ -32,12 +32,12 @@ test('selection cycles CPU → Práctica → Jugador 2 and starts a two-player m
   await page.waitForFunction(() => (window as any).__game.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 15000 });
   const fight = await page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('FightScene');
-    return { human: typeof s.opponent.processInput === 'function', think: typeof s.opponent.think, hint: s.children.getByName('fight-controls').text };
+    return { human: typeof s.opponent.processInput === 'function', think: typeof s.opponent.think, footer: s.children.getByName('fight-controls') };
   });
   expect(fight.human).toBe(true);
   expect(fight.think).toBe('undefined');
-  expect(fight.hint).toContain('J1:');
-  expect(fight.hint).toContain('J2:');
+  // The fight shows no keyboard footer; the keys live in the pause menu.
+  expect(fight.footer).toBeNull();
 });
 
 test('each player moves and attacks with their own keys; the arrows belong to player 2 only', async ({ page }) => {

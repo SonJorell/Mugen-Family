@@ -26,16 +26,11 @@ test('«Cinturão de Elite» loads after the menu appears and loops without its 
   expect(typeof preload).toBe('boolean');
 });
 
-test('the menu song follows the music volume and M, and the fight keeps its own music', async ({ page }) => {
+test('the menu plays its song and the fight keeps its own music', async ({ page }) => {
   await bootGame(page);
   await page.keyboard.press('Shift');
   await expect.poll(async () => (await music(page))?.key, { timeout: 30000 }).toBe('music-cinturao');
-  await page.keyboard.press('Period');
-  await expect.poll(async () => (await music(page))?.volume).toBeCloseTo(0.45, 2);
-  await page.keyboard.press('m');
-  await expect.poll(async () => (await music(page))?.mute).toBe(true);
-  await page.keyboard.press('m');
-  await expect.poll(async () => (await music(page))?.mute).toBe(false);
+  // Volume and mute are only changed in Configuración (see settings.spec.ts).
   // Into a fight: «Hardline Beatdown», alone and without its silent ends; pausing the fight pauses it.
   await page.evaluate(() => {
     const g = (window as any).__game;

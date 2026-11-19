@@ -1,22 +1,32 @@
 // ============================================================
-// HealthBar — Arcade health bar with damage trail, hit feedback and danger pulse
+// HealthBar — Slanted glass health gauge with damage trail, hit feedback and danger pulse
 // ============================================================
+//
+// "Arcade Impact" look (theme.ts): the bar sits on an ivory glass plate with a hard ink shadow,
+// is a parallelogram slanted 12° and has a 3 px ink outline. Health shines Electric Orange,
+// turning Gold above 75%; health just lost waits in Crimson before the trail catches up; under
+// 25% the bar throbs with a Neon Cyan flash.
 
 import Phaser from 'phaser';
 import { FONT_NAME, FONT_NUMBER } from './fonts';
+import { C, CSS, SLANT, drawGlass, fillSlanted } from './theme';
 
 const H = 24;
-/** How long the pale trail waits before it starts catching up with the real health. */
+/** How long the crimson trail waits before it starts catching up with the real health. */
 const TRAIL_DELAY = 420;
 
 export class HealthBar {
   private readonly parts: Phaser.GameObjects.GameObject[] = [];
-  private readonly bar: Phaser.GameObjects.Rectangle;
-  private readonly trail: Phaser.GameObjects.Rectangle;
-  private readonly gloss: Phaser.GameObjects.Rectangle;
-  private readonly flash: Phaser.GameObjects.Rectangle;
-  private readonly danger: Phaser.GameObjects.Rectangle;
-  private readonly frame: Phaser.GameObjects.Rectangle;
+  /** Remaining health (redrawn every frame). */
+  private readonly bar: Phaser.GameObjects.Graphics;
+  /** Health just lost, in crimson. */
+  private readonly trail: Phaser.GameObjects.Graphics;
+  /** White flash over the bar when a hit lands. */
+  private readonly flash: Phaser.GameObjects.Graphics;
+  /** Cyan throb under a quarter of health. */
+  private readonly danger: Phaser.GameObjects.Graphics;
+  /** Ink outline, crimson while in danger. */
+  private readonly frame: Phaser.GameObjects.Graphics;
   private readonly nameText: Phaser.GameObjects.Text;
   private readonly valueText: Phaser.GameObjects.Text;
 
@@ -36,28 +46,38 @@ export class HealthBar {
     private readonly maxHealth: number,
     name: string,
     private readonly flipped = false,
-    private readonly accent = 0xff6a1f,
+    private readonly accent: number = C.primary,
   ) {
     const add = <T extends Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Depth & Phaser.GameObjects.Components.ScrollFactor>(object: T, depth: number) => {
       object.setDepth(depth).setScrollFactor(0); this.parts.push(object); return object;
     };
-    this.frame = add(scene.add.rectangle(x - 4, y - 4, width + 8, H + 8, 0x0e3a80).setOrigin(0, 0).setStrokeStyle(2, accent, 0.9), 50);
-    add(scene.add.rectangle(x, y, width, H, 0x35101a).setOrigin(0, 0), 50);
-    this.trail = add(scene.add.rectangle(x, y, width, H, 0xffe6b0).setOrigin(0, 0), 51);
-    this.bar = add(scene.add.rectangle(x, y, width, H, 0x00dd44).setOrigin(0, 0), 52);
-    this.gloss = add(scene.add.rectangle(x, y + 2, width, 8, 0xffffff, 0.2).setOrigin(0, 0), 53);
-    this.danger = add(scene.add.rectangle(x, y, width, H, 0xff2a2a, 0).setOrigin(0, 0).setBlendMode(Phaser.BlendModes.ADD), 53);
-    this.flash = add(scene.add.rectangle(x, y, width, H, 0xffffff, 0).setOrigin(0, 0).setBlendMode(Phaser.BlendModes.ADD), 54);
+    // Glass plate behind name and bar, chamfered on the outer top and inner bottom corners.
+    add(drawGlass(scene.add.graphics(), x - 14, y - 34, width + 28, H + 46, { chamfer: 12, skew: flipped ? -8 : 8 }), 49);
+    // Accent flag on the outer edge of the plate (player colour).
+    const flag = add(scene.add.graphics(), 49);
+    fillSlanted(flag, flipped ? x + width + 6 : x - 14, y - 34, 8, H + 46, accent, 1, flipped);
+    // Track: the empty gauge in ink.
+    const track = add(scene.add.graphics(), 50);
+    fillSlanted(track, x, y, width, H, C.ink, 0.88, flipped);
+    this.trail = add(scene.add.graphics(), 51);
+    this.bar = add(scene.add.graphics(), 52);
+    this.danger = add(scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD).setAlpha(0), 53);
+    this.flash = add(scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD).setAlpha(0), 54);
     // Notches every tenth make the remaining health readable at a glance.
-    const notches = add(scene.add.graphics(), 54).lineStyle(2, 0x0e3a80, 0.45);
-    for (let i = 1; i < 10; i++) notches.lineBetween(x + width * i / 10, y, x + width * i / 10, y + H);
+    const notches = add(scene.add.graphics(), 54).lineStyle(2, C.ink, 0.45);
+    const s = H * SLANT;
+    for (let i = 1; i < 10; i++) {
+      const nx = x + width * i / 10;
+      if (flipped) notches.lineBetween(nx, y, nx - s, y + H); else notches.lineBetween(nx + s, y, nx, y + H);
+    }
+    this.frame = add(scene.add.graphics(), 55);
 
-    this.nameText = add(scene.add.text(flipped ? x + width : x, y - 25, name.toUpperCase(), {
-      fontFamily: FONT_NAME, fontSize: '26px', color: '#fff7ec', stroke: '#0e3a80', strokeThickness: 4,
-    }).setOrigin(flipped ? 1 : 0, 0), 55);
-    this.valueText = add(scene.add.text(flipped ? x + 8 : x + width - 8, y + H / 2, '', {
-      fontFamily: FONT_NUMBER, fontSize: '17px', color: '#ffffff', stroke: '#0e3a80', strokeThickness: 4,
-    }).setOrigin(flipped ? 0 : 1, 0.5), 55);
+    this.nameText = add(scene.add.text(flipped ? x + width : x, y - 31, name.toUpperCase(), {
+      fontFamily: FONT_NAME, fontSize: '26px', color: CSS.ink, stroke: CSS.ivory, strokeThickness: 3,
+    }).setOrigin(flipped ? 1 : 0, 0), 56);
+    this.valueText = add(scene.add.text(flipped ? x + 10 : x + width - 4, y + H / 2, '', {
+      fontFamily: FONT_NUMBER, fontSize: '17px', color: CSS.ivory, stroke: CSS.ink, strokeThickness: 4,
+    }).setOrigin(flipped ? 0 : 1, 0.5), 56);
     this.setHealth(maxHealth);
     this.layout();
   }
@@ -90,13 +110,13 @@ export class HealthBar {
     this.flash.setAlpha(0.85);
     tweens.add({ targets: this.flash, alpha: 0, duration: 260, ease: 'Cubic.easeOut' });
     tweens.killTweensOf(this.nameText);
-    this.nameText.setY(this.y - 25);
-    tweens.add({ targets: this.nameText, y: this.y - 21, duration: 45, yoyo: true, repeat: 2 });
+    this.nameText.setY(this.y - 31);
+    tweens.add({ targets: this.nameText, y: this.y - 27, duration: 45, yoyo: true, repeat: 2 });
     // Sparks fly off the edge the bar just lost.
     const edge = this.flipped ? this.x + this.width * (1 - this.ratio) : this.x + this.width * this.ratio;
     for (let i = 0; i < 7; i++) {
-      const spark = this.scene.add.rectangle(edge, this.y + Phaser.Math.Between(2, H - 2), Phaser.Math.Between(3, 7), 3, i % 2 ? 0xffe6b0 : 0xff8a4c)
-        .setDepth(56).setScrollFactor(0).setBlendMode(Phaser.BlendModes.ADD).setAngle(Phaser.Math.Between(0, 180));
+      const spark = this.scene.add.rectangle(edge, this.y + Phaser.Math.Between(2, H - 2), Phaser.Math.Between(3, 7), 3, i % 2 ? C.gold : C.primary)
+        .setDepth(57).setScrollFactor(0).setBlendMode(Phaser.BlendModes.ADD).setAngle(Phaser.Math.Between(0, 180));
       tweens.add({
         targets: spark, x: edge + Phaser.Math.Between(-70, 70), y: spark.y + Phaser.Math.Between(18, 70), alpha: 0, angle: spark.angle + 200,
         duration: Phaser.Math.Between(300, 520), ease: 'Cubic.easeOut', onComplete: () => spark.destroy(),
@@ -104,28 +124,34 @@ export class HealthBar {
     }
   }
 
+  /** Fills a share of the gauge from its outer edge. */
+  private fill(g: Phaser.GameObjects.Graphics, share: number, color: number, alpha = 1): void {
+    g.clear();
+    const w = Math.floor(this.width * share);
+    fillSlanted(g, this.flipped ? this.x + this.width - w : this.x, this.y, w, H, color, alpha, this.flipped);
+  }
+
   private layout(): void {
-    const barW = Math.floor(this.width * this.shown), trailW = Math.floor(this.width * this.trailRatio);
-    const left = (w: number) => this.flipped ? this.x + this.width - w : this.x;
-    this.bar.setPosition(left(barW), this.y).setSize(barW, H);
-    this.gloss.setPosition(left(barW), this.y + 2).setSize(barW, 8);
-    this.flash.setPosition(left(barW), this.y).setSize(barW, H);
-    this.danger.setPosition(left(barW), this.y).setSize(barW, H);
-    this.trail.setPosition(left(trailW), this.y).setSize(trailW, H);
-
-    // Colour shift: green → yellow → red.
     const r = this.shown;
-    const from = r > 0.5 ? new Phaser.Display.Color(220, 220, 0) : new Phaser.Display.Color(200, 0, 0);
-    const to = r > 0.5 ? new Phaser.Display.Color(0, 221, 68) : new Phaser.Display.Color(220, 220, 0);
-    const c = Phaser.Display.Color.Interpolate.ColorWithColor(from, to, 100, Math.floor((r > 0.5 ? (r - 0.5) * 2 : r * 2) * 100));
-    this.bar.setFillStyle(Phaser.Display.Color.GetColor(c.r, c.g, c.b));
-
-    // Under a quarter of health the bar and its frame throb.
     const low = this.ratio > 0 && this.ratio <= 0.25;
+    this.fill(this.trail, this.trailRatio, C.secondary);
+    this.fill(this.bar, r, low ? C.secondary : r > 0.75 ? C.gold : C.primary);
+    // A thin sheen on the top quarter of the fill.
+    const w = Math.floor(this.width * r);
+    if (w > 0) fillSlanted(this.bar, this.flipped ? this.x + this.width - w : this.x, this.y + 2, w, 5, C.white, 0.28, this.flipped);
+    this.fill(this.flash, r, C.white);
+    this.fill(this.danger, r, C.tertiary);
+
+    // Under a quarter of health the bar flashes cyan and the outline turns crimson.
     const throb = low ? 0.5 + Math.sin(this.clock / 110) * 0.5 : 0;
     this.danger.setAlpha(throb * 0.55);
-    this.frame.setStrokeStyle(2, low ? 0xff4d4d : this.accent, low ? 0.55 + throb * 0.45 : 0.9);
-    this.valueText.setColor(low ? '#ff9a9a' : '#ffffff');
+    const s = H * SLANT, x = this.x, y = this.y, wd = this.width;
+    const pts = this.flipped
+      ? [[x, y], [x + wd, y], [x + wd - s, y + H], [x - s, y + H]]
+      : [[x + s, y], [x + wd + s, y], [x + wd, y + H], [x, y + H]];
+    this.frame.clear().lineStyle(3, low && throb > 0.5 ? C.secondary : C.ink, 1)
+      .strokePoints(pts.map(([px, py]) => new Phaser.Math.Vector2(px, py)), true);
+    this.valueText.setColor(low ? '#ffdad6' : CSS.ivory);
   }
 
   destroy(): void { this.parts.forEach(part => part.destroy()); }

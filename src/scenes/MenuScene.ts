@@ -2,11 +2,12 @@ import Phaser from 'phaser';
 import { CpuDifficulty, GAME_CONFIG, GameMode, normalizeDifficulty, normalizeMode } from '../config/gameConfig';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { SpriteSheetOptions } from '../animation/SpriteSheetLoader';
-import { GameAudio, musicControls } from '../systems/GameAudio';
+import { GameAudio } from '../systems/GameAudio';
 import { FighterChoice, FIGHTER_ROSTER, normalizeChoice, RosterEntry } from '../config/roster';
 import { manifestKey, menuArtKey, playUiSound } from '../config/characters';
 import { EmberField, GodRays, GroundPulse, Title3D } from '../ui/menu/MenuEffects';
-import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
+import { FONT_UI, FONT_IMPACT, FONT_NAME } from '../ui/fonts';
+import { C, CSS, GLASS } from '../ui/theme';
 
 interface MenuManifest {
   assetPath: string;
@@ -96,21 +97,15 @@ export class MenuScene extends Phaser.Scene {
     isolateSceneKeyboard(this);
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.drawBackground();
-    const credit = this.add.text(68, 35, 'Creado por Jorell', { fontFamily: FONT_UI, fontSize: '17px', color: '#d3dce2' }).setDepth(10);
-    this.title = new Title3D(this, 62, 69, ['FIGHTER', 'FAMILY'], 10);
+    const credit = this.add.text(68, 35, 'Creado por Jorell', { fontFamily: FONT_UI, fontSize: '16px', fontStyle: 'bold', color: CSS.ink }).setDepth(10);
+    this.title = new Title3D(this, 62, 69, ['FIGHTER', 'FAMILY'], 10, { side: [C.ink, C.primaryDeep], face: [C.cream, C.primary] });
     const tagline = this.add.text(67, 278, 'Arica es tu escenario.', {
-      fontFamily: FONT_UI, fontSize: '22px', color: '#ffb02e',
+      fontFamily: FONT_UI, fontSize: '22px', fontStyle: 'bold', color: CSS.primary, stroke: CSS.ivory, strokeThickness: 4,
     }).setDepth(10);
     const heroTexts = this.createHero();
     this.buildMenu();
-    const hints = [
-      this.add.text(64, 682, '↑ ↓  Elegir    Enter  Confirmar', {
-        fontFamily: FONT_UI, fontSize: '15px', color: '#d3dce2',
-      }).setDepth(10),
-      this.add.text(1214, 682, 'W / ↑ ×2  Doble salto     O  Poder especial', {
-        fontFamily: FONT_UI, fontSize: '15px', color: '#d3dce2',
-      }).setOrigin(1, 0).setDepth(10),
-    ];
+    // No footer and no key hints on the title screen (Jorell).
+    const hints: Phaser.GameObjects.Text[] = [];
     this.embersBack = new EmberField(this, 70, 3, 1.4, 3.2);
     this.embersFront = new EmberField(this, 22, 14, 0.45, 1.3);
     this.pulse = new GroundPulse(this, 3);
@@ -118,7 +113,6 @@ export class MenuScene extends Phaser.Scene {
     if (this.reducedMotion) this.skipIntro(); else this.playIntro(credit, tagline, heroTexts, hints);
     this.time.addEvent({ delay: SHOWCASE_INTERVAL, loop: true, callback: () => this.nextFighter() });
     GameAudio.for(this).play('music-menu');
-    musicControls(this);
 
     for (const key of ['UP', 'W']) this.input.keyboard!.on('keydown-' + key, () => this.navigate(-1));
     for (const key of ['DOWN', 'S']) this.input.keyboard!.on('keydown-' + key, () => this.navigate(1));
@@ -148,23 +142,22 @@ export class MenuScene extends Phaser.Scene {
       const texture = this.textures.createCanvas('menu_arica_shade', 1280, 720)!;
       const ctx = texture.context;
       const shade = ctx.createLinearGradient(0, 0, 1120, 0);
-      shade.addColorStop(0, 'rgba(16,78,180,0.7)');
-      shade.addColorStop(0.46, 'rgba(16,78,180,0.55)');
-      shade.addColorStop(0.72, 'rgba(16,78,180,0.1)');
-      shade.addColorStop(1, 'rgba(16,78,180,0)');
+      // A wash of ivory glass on the left, where the title and the menu sit.
+      shade.addColorStop(0, 'rgba(253,251,247,0.62)');
+      shade.addColorStop(0.46, 'rgba(253,251,247,0.42)');
+      shade.addColorStop(0.72, 'rgba(253,251,247,0.08)');
+      shade.addColorStop(1, 'rgba(253,251,247,0)');
       ctx.fillStyle = shade; ctx.fillRect(0, 0, 1280, 720);
       const vignette = ctx.createLinearGradient(0, 540, 0, 720);
-      vignette.addColorStop(0, 'rgba(16,78,180,0)'); vignette.addColorStop(1, 'rgba(16,78,180,0.75)');
+      vignette.addColorStop(0, 'rgba(18,17,20,0)'); vignette.addColorStop(1, 'rgba(18,17,20,0.35)');
       ctx.fillStyle = vignette; ctx.fillRect(0, 540, 1280, 180);
       texture.refresh();
     }
     this.add.image(640, 360, 'menu_arica_shade').setDepth(2);
-    this.add.rectangle(640, 695, 1280, 50, 0x1257c4, 0.85).setDepth(8);
-    this.add.rectangle(640, 670, 1152, 1, 0x7fd4ff, 0.25).setDepth(8);
   }
 
   private createHero(): Phaser.GameObjects.Text[] {
-    this.shadow = this.add.ellipse(HERO_X, HERO_FOOT - 9, 310, 28, 0x0e4fb4, 0.55).setDepth(3);
+    this.shadow = this.add.ellipse(HERO_X, HERO_FOOT - 9, 310, 28, C.ink, 0.45).setDepth(3);
     const art = menuArtKey(this.featured.id);
     if (this.renderer.type === Phaser.WEBGL) {
       const plane = this.add.plane(HERO_X, HERO_FOOT - HERO_H / 2, art);
@@ -176,14 +169,15 @@ export class MenuScene extends Phaser.Scene {
     this.hero.setName('menu-fighter').setDepth(4);
     this.heroTexts = [
       this.add.text(650, 123, '', {
-        fontFamily: FONT_IMPACT, fontSize: '66px', color: '#fff7ec', stroke: '#0e3a80', strokeThickness: 2,
+        // The featured fighter's name in Edo SZ, like every fighter name.
+        fontFamily: FONT_NAME, fontSize: '62px', color: CSS.ivory, stroke: CSS.ink, strokeThickness: 6,
+        shadow: { offsetX: 4, offsetY: 4, color: CSS.ink, blur: 0, fill: true, stroke: true },
       }).setDepth(12),
       this.add.text(654, 207, '', {
-        fontFamily: FONT_UI, fontSize: '23px', color: '#fff7ec', lineSpacing: 3,
-        shadow: { offsetX: 1, offsetY: 2, color: '#0e3a80', blur: 6, fill: true },
+        fontFamily: FONT_UI, fontSize: '21px', fontStyle: 'bold', color: CSS.ivory, lineSpacing: 3, stroke: CSS.ink, strokeThickness: 4,
       }).setDepth(12),
-      this.add.text(654, 583, '', { fontFamily: FONT_UI, fontSize: '23px', fontStyle: 'bold', color: '#7fd4ff' }).setDepth(13),
-      this.add.text(654, 617, '', { fontFamily: FONT_UI, fontSize: '17px', color: '#fff7ec', wordWrap: { width: 230 } }).setDepth(13),
+      this.add.text(654, 583, '', { fontFamily: FONT_UI, fontSize: '21px', fontStyle: 'bold', color: CSS.tertiary, stroke: CSS.ink, strokeThickness: 4 }).setDepth(13),
+      this.add.text(654, 617, '', { fontFamily: FONT_UI, fontSize: '16px', fontStyle: 'bold', color: CSS.ivory, stroke: CSS.ink, strokeThickness: 3, wordWrap: { width: 230 } }).setDepth(13),
     ];
     this.describeFeatured();
     return this.heroTexts;
@@ -305,19 +299,24 @@ export class MenuScene extends Phaser.Scene {
     this.rows = []; this.menuItems = []; this.rowBackgrounds = [];
     const positions = [380, 462, 516, 570, 624];
     this.cursor?.destroy();
-    this.cursor = this.add.rectangle(52, positions[0], 6, 64, 0x7fd4ff, 1).setDepth(16)
-      .setBlendMode(Phaser.BlendModes.ADD).setName('menu-cursor');
+    this.cursor = this.add.rectangle(52, positions[0], 8, 64, C.primary, 1).setDepth(16).setName('menu-cursor');
     this.options.forEach((option, i) => {
       const row = this.add.container(64, positions[i]).setDepth(15).setData('baseY', positions[i]);
-      if (i === 0) row.add(this.add.rectangle(5, 6, 516, 64, 0x754a30).setOrigin(0, 0.5));
-      const bg = this.add.rectangle(0, 0, 516, i === 0 ? 64 : 48, 0x1f6fd6, 0.2).setOrigin(0, 0.5)
+      // Hard ink offset under every row (no blur), glass on top.
+      // (two strips on the right and bottom, so the ink does not show through the glass).
+      const rowH = i === 0 ? 64 : 48;
+      row.add([
+        this.add.rectangle(4, rowH / 2, 516, 4, C.ink, 0.9).setOrigin(0, 0),
+        this.add.rectangle(516, -rowH / 2 + 4, 4, rowH, C.ink, 0.9).setOrigin(0, 0),
+      ]);
+      const bg = this.add.rectangle(0, 0, 516, i === 0 ? 64 : 48, C.ivory, GLASS.fill).setOrigin(0, 0.5)
         .setInteractive({ useHandCursor: true });
       const text = this.add.text(20, 0, option.label, {
         fontFamily: i === 0 ? FONT_IMPACT : FONT_UI,
-        fontSize: i === 0 ? '36px' : '23px', color: '#fff7ec',
+        fontSize: i === 0 ? '38px' : '22px', fontStyle: i === 0 ? 'normal' : 'bold', color: CSS.ink,
       }).setOrigin(0, 0.5);
       row.add([bg, text]);
-      if (i === 0) row.add(this.add.text(484, 0, '▶', { fontSize: '25px', color: '#0e3a80' }).setOrigin(1, 0.5));
+      if (i === 0) row.add(this.add.text(484, 0, '▶', { fontSize: '25px', color: CSS.white }).setOrigin(1, 0.5));
       bg.on('pointerover', () => { this.selectedIndex = i; this.updateSelection(); });
       bg.on('pointerdown', () => { this.selectedIndex = i; this.options[i].action(); });
       this.rows.push(row); this.menuItems.push(text); this.rowBackgrounds.push(bg);
@@ -333,9 +332,10 @@ export class MenuScene extends Phaser.Scene {
   private updateSelection(): void {
     this.rowBackgrounds.forEach((bg, i) => {
       const selected = i === this.selectedIndex;
-      bg.setFillStyle(i === 0 ? 0xffb02e : 0x1f6fd6, i === 0 ? 1 : selected ? 0.94 : 0.38);
-      if (selected) bg.setStrokeStyle(2, 0x7fd4ff); else bg.setStrokeStyle();
-      this.menuItems[i].setColor(i === 0 ? '#0e3a80' : selected ? '#7fd4ff' : '#fff7ec');
+      // First row is the call to action in Electric Orange; a selected row inverts to ink.
+      bg.setFillStyle(i === 0 ? C.primary : selected ? C.ink : C.ivory, i === 0 ? 1 : selected ? 0.88 : 0.62);
+      if (selected) bg.setStrokeStyle(2, i === 0 ? C.ink : C.primary); else bg.setStrokeStyle(1, C.ivory, 0.85);
+      this.menuItems[i].setColor(i === 0 ? CSS.white : selected ? CSS.ivory : CSS.ink);
       const row = this.rows[i];
       // A light sweep runs across the chosen row (WebGL only; Canvas simply skips it).
       row.postFX?.clear();

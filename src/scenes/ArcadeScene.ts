@@ -9,7 +9,7 @@ import { ArcadeRun, ArcadeStep, buildLadder, newRun } from '../config/arcade';
 import { menuArtKey, playUiSound } from '../config/characters';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { recordArcadeClear } from '../systems/Stats';
-import { GameAudio, musicControls } from '../systems/GameAudio';
+import { GameAudio } from '../systems/GameAudio';
 import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
 
 export type ArcadeView = 'pick' | 'ladder' | 'continue' | 'ending';
@@ -53,7 +53,6 @@ export class ArcadeScene extends Phaser.Scene {
   create(): void {
     isolateSceneKeyboard(this);
     GameAudio.for(this).play('music-menu');
-    musicControls(this);
     const backdrop = this.add.image(640, 360, 'menu_arica_coast');
     if (backdrop.width > 1) backdrop.setDisplaySize(1280, 720);
     this.add.rectangle(640, 360, 1280, 720, 0x0e47a8, 0.78);
