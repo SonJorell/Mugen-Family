@@ -11,6 +11,7 @@ import { DRIVE_ASSETS } from '../combat/driveAssets';
 import { prepareDriveAtlas } from '../animation/DriveSpriteAtlas';
 import { CharacterManifest, isValidManifest, manifestKey, menuArtKey, sortAnimationFiles, superPortraitKey, UI_SOUNDS } from '../config/characters';
 import { FONT_UI } from '../ui/fonts';
+import { C, CSS, drawGlass } from '../ui/theme';
 
 export class PreloadScene extends Phaser.Scene {
   private manifests: CharacterManifest[] = [];
@@ -86,13 +87,13 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   private showLoadError(): void {
-    this.add.rectangle(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT, 0x030a13, 0.8).setDepth(9);
-    this.add.rectangle(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, 800, 250, 0x12121c).setDepth(10);
+    this.add.rectangle(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT, C.ink, 0.6).setDepth(9);
+    drawGlass(this.add.graphics(), GAME_CONFIG.WIDTH / 2 - 400, GAME_CONFIG.HEIGHT / 2 - 125, 800, 250, { alpha: 0.92, chamfer: 18, shadow: 4 }).setDepth(10);
     this.add.text(GAME_CONFIG.WIDTH / 2, 320, 'No se pudieron cargar los archivos del juego.\nComprueba la conexión y vuelve a intentarlo.', {
-      fontFamily: FONT_UI, fontSize: '24px', color: '#ffffff', align: 'center',
+      fontFamily: FONT_UI, fontSize: '22px', fontStyle: 'bold', color: CSS.ink, align: 'center',
     }).setOrigin(0.5).setDepth(11);
     this.add.text(GAME_CONFIG.WIDTH / 2, 410, 'Reintentar · Enter', {
-      fontFamily: FONT_UI, fontStyle: 'bold', fontSize: '28px', color: '#ffdd00',
+      fontFamily: FONT_UI, fontStyle: 'bold', fontSize: '26px', color: CSS.primary,
     }).setOrigin(0.5).setDepth(11).setInteractive({ useHandCursor: true }).on('pointerdown', () => window.location.reload());
     this.input.keyboard?.once('keydown-ENTER', () => window.location.reload());
   }

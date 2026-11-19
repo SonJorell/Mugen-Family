@@ -37,6 +37,7 @@ export const CSS = {
   tertiary: '#00e5ff',
   gold: '#ffb800',
   white: '#ffffff',
+  primaryDeep: '#8a1c00',
 } as const;
 
 export const GLASS = {
