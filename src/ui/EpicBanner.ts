@@ -32,12 +32,12 @@ export interface BannerStyle {
 
 export const BANNER_STYLES = {
   // Arcade Impact palette (theme.ts): extrusion in ink toward the accent, faces from white.
-  round: { side: [C.ink, 0x004f58], face: [C.white, C.tertiary], accent: C.tertiary, fontSize: 104, shake: 0.004, volume: 0.45 },
-  fight: { side: [C.ink, 0x8a1c00], face: [0xfff1c2, C.primary], accent: C.primary, fontSize: 150, shake: 0.012, volume: 0.9 },
-  ko: { side: [C.ink, 0x930019], face: [C.white, C.secondary], accent: C.secondary, fontSize: 190, shake: 0.016, volume: 1 },
-  time: { side: [C.ink, 0x004f58], face: [C.white, C.tertiary], accent: C.tertiary, fontSize: 150, shake: 0.008, volume: 0.7 },
-  victory: { side: [C.ink, 0x8a5a00], face: [0xfffbe0, C.gold], accent: C.gold, fontSize: 150, shake: 0.01, volume: 0.9, celebrate: true },
-  defeat: { side: [C.ink, 0x930019], face: [0xffdad8, C.secondary], accent: C.secondary, fontSize: 150, shake: 0.006, volume: 0.8, mourn: true },
+  round: { side: [C.ink, C.tertiaryDeep], face: [C.white, C.tertiary], accent: C.tertiary, fontSize: 104, shake: 0.004, volume: 0.45 },
+  fight: { side: [C.ink, C.primaryDeep], face: [C.cream, C.primary], accent: C.primary, fontSize: 150, shake: 0.012, volume: 0.9 },
+  ko: { side: [C.ink, C.secondaryDeep], face: [C.white, C.secondary], accent: C.secondary, fontSize: 190, shake: 0.016, volume: 1 },
+  time: { side: [C.ink, C.tertiaryDeep], face: [C.white, C.tertiary], accent: C.tertiary, fontSize: 150, shake: 0.008, volume: 0.7 },
+  victory: { side: [C.ink, C.goldDeep], face: [0xfffbe0, C.gold], accent: C.gold, fontSize: 150, shake: 0.01, volume: 0.9, celebrate: true },
+  defeat: { side: [C.ink, C.secondaryDeep], face: [0xffdad8, C.secondary], accent: C.secondary, fontSize: 150, shake: 0.006, volume: 0.8, mourn: true },
   draw: { side: [C.ink, 0x5e3f38], face: [C.white, 0xe6e1e5], accent: C.ivory, fontSize: 150, shake: 0.006, volume: 0.6 },
 } satisfies Record<string, BannerStyle>;
 

@@ -18,8 +18,14 @@ export const C = {
   tertiary: 0x00e5ff,
   gold: 0xffb800,
   white: 0xffffff,
-  /** Deep red for lost health and danger surfaces. */
+  /** Deep tones for 3D lettering extrusions and dark accents. */
   crimsonDeep: 0x5c0a1c,
+  primaryDeep: 0x8a1c00,
+  secondaryDeep: 0x930019,
+  tertiaryDeep: 0x004f58,
+  goldDeep: 0x8a5a00,
+  /** Warm cream for the top of lettering faces. */
+  cream: 0xfff1c2,
 } as const;
 
 /** The same palette as CSS strings, for Phaser text styles. */
@@ -103,6 +109,10 @@ export function fillSlanted(g: Phaser.GameObjects.Graphics, x: number, y: number
     : [[x + s, y], [x + w + s, y], [x + w, y + h], [x, y + h]];
   g.fillStyle(color, alpha).fillPoints(pts.map(([px, py]) => new Phaser.Math.Vector2(px, py)), true);
 }
+
+/** Darker accents for small text on ivory glass (the bright tokens are too light to read there). */
+export const TERTIARY_INK = '#006672';
+export const MUTED_INK = '#5e3f38';
 
 /** Text chips (buttons, labels): ink on ivory glass. Phaser text cannot draw a border, so the glass does the work. */
 export const CHIP = { color: CSS.ink, backgroundColor: 'rgba(253, 251, 247, 0.78)' } as const;

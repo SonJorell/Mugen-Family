@@ -14,6 +14,7 @@ import { COMMAND_MOVES } from '../combat/AttackDefinition';
 import { comboExamples, describeCombo } from '../config/combos';
 import type { TrainingOptions } from '../ui/TrainingOverlay';
 import { FONT_UI, FONT_NAME, FONT_IMPACT } from '../ui/fonts';
+import { C, CSS, MUTED_INK, TERTIARY_INK, drawGlass } from '../ui/theme';
 
 export class PauseScene extends Phaser.Scene {
   private selectedIndex: number = 0;
@@ -33,6 +34,7 @@ export class PauseScene extends Phaser.Scene {
   private movePages: Phaser.GameObjects.Container[] = [];
   movePage = 0;
   private title!: Phaser.GameObjects.Text;
+  private panel?: Phaser.GameObjects.Graphics;
   /** True while the move list covers the pause menu. */
   get moveListOpen(): boolean { return !!this.moveList?.visible; }
 
@@ -67,16 +69,18 @@ export class PauseScene extends Phaser.Scene {
     const W = GAME_CONFIG.WIDTH;
     const H = GAME_CONFIG.HEIGHT;
 
-    // Semi-transparent overlay
-    this.add.rectangle(W / 2, H / 2, W, H, 0x0e3a80, 0.6);
+    // Dim the fight, then a glass panel behind the title and the options.
+    this.add.rectangle(W / 2, H / 2, W, H, C.ink, 0.38);
+    const titleY = training ? 110 : H / 2 - 140;
+    const panelTop = titleY - 52, panelBottom = top + (this.items.length - 1) * step + 40;
+    this.panel = drawGlass(this.add.graphics(), W / 2 - 280, panelTop, 560, panelBottom - panelTop, { alpha: 0.62, chamfer: 22, shadow: 4 });
+    this.panel.fillStyle(C.primary, 1).fillRect(W / 2 - 280, panelTop + 22, 8, panelBottom - panelTop - 22);
 
     // Pause title
-    this.title = this.add.text(W / 2, training ? 110 : H / 2 - 140, 'PAUSA', {
+    this.title = this.add.text(W / 2, titleY, 'PAUSA', {
       fontFamily: FONT_IMPACT,
-      fontSize: '60px',
-      color: '#ffffff',
-      stroke: '#0e3a80',
-      strokeThickness: 8,
+      fontSize: '64px',
+      color: CSS.ink,
     }).setOrigin(0.5);
 
     // Options
@@ -84,10 +88,9 @@ export class PauseScene extends Phaser.Scene {
       const t = this.add.text(W / 2, top + i * step, opt.label, {
         fontFamily: FONT_UI,
         fontStyle: 'bold',
-        fontSize: '32px',
-        color: '#ffffff',
-        stroke: '#0e3a80',
-        strokeThickness: 5,
+        fontSize: '28px',
+        color: CSS.ink,
+        padding: { x: 18, y: 4 },
       }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
       t.on('pointerover', () => { this.selectedIndex = i; this.updateSelection(); });
@@ -123,6 +126,7 @@ export class PauseScene extends Phaser.Scene {
     if (open) this.showMovePage(0);
     this.menuItems.forEach(t => t.setVisible(!open));
     this.title.setVisible(!open);
+    this.panel?.setVisible(!open);
   }
 
   showMovePage(page: number): void {
@@ -135,19 +139,19 @@ export class PauseScene extends Phaser.Scene {
     const data = (this.scene.get('FightScene') as FightScene).getMatchData();
     const fighters = [rosterEntry(data.playerChoice.characterId), rosterEntry(data.opponentChoice.characterId)];
     const frame = this.add.container(0, 0).setDepth(10);
-    frame.add(this.add.rectangle(W / 2, 440, 1040, 500, 0x1757c2, 0.96).setStrokeStyle(3, 0xffb02e, 0.8));
+    frame.add(drawGlass(this.add.graphics(), W / 2 - 520, 190, 1040, 500, { alpha: 0.86, chamfer: 26, shadow: 4 }));
     const box = this.add.container(0, 0), combos = this.add.container(0, 0);
     frame.add([box, combos]);
     this.movePages = [box, combos];
     box.add(this.add.text(W / 2, 228, 'MOVIMIENTOS', {
-      fontFamily: FONT_IMPACT, fontSize: '36px', color: '#ffb02e', stroke: '#0e3a80', strokeThickness: 6,
+      fontFamily: FONT_IMPACT, fontSize: '36px', color: CSS.ink,
     }).setOrigin(0.5));
-    const row = { fontFamily: FONT_UI, fontSize: '20px', color: '#fff7ec' };
+    const row = { fontFamily: FONT_UI, fontSize: '20px', color: CSS.ink };
     const versus = data.mode === 'versus', set = loadBindings();
     const p1 = activeKeys(set, 'p1', versus), p2 = activeKeys(set, 'p2', true);
     if (versus) {
-      box.add(this.add.text(360, 252, 'JUGADOR 1', { ...row, fontSize: '15px', color: '#ffb07a', fontStyle: 'bold' }));
-      box.add(this.add.text(560, 252, 'JUGADOR 2', { ...row, fontSize: '15px', color: '#7fd4ff', fontStyle: 'bold' }));
+      box.add(this.add.text(360, 252, 'JUGADOR 1', { ...row, fontSize: '15px', color: CSS.primary, fontStyle: 'bold' }));
+      box.add(this.add.text(560, 252, 'JUGADOR 2', { ...row, fontSize: '15px', color: TERTIARY_INK, fontStyle: 'bold' }));
     }
     const keysOf = (move: typeof MOVE_LIST[number], keys: typeof p1) =>
       move.with ? `${describeKeys(move.binding, keys)} + ${describeKeys(move.with, keys)}` : describeKeys(move.binding, keys);
@@ -155,42 +159,44 @@ export class PauseScene extends Phaser.Scene {
       const y = 270 + i * 29;
       const small = { ...row, fontSize: '18px' };
       box.add(this.add.text(160, y, move.label, { ...small, fontStyle: 'bold' }));
-      box.add(this.add.text(versus ? 360 : 380, y, keysOf(move, p1), { ...small, color: '#ffb02e' }));
-      if (versus) box.add(this.add.text(560, y, keysOf(move, p2), { ...small, color: '#ffb02e' }));
-      else if (move.note) box.add(this.add.text(540, y, move.note, { ...row, color: '#cfe6ff', fontSize: '15px' }).setWordWrapWidth(260));
+      box.add(this.add.text(versus ? 360 : 380, y, keysOf(move, p1), { ...small, color: CSS.primary }));
+      if (versus) box.add(this.add.text(560, y, keysOf(move, p2), { ...small, color: CSS.primary }));
+      else if (move.note) box.add(this.add.text(540, y, move.note, { ...row, color: MUTED_INK, fontSize: '15px' }).setWordWrapWidth(260));
     });
     const superKeys = versus ? `J1 ${describeKeys('SPECIAL', p1)} · J2 ${describeKeys('SPECIAL', p2)}` : describeKeys('SPECIAL', p1);
     fighters.forEach((f, i) => {
       const x = 820, y = 282 + i * 140;
-      box.add(this.add.text(x, y, f.name.toUpperCase(), { fontFamily: FONT_NAME, fontSize: '30px', color: '#ffffff' }));
-      box.add(this.add.text(x, y + 34, `${f.power}  ·  ${superKeys}`, { ...row, color: '#ffb02e' }));
-      box.add(this.add.text(x, y + 64, 'Súper con la energía al 100 %', { ...row, fontSize: '16px', color: '#cfe6ff' }));
-      box.add(this.add.text(x, y + 92, `${COMMAND_MOVES[f.stats.commandMove].label}  ·  ↓ ↘ → + Puño`, { ...row, fontSize: '17px', color: '#7fd4ff' }));
+      box.add(this.add.text(x, y, f.name.toUpperCase(), { fontFamily: FONT_NAME, fontSize: '30px', color: CSS.ink }));
+      box.add(this.add.text(x, y + 34, `${f.power}  ·  ${superKeys}`, { ...row, color: CSS.primary }));
+      box.add(this.add.text(x, y + 64, 'Súper con la energía al 100 %', { ...row, fontSize: '16px', color: MUTED_INK }));
+      box.add(this.add.text(x, y + 92, `${COMMAND_MOVES[f.stats.commandMove].label}  ·  ↓ ↘ → + Puño`, { ...row, fontSize: '17px', color: TERTIARY_INK }));
     });
-    box.add(this.add.text(W / 2, 668, '← →  Combos     Esc o Enter  Volver', { ...row, fontSize: '17px', color: '#cfe6ff' }).setOrigin(0.5));
+    box.add(this.add.text(W / 2, 668, '← →  Combos     Esc o Enter  Volver', { ...row, fontSize: '17px', color: MUTED_INK }).setOrigin(0.5));
 
     // Page 2: example combos for each fighter, written with player 1's keys.
     combos.add(this.add.text(W / 2, 228, 'COMBOS', {
-      fontFamily: FONT_IMPACT, fontSize: '36px', color: '#ffb02e', stroke: '#0e3a80', strokeThickness: 6,
+      fontFamily: FONT_IMPACT, fontSize: '36px', color: CSS.ink,
     }).setOrigin(0.5));
     const first = (b: Parameters<typeof describeKeys>[0]) => keyLabel(p1[b][0] ?? '?');
     fighters.forEach((f, i) => {
       const x = 160 + i * 500;
-      combos.add(this.add.text(x, 268, f.name.toUpperCase(), { fontFamily: FONT_NAME, fontSize: '30px', color: '#ffffff' }));
+      combos.add(this.add.text(x, 268, f.name.toUpperCase(), { fontFamily: FONT_NAME, fontSize: '30px', color: CSS.ink }));
       comboExamples(f.id).forEach((combo, j) => {
         const y = 306 + j * 82;
-        combos.add(this.add.text(x, y, combo.title, { ...row, fontSize: '18px', fontStyle: 'bold', color: '#7fd4ff' }));
-        combos.add(this.add.text(x, y + 25, describeCombo(combo.route, first), { ...row, fontSize: '20px', color: '#ffb02e' }));
-        if (combo.note) combos.add(this.add.text(x, y + 52, combo.note, { ...row, fontSize: '14px', color: '#cfe6ff' }));
+        combos.add(this.add.text(x, y, combo.title, { ...row, fontSize: '18px', fontStyle: 'bold', color: TERTIARY_INK }));
+        combos.add(this.add.text(x, y + 25, describeCombo(combo.route, first), { ...row, fontSize: '20px', color: CSS.primary }));
+        if (combo.note) combos.add(this.add.text(x, y + 52, combo.note, { ...row, fontSize: '14px', color: MUTED_INK }));
       });
     });
-    combos.add(this.add.text(W / 2, 668, '← →  Movimientos     Esc o Enter  Volver', { ...row, fontSize: '17px', color: '#cfe6ff' }).setOrigin(0.5));
+    combos.add(this.add.text(W / 2, 668, '← →  Movimientos     Esc o Enter  Volver', { ...row, fontSize: '17px', color: MUTED_INK }).setOrigin(0.5));
     return frame;
   }
 
   private updateSelection(): void {
     this.menuItems.forEach((t, i) => {
-      t.setColor(i === this.selectedIndex ? '#ffb02e' : '#ffffff');
+      // Selected: inverted ink chip with ivory text; the rest ink on the glass.
+      const on = i === this.selectedIndex;
+      t.setColor(on ? CSS.ivory : CSS.ink).setBackgroundColor(on ? CSS.ink : 'rgba(0,0,0,0)');
       t.setScale(i === this.selectedIndex ? 1.06 : 1.0);
     });
   }
