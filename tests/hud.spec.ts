@@ -15,7 +15,7 @@ async function fight(page: Page) {
 }
 /** Screen-pinned banner lettering currently alive in the fight (Title3D containers). */
 const banners = (page: Page) => page.evaluate(() => (window as any).__game.scene.getScene('FightScene').children.list
-  .filter((o: any) => o.type === 'Container' && o.scrollFactorX === 0 && o.list.some((c: any) => c.type === 'Text'))
+  .filter((o: any) => o.type === 'Container' && o.scrollFactorX === 0 && !String(o.name).startsWith('combo-') && o.list.some((c: any) => c.type === 'Text'))
   .map((o: any) => o.list[o.list.length - 1].text as string));
 
 test('round and fight banners announce the start and clean up without delaying the fight', async ({ page }) => {
