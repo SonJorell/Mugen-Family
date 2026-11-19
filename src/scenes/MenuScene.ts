@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { CpuDifficulty, GAME_CONFIG, GameMode, normalizeDifficulty, normalizeMode } from '../config/gameConfig';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { SpriteSheetOptions } from '../animation/SpriteSheetLoader';
-import { GameAudio, musicControls } from '../systems/GameAudio';
+import { GameAudio } from '../systems/GameAudio';
 import { FighterChoice, FIGHTER_ROSTER, normalizeChoice, RosterEntry } from '../config/roster';
 import { manifestKey, menuArtKey, playUiSound } from '../config/characters';
 import { EmberField, GodRays, GroundPulse, Title3D } from '../ui/menu/MenuEffects';
@@ -106,14 +106,8 @@ export class MenuScene extends Phaser.Scene {
     }).setDepth(10);
     const heroTexts = this.createHero();
     this.buildMenu();
-    const hints = [
-      this.add.text(64, 682, '↑ ↓  Elegir    Enter  Confirmar', {
-        fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: CSS.ink,
-      }).setDepth(10),
-      this.add.text(1214, 682, 'W / ↑ ×2  Doble salto     O  Poder especial', {
-        fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: CSS.ink,
-      }).setOrigin(1, 0).setDepth(10),
-    ];
+    // No footer and no key hints on the title screen (Jorell).
+    const hints: Phaser.GameObjects.Text[] = [];
     this.embersBack = new EmberField(this, 70, 3, 1.4, 3.2);
     this.embersFront = new EmberField(this, 22, 14, 0.45, 1.3);
     this.pulse = new GroundPulse(this, 3);
@@ -121,7 +115,6 @@ export class MenuScene extends Phaser.Scene {
     if (this.reducedMotion) this.skipIntro(); else this.playIntro(credit, tagline, heroTexts, hints);
     this.time.addEvent({ delay: SHOWCASE_INTERVAL, loop: true, callback: () => this.nextFighter() });
     GameAudio.for(this).play('music-menu');
-    musicControls(this);
 
     for (const key of ['UP', 'W']) this.input.keyboard!.on('keydown-' + key, () => this.navigate(-1));
     for (const key of ['DOWN', 'S']) this.input.keyboard!.on('keydown-' + key, () => this.navigate(1));
@@ -163,10 +156,6 @@ export class MenuScene extends Phaser.Scene {
       texture.refresh();
     }
     this.add.image(640, 360, 'menu_arica_shade').setDepth(2);
-    // Footer: a strip of ivory glass on an ink rule.
-    this.add.rectangle(640, 695, 1280, 50, C.ivory, 0.72).setDepth(8);
-    this.add.rectangle(640, 669, 1280, 3, C.ink, 0.9).setDepth(8);
-    this.add.rectangle(640, 672, 1280, 2, C.primary, 1).setDepth(8);
   }
 
   private createHero(): Phaser.GameObjects.Text[] {
