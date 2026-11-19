@@ -36,7 +36,7 @@ for (const difficulty of DIFFICULTIES) {
       game.scene.start('FightScene', { mode: 'cpu', difficulty, cpuSeed: 11,
         playerChoice: { characterId: left, paletteId: 'original' }, opponentChoice: { characterId: right, paletteId: 'amethyst' } });
     }, { left, right, difficulty });
-    await page.waitForFunction(() => window.__game.scene.getScene('FightScene').roundSystem?.phase === 'FIGHT', null, { timeout: 20000 });
+    await page.waitForFunction(() => window.__game?.scene.getScene('FightScene')?.roundSystem?.phase === 'FIGHT', null, { timeout: 20000 });
     const batch = await page.evaluate(({ rounds, difficulty }) => {
       const game = window.__game, s = game.scene.getScene('FightScene');
       game.loop.stop();

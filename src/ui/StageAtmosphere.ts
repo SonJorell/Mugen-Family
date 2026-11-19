@@ -52,6 +52,7 @@ export class StageAtmosphere {
   private theme: StageTheme = THEMES[0];
   private motes: Mote[] = [];
   private clock = 0;
+  private drawCooldown = 0;
 
   constructor(private readonly scene: Phaser.Scene, stageIndex: number) {
     const W = GAME_CONFIG.STAGE_WIDTH, H = GAME_CONFIG.STAGE_HEIGHT;
@@ -85,7 +86,12 @@ export class StageAtmosphere {
       if (m.y < 70) m.y = H;
       if (m.y > H + 12) m.y = 75;
     }
-    this.drawMotes();
+    // Redraw motes at ~30 Hz to keep Graphics geometry rebuilds light even on software renderers.
+    this.drawCooldown -= delta;
+    if (this.drawCooldown <= 0) {
+      this.drawCooldown = 33;
+      this.drawMotes();
+    }
   }
 
   private drawFloorGrounding(): void {
@@ -107,13 +113,13 @@ export class StageAtmosphere {
 
   private seedMotes(): void {
     const t = this.theme, W = GAME_CONFIG.STAGE_WIDTH, H = GAME_CONFIG.FLOOR_Y;
-    this.motes = Array.from({ length: 28 }, (_, i) => ({
+    this.motes = Array.from({ length: 16 }, (_, i) => ({
       x: ((i * 197 + 53) % W),
       y: 90 + ((i * 131 + 29) % (H - 90)),
       vx: Phaser.Math.Linear(t.speedX[0], t.speedX[1], ((i * 37) % 100) / 100),
       vy: Phaser.Math.Linear(t.speedY[0], t.speedY[1], ((i * 61) % 100) / 100),
       size: Phaser.Math.Linear(t.size[0], t.size[1], ((i * 23) % 100) / 100),
-      alpha: 0.18 + ((i * 19) % 38) / 100,
+      alpha: 0.22 + ((i * 19) % 38) / 100,
       phase: i * 0.7,
       color: t.colors[i % t.colors.length],
     }));
@@ -125,10 +131,9 @@ export class StageAtmosphere {
       const pulse = 0.65 + 0.35 * Math.sin(this.clock * 2.4 + m.phase);
       const a = m.alpha * pulse;
       if (streak) {
-        g.lineStyle(m.size, m.color, a * 0.8).lineBetween(m.x, m.y, m.x - m.vx * 0.18, m.y - m.vy * 0.18);
+        g.lineStyle(m.size, m.color, a * 0.85).lineBetween(m.x, m.y, m.x - m.vx * 0.18, m.y - m.vy * 0.18);
       } else {
-        g.fillStyle(m.color, a * 0.35).fillCircle(m.x, m.y, m.size * 2.2);
-        g.fillStyle(m.color, a).fillCircle(m.x, m.y, m.size);
+        g.fillStyle(m.color, a).fillCircle(m.x, m.y, m.size * 1.25);
       }
     }
   }

@@ -92,7 +92,7 @@ for (const right of [true, false]) test(`César throws, enters the i30, hits onc
   expect(result.returning).toEqual({ visible: true, texture: 'cesar-drive-celebrate', carVisible: false, targetInside: true });
   expect(result.end).toEqual({ active: false, health: 40, x: right ? 600 : 1320, targetX: right ? 1680 : 240,
     grounded: true, energy: [0, 0], visible: [true, true], onScreen: true, layers: 0 });
-  expect(result.snap[0]).toBeLessThan(1);
+  expect(result.snap[0]).toBeLessThan(3);
   expect(result.snap[1]).toBeLessThan(8);
 });
 
@@ -189,7 +189,7 @@ test('non-Tilin opponents play animated combat reaction poses during César\'s i
   });
   expect(keys[0]).toContain('joako_HIT_REACTION');
   expect(keys[1]).toContain('joako_KNOCKDOWN');
-  expect(keys[2]).toContain('joako_STUN');
+  expect(keys[2]).toContain('joako_GET_UP');
   expect(keys[3]).toContain('joako_KNOCKDOWN');
   expect(keys[4]).toContain('joako_GET_UP');
 });

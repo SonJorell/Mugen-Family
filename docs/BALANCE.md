@@ -129,3 +129,29 @@ Paso veloz. Conviene revisarlo con partidas de dos jugadores antes de ajustar.
 César bajó su multiplicador de daño de 1.3 a 1.2. Motivo y alternativas descartadas en
 `docs/DECISIONES.md`. La CPU no aprovecha del todo la velocidad de Tilin (no castiga por frames ni
 busca el alcance), así que conviene revisar estas cifras con partidas reales de dos jugadores.
+
+## Plantel completo de 5 luchadores (noviembre 2026)
+
+### Atributos comparados (`src/config/roster.ts`)
+
+| Luchador | Estatura | Vida | Daño | Vel. ataque | Caminar | Salto | Peso | Súper (60 daño) | Comando |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| **Tilin** | 167 cm | 100 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | Canto sónico (proyectil) | Paso veloz |
+| **César** | 183 cm | 125 | 1.20 | 0.80 | 0.72 | 0.86 | 1.70 | Furia del i30 (agarre cercano) | Pisotón sísmico |
+| **Joako** | 181 cm | 90 | 0.88 | 1.25 | 1.30 | 1.12 | 0.85 | Cancha y construcción (proyectil) | Paso veloz |
+| **Jorell** | 182 cm | 100 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | Kamehameha (golpe cercano) | Paso veloz |
+| **Tata** | 165 cm | 110 | 1.04 | 0.95 | 0.90 | 0.94 | 1.15 | Brindis a pedales (empujón cercano) | Paso veloz |
+
+### Simulación 5×5 CPU contra CPU (`node scripts/simulate-balance.mjs 6 normal`)
+
+120 rounds totales (10 emparejamientos únicos × 2 lados × 6 rounds por lado, con bloqueo alto/bajo activo; 0 empates, 120 K.O., promedio 20 s por round):
+
+| Luchador | Victorias | % | Vida media al ganar | vs Tilin | vs César | vs Joako | vs Jorell | vs Tata |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| **Tilin** | 32 / 48 | 67 % | 51 % | — | 75 % | 58 % | 67 % | 67 % |
+| **Joako** | 29 / 48 | 60 % | 40 % | 42 % | 67 % | — | 83 % | 50 % |
+| **César** | 20 / 48 | 42 % | 52 % | 25 % | — | 33 % | 50 % | 58 % |
+| **Tata** | 20 / 48 | 42 % | 56 % | 33 % | 42 % | 50 % | 42 % | — |
+| **Jorell** | 19 / 48 | 40 % | 44 % | 33 % | 50 % | 17 % | — | 58 % |
+
+**Lectura preliminar:** en CPU Normal, los dos luchadores con súper de proyectil (**Tilin** 67 % y **Joako** 60 %) sacan ventaja frente a los tres de apertura cuerpo a cuerpo (**César** 42 %, **Tata** 42 %, **Jorell** 40 %), porque la CPU rara vez salta o bloquea a distancia con precisión y los abridores cercanos fallan con más frecuencia. Como referencia futura de balance, conviene probar una muestra más larga en Difícil (`node scripts/simulate-balance.mjs 20 hard`) y validar en combates 2P reales antes de ajustar multiplicadores.
