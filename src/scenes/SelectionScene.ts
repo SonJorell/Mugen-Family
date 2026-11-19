@@ -10,7 +10,8 @@ import { ensureGlowTexture, Title3D } from '../ui/menu/MenuEffects';
 import { isolateSceneKeyboard } from '../input/SceneKeyboard';
 import { GameAudio, musicControls } from '../systems/GameAudio';
 import { announce } from '../systems/Announcer';
-import { FONT_UI, FONT_IMPACT } from '../ui/fonts';
+import { FONT_UI, FONT_IMPACT, FONT_NAME } from '../ui/fonts';
+import { C, CSS } from '../ui/theme';
 
 interface SelectionData {
   manifest?: { assetPath: string; animations: Record<string, string[]>; spriteSheet?: SpriteSheetOptions };
@@ -23,7 +24,7 @@ interface SelectionData {
 }
 
 /** Fire colours of the VS, matching the fighters' names: extrusion (far, near) and face (top, bottom). */
-const VS_FIRE = { side: [0x3a0a05, 0xb3260f] as [number, number], face: [0xffd24a, 0xe8401c] as [number, number] };
+const VS_FIRE = { side: [C.ink, C.primaryDeep] as [number, number], face: [C.gold, C.primary] as [number, number] };
 
 const MODE_LABELS: Record<GameMode, string> = { cpu: 'CPU', training: 'Práctica', versus: 'Jugador 2' };
 
@@ -93,10 +94,10 @@ export class SelectionScene extends Phaser.Scene {
       this.pointerY = Phaser.Math.Clamp((pointer.y - 360) / 360, -1, 1);
     });
     this.input.on('gameout', () => { this.pointerX = 0; this.pointerY = 0; });
-    this.helpBar = this.add.rectangle(640, 677, 1280, 86, 0x1757c2).setDepth(20);
-    this.title = this.add.text(48, 30, '', { fontFamily: FONT_IMPACT, fontSize: '43px', color: '#fff7ec' }).setStroke('#0e3a80', 6).setDepth(30);
-    this.steps = this.add.text(50, 88, '', { fontFamily: FONT_UI, fontSize: '18px', color: '#7fd4ff' }).setStroke('#0e3a80', 4).setDepth(30);
-    this.help = this.add.text(48, 683, '', { fontFamily: FONT_UI, fontSize: '15px', color: '#e3f1ff' }).setDepth(30);
+    this.helpBar = this.add.rectangle(640, 677, 1280, 86, C.ivory, 0.72).setDepth(20);
+    this.title = this.add.text(48, 30, '', { fontFamily: FONT_IMPACT, fontSize: '46px', color: CSS.ivory }).setStroke(CSS.ink, 6).setDepth(30);
+    this.steps = this.add.text(50, 88, '', { fontFamily: FONT_UI, fontSize: '17px', fontStyle: 'bold', color: CSS.tertiary }).setStroke(CSS.ink, 4).setDepth(30);
+    this.help = this.add.text(48, 683, '', { fontFamily: FONT_UI, fontSize: '15px', fontStyle: 'bold', color: CSS.ink }).setDepth(30);
     this.content = this.add.container(0, 0).setDepth(25);
     // Rendering replaces the preview objects. Resolve clicks against current bounds
     // immediately, without waiting for Phaser's next interactive-object queue flush.
@@ -127,7 +128,7 @@ export class SelectionScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.transition?.remove(); this.showVideo(false); });
     this.render();
   }
-  private text(x: number, y: number, value: string, size = 20, color = '#fff7ec', centered = false, headline = false) {
+  private text(x: number, y: number, value: string, size = 20, color: string = CSS.ivory, centered = false, headline = false) {
     const text = this.add.text(x, y, value, { fontFamily: headline ? FONT_IMPACT : FONT_UI, fontSize: size + 'px', color });
     if (centered) text.setOrigin(0.5, 0);
     this.content.add(text); this.bucket?.push(text); return text;
@@ -137,10 +138,11 @@ export class SelectionScene extends Phaser.Scene {
     this.content.add(rect); this.bucket?.push(rect); return rect;
   }
   private button(x: number, y: number, width: number, label: string, action: () => void, primary = false) {
-    const rect = this.clickable(this.rectangle(x, y, width, 46, primary ? 0xff6a1f : 0x2f86f0), action);
-    rect.on('pointerover', () => rect.setStrokeStyle(2, 0x7fd4ff));
+    // Primary: Electric Orange chip; secondary: ink glass. Hover rims them in gold.
+    const rect = this.clickable(this.rectangle(x, y, width, 46, primary ? C.primary : C.ink, primary ? 1 : 0.82), action);
+    rect.on('pointerover', () => rect.setStrokeStyle(3, C.gold));
     rect.on('pointerout', () => rect.setStrokeStyle());
-    this.text(x, y - 14, label, 22, primary ? '#0e3a80' : '#fff7ec', true, primary);
+    this.text(x, y - 14, label, 22, primary ? CSS.white : CSS.ivory, true, primary);
   }
   private clickable(rect: Phaser.GameObjects.Rectangle, action: () => void) {
     this.hitTargets.push({ bounds: rect.getBounds(), action });
@@ -231,7 +233,7 @@ export class SelectionScene extends Phaser.Scene {
     this.showVideo(this.phase === 'fighters');
     // Over the video the controls float on the picture, without the dark bar.
     this.helpBar.setVisible(this.phase !== 'fighters');
-    this.help.setStroke('#0e3a80', this.phase === 'fighters' ? 4 : 0).setColor(this.phase === 'fighters' ? '#fff7ec' : '#e3f1ff');
+    this.help.setStroke(CSS.ink, this.phase === 'fighters' ? 4 : 0).setColor(this.phase === 'fighters' ? CSS.ivory : CSS.ink);
     const fresh = this.shown.phase !== this.phase;
     const now = { phase: this.phase, player: this.playerChoice.characterId + this.playerChoice.paletteId,
       opponent: this.opponentChoice.characterId + this.opponentChoice.paletteId, stage: this.stageIndex };
@@ -287,7 +289,7 @@ export class SelectionScene extends Phaser.Scene {
       const player = side === 'player', x = player ? 205 : 1075, out = player ? 1 : -1;
       const edge = player ? 34 : 1246, origin = player ? 0 : 1;
       const choice = player ? this.playerChoice : this.opponentChoice;
-      const accent = player ? 0xff6a1f : 0x7fd4ff, active = this.activeSide === side;
+      const accent = player ? C.primary : C.tertiary, active = this.activeSide === side;
       let art!: Animatable;
       const card = this.collect(() => {
         this.clickable(this.rectangle(x, 400, 400, 600, 0x000000, 0), () => { this.activeSide = side; this.render(); });
@@ -295,16 +297,17 @@ export class SelectionScene extends Phaser.Scene {
           .setTint(accent).setBlendMode(Phaser.BlendModes.ADD).setAlpha(active ? 0.3 : 0));
         if (active) this.live.push(t => glow.setAlpha(0.26 + Math.sin(t * 2.2) * 0.06));
         art = this.portrait(x, 790, 700, choice, !player);
-        const label = this.text(edge, 564, player ? '1P · Tu personaje' : rivalTag + ' · Rival', 18, '#fff7ec')
-          .setOrigin(origin, 0).setFontStyle('bold').setStroke('#0e3a80', 5);
-        this.text(edge + out * (label.width + 12), 566, `${rosterEntry(choice.characterId).heightCm} cm`, 15, '#ffd27a')
-          .setOrigin(origin, 0).setStroke('#0e3a80', 4).setName(`selection-height-${side}`);
+        const label = this.text(edge, 564, player ? '1P · Tu personaje' : rivalTag + ' · Rival', 18, CSS.ivory)
+          .setOrigin(origin, 0).setFontStyle('bold').setStroke(CSS.ink, 5);
+        this.text(edge + out * (label.width + 12), 566, `${rosterEntry(choice.characterId).heightCm} cm`, 15, CSS.gold)
+          .setOrigin(origin, 0).setStroke(CSS.ink, 4).setName(`selection-height-${side}`);
         // Fire-coloured name, outlined so it reads over the art, shrinking to stay in its corner.
-        const name = this.text(edge, 584, rosterEntry(choice.characterId).name.toUpperCase(), 84, '#ffb02e', false, true)
-          .setOrigin(origin, 0).setStroke('#1a0d08', 10).setShadow(0, 5, '#000000', 6, true, true);
+        const name = this.text(edge, 584, rosterEntry(choice.characterId).name.toUpperCase(), 84, CSS.gold, false, true)
+          // Fighter names are set in Edo SZ, with a hard ink offset instead of a soft shadow.
+          .setFontFamily(FONT_NAME).setOrigin(origin, 0).setStroke(CSS.ink, 10).setShadow(5, 5, CSS.ink, 0, true, true);
         if (name.width > 380) name.setFontSize(Math.floor(84 * 380 / name.width));
         const fill = name.context.createLinearGradient(0, 0, 0, name.height);
-        fill.addColorStop(0.15, '#ffd24a'); fill.addColorStop(0.6, '#f56a1f'); fill.addColorStop(0.95, '#c8231a');
+        fill.addColorStop(0.15, CSS.gold); fill.addColorStop(0.6, CSS.primary); fill.addColorStop(0.95, CSS.secondary);
         name.setFill(fill);
       });
       // Sides slide in from off-screen; a changed fighter pops up in place.
@@ -318,22 +321,22 @@ export class SelectionScene extends Phaser.Scene {
       const x = 640 + (index - (FIGHTER_ROSTER.length - 1) / 2) * STEP, y = TOP;
       const p1 = this.playerChoice.characterId === fighter.id, p2 = this.opponentChoice.characterId === fighter.id;
       const tile = this.collect(() => {
-        const frame = this.rectangle(x, y, TILE, TILE, 0x2a74d9, 0.9).setStrokeStyle(1, 0xbfe2ff);
+        const frame = this.rectangle(x, y, TILE, TILE, C.ivory, 0.42).setStrokeStyle(1.5, C.ivory, 0.9);
         this.clickable(frame, () => { activeChoice.characterId = fighter.id; this.render(); });
         const face = ensureFaceTexture(this, fighter.id);
         if (face) this.place(this.add.image(x, y, face).setDisplaySize(TILE - 4, TILE - 4).setName(`selection-face-${fighter.id}`));
-        this.rectangle(x, y + TILE / 2 - 9, TILE - 4, 16, 0x1757c2, 0.85);
-        this.text(x, y + TILE / 2 - 17, fighter.name.toUpperCase(), 13, p1 || p2 ? '#fff7ec' : '#cfe6ff', true).setFontStyle('bold');
+        this.rectangle(x, y + TILE / 2 - 9, TILE - 4, 16, C.ink, 0.82);
+        this.text(x, y + TILE / 2 - 17, fighter.name.toUpperCase(), 13, p1 || p2 ? CSS.ivory : '#e6e1e5', true).setFontStyle('bold');
         // Cursors: 1P outside in pink, the rival just inside in aqua, so both show on the same face.
         if (p1) {
-          const cursor = this.rectangle(x, y, TILE + 4, TILE + 4, 0x000000, 0).setStrokeStyle(3, 0xff6a1f);
-          if (this.activeSide === 'player') this.pulseBorder(cursor, 3, 0xff6a1f);
-          this.text(x - TILE / 2 - 2, y - TILE / 2 - 9, '1P', 13, '#0e3a80').setFontStyle('bold').setBackgroundColor('#ff6a1f').setPadding(4, 0);
+          const cursor = this.rectangle(x, y, TILE + 4, TILE + 4, 0x000000, 0).setStrokeStyle(3, C.primary);
+          if (this.activeSide === 'player') this.pulseBorder(cursor, 3, C.primary);
+          this.text(x - TILE / 2 - 2, y - TILE / 2 - 9, '1P', 13, CSS.white).setFontStyle('bold').setBackgroundColor(CSS.primary).setPadding(4, 0);
         }
         if (p2) {
-          const cursor = this.rectangle(x, y, TILE - 4, TILE - 4, 0x000000, 0).setStrokeStyle(3, 0x7fd4ff);
-          if (this.activeSide === 'opponent') this.pulseBorder(cursor, 3, 0x7fd4ff);
-          this.text(x + TILE / 2 + 2, y - TILE / 2 - 9, rivalTag === 'PRÁCTICA' ? 'PR' : rivalTag, 13, '#0e3a80').setFontStyle('bold').setBackgroundColor('#7fd4ff').setPadding(4, 0).setOrigin(1, 0);
+          const cursor = this.rectangle(x, y, TILE - 4, TILE - 4, 0x000000, 0).setStrokeStyle(3, C.tertiary);
+          if (this.activeSide === 'opponent') this.pulseBorder(cursor, 3, C.tertiary);
+          this.text(x + TILE / 2 + 2, y - TILE / 2 - 9, rivalTag === 'PRÁCTICA' ? 'PR' : rivalTag, 13, CSS.ink).setFontStyle('bold').setBackgroundColor(CSS.tertiary).setPadding(4, 0).setOrigin(1, 0);
         }
       });
       if (fresh) this.enter(tile, { y: -34, alpha: 0 }, { duration: 380, delay: 300 + index * 70, ease: 'Back.easeOut' });
@@ -357,11 +360,11 @@ export class SelectionScene extends Phaser.Scene {
   }
   /** Dark plate with a cream outline; the primary one is a cream plate with dark lettering. */
   private arcadeButton(x: number, y: number, width: number, label: string, action: () => void, primary = false): void {
-    const rect = this.clickable(this.rectangle(x, y, width, 44, primary ? 0xfff7ec : 0x1c1626, primary ? 1 : 0.88), action)
-      .setStrokeStyle(2, primary ? 0xffffff : 0xb9a98f, primary ? 0.9 : 0.7);
-    rect.on('pointerover', () => rect.setStrokeStyle(2, 0xffb02e, 1));
-    rect.on('pointerout', () => rect.setStrokeStyle(2, primary ? 0xffffff : 0xb9a98f, primary ? 0.9 : 0.7));
-    this.text(x, y - 13, label, 20, primary ? '#0e3a80' : '#fff7ec', true, primary);
+    const rect = this.clickable(this.rectangle(x, y, width, 44, primary ? C.primary : C.ink, primary ? 1 : 0.82), action)
+      .setStrokeStyle(2, C.ivory, primary ? 0.9 : 0.7);
+    rect.on('pointerover', () => rect.setStrokeStyle(3, C.gold, 1));
+    rect.on('pointerout', () => rect.setStrokeStyle(2, C.ivory, primary ? 0.9 : 0.7));
+    this.text(x, y - 13, label, 20, primary ? CSS.white : CSS.ivory, true, primary);
   }
   private renderStages(fresh: boolean, changed: boolean): void {
     this.title.setText('ELIGE EL ESCENARIO');
@@ -371,7 +374,7 @@ export class SelectionScene extends Phaser.Scene {
     // Wide window onto the arena: the camera pans slowly inside it instead of squashing the image.
     const source = this.textures.get(stage.textureKey).getSourceImage(), fit = 650 / source.width, band = 174 / fit;
     const image = this.place(this.add.image(890, 218, stage.textureKey));
-    const window = this.rectangle(890, 218, 650, 174, 0x000000, 0).setStrokeStyle(2, 0x7fd4ff);
+    const window = this.rectangle(890, 218, 650, 174, 0x000000, 0).setStrokeStyle(3, C.ink);
     if (band < source.height) {
       const pan = (f: number) => {
         const top = (source.height - band) * f;
@@ -381,27 +384,27 @@ export class SelectionScene extends Phaser.Scene {
       image.setScale(fit); pan(0.5);
       this.live.push(t => pan(0.5 + Math.sin(t * 0.35) * 0.3));
     } else image.setDisplaySize(650, 174);
-    const name = this.text(58, 137, stage.name, 35, '#fff7ec', false, true).setWordWrapWidth(450);
+    const name = this.text(58, 137, stage.name, 35, CSS.ivory, false, true).setStroke(CSS.ink, 5).setWordWrapWidth(450);
     // A new arena swings open like a door, around its vertical axis.
     if (fresh || changed) {
       this.enter([image, window], { scaleX: 0.04 }, { duration: 340, ease: 'Back.easeOut', delay: fresh ? 120 : 0 });
       this.enter([name], { x: -28, alpha: 0 }, { duration: 300, delay: fresh ? 120 : 0 });
     }
-    this.text(60, 214, rosterEntry(this.playerChoice.characterId).name, 22, '#ffb02e').setFontStyle('bold').setStroke('#0e3a80', 4);
-    this.text(60, 245, 'vs. ' + rosterEntry(this.opponentChoice.characterId).name, 22, '#ffffff').setFontStyle('bold').setStroke('#0e3a80', 4);
-    this.text(60, 280, this.mode === 'cpu' ? 'Combate contra CPU · ' + GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label : this.mode === 'versus' ? 'Dos jugadores' : 'Muñeco de práctica', 17, '#e3f1ff');
+    this.text(60, 210, rosterEntry(this.playerChoice.characterId).name, 26, CSS.primary).setFontFamily(FONT_NAME).setStroke(CSS.ivory, 4);
+    this.text(60, 245, 'vs. ' + rosterEntry(this.opponentChoice.characterId).name, 26, CSS.ivory).setFontFamily(FONT_NAME).setStroke(CSS.ink, 4);
+    this.text(60, 280, this.mode === 'cpu' ? 'Combate contra CPU · ' + GAME_CONFIG.CPU_DIFFICULTY[this.difficulty].label : this.mode === 'versus' ? 'Dos jugadores' : 'Muñeco de práctica', 17, CSS.ivory).setFontStyle('bold').setStroke(CSS.ink, 3);
     GAME_CONFIG.STAGES.forEach((entry, i) => {
       const x = 230 + (i % 3) * 410, y = 386 + Math.floor(i / 3) * 142, selected = this.stageIndex === i;
       let thumb!: Phaser.GameObjects.Image, border!: Phaser.GameObjects.Rectangle;
       const tile = this.collect(() => {
         thumb = this.place(this.add.image(x, y - 13, entry.textureKey).setDisplaySize(360, 102));
-        this.rectangle(x, y + 45, 360, 32, 0x1757c2, 0.96);
-        this.text(x, y + 33, entry.name, 18, selected ? '#ffb02e' : '#fff7ec', true);
-        border = this.rectangle(x, y, 360, 124, 0x000000, 0).setStrokeStyle(selected ? 4 : 1, selected ? 0x7fd4ff : 0xbfe2ff);
+        this.rectangle(x, y + 45, 360, 32, C.ink, 0.86);
+        this.text(x, y + 33, entry.name, 18, selected ? CSS.gold : CSS.ivory, true);
+        border = this.rectangle(x, y, 360, 124, 0x000000, 0).setStrokeStyle(selected ? 4 : 2, selected ? C.tertiary : C.ink);
         this.clickable(border, () => { this.stageIndex = i; this.render(); });
         if (selected) {
-          this.pulseBorder(border, 4, 0x7fd4ff);
-          this.text(x - 172, y - 54, 'Elegido', 14, '#0e3a80').setBackgroundColor('#ffb02e').setPadding(7, 3);
+          this.pulseBorder(border, 4, C.tertiary);
+          this.text(x - 172, y - 54, 'Elegido', 14, CSS.ink).setFontStyle('bold').setBackgroundColor(CSS.gold).setPadding(7, 3);
         }
       });
       // Tiles flip up one after another; the newly chosen one pops forward.
@@ -421,16 +424,16 @@ export class SelectionScene extends Phaser.Scene {
     for (const player of [true, false]) {
       const choice = player ? this.playerChoice : this.opponentChoice, x = player ? 330 : 950;
       const fighter = this.collect(() => {
-        this.pedestal(x, 568, 300, player ? 0xff6a1f : 0x7fd4ff, true);
+        this.pedestal(x, 568, 300, player ? C.primary : C.tertiary, true);
         this.preview(x, 570, 0.5, choice, !player);
       });
       this.enter(fighter, { x: player ? -560 : 560 }, { duration: 420, ease: 'Back.easeOut' });
     }
     const names = this.collect(() => {
-      this.text(310, 145, rosterEntry(this.playerChoice.characterId).name.toUpperCase(), 52, '#ffb07a', true, true);
-      this.text(970, 145, rosterEntry(this.opponentChoice.characterId).name.toUpperCase(), 52, '#7fd4ff', true, true);
-      this.text(310, 207, '1P', 21, '#fff7ec', true);
-      this.text(970, 207, MODE_LABELS[this.mode], 21, '#fff7ec', true);
+      this.text(310, 145, rosterEntry(this.playerChoice.characterId).name.toUpperCase(), 52, CSS.primary, true, true).setFontFamily(FONT_NAME).setStroke(CSS.ink, 7);
+      this.text(970, 145, rosterEntry(this.opponentChoice.characterId).name.toUpperCase(), 52, CSS.tertiary, true, true).setFontFamily(FONT_NAME).setStroke(CSS.ink, 7);
+      this.text(310, 207, '1P', 21, CSS.ivory, true).setFontStyle('bold').setStroke(CSS.ink, 4);
+      this.text(970, 207, MODE_LABELS[this.mode], 21, CSS.ivory, true).setFontStyle('bold').setStroke(CSS.ink, 4);
     });
     this.enter(names, { y: -46, alpha: 0 }, { duration: 340, delay: 140 });
     this.slamTitle(640, 270, 'VS', 112, VS_FIRE, { from: 3.4, delay: 240, shake: 0.011, volume: 0.85 });
@@ -441,8 +444,8 @@ export class SelectionScene extends Phaser.Scene {
       this.tweens.add({ targets: slash, x: 1600, duration: 460, delay: 300, ease: 'Cubic.easeIn' });
     }
     const banner = this.collect(() => {
-      this.rectangle(640, 622, 680, 50, 0x1757c2, 0.95);
-      this.text(640, 606, stage.name, 26, '#fff7ec', true);
+      this.rectangle(640, 622, 680, 50, C.ink, 0.82).setStrokeStyle(2, C.primary);
+      this.text(640, 606, stage.name, 26, CSS.ivory, true);
     });
     this.enter(banner, { y: 50, alpha: 0 }, { duration: 320, delay: 320 });
   }
@@ -488,9 +491,9 @@ export class SelectionScene extends Phaser.Scene {
     if (!this.motion) return;
     const title = new Title3D(this, 640, 236, ['VS'], 40, { fontSize: 120, centered: true, shine: false, ...VS_FIRE });
     const line = title.lines[0];
-    const glow = this.add.image(640, line.y, ensureGlowTexture(this)).setDepth(39).setTint(0xff7a1f)
+    const glow = this.add.image(640, line.y, ensureGlowTexture(this)).setDepth(39).setTint(C.primary)
       .setBlendMode(Phaser.BlendModes.ADD).setScale(0.6).setAlpha(0.9);
-    const ring = this.add.circle(640, line.y, 70).setStrokeStyle(10, 0xffb02e, 1).setDepth(39).setBlendMode(Phaser.BlendModes.ADD);
+    const ring = this.add.circle(640, line.y, 70).setStrokeStyle(10, C.gold, 1).setDepth(39).setBlendMode(Phaser.BlendModes.ADD);
     ring.isFilled = false;
     this.flourish.push(title, glow, ring);
     this.cameras.main.flash(220, 255, 120, 40).shake(240, 0.008);
