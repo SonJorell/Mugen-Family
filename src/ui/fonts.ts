@@ -4,7 +4,9 @@
 //
 // Roles ("Arcade Impact HUD"):
 //   UI      Chivo for menus, data and interface text.
-//   NAME    Black Ops One for fighter names (Edo SZ was dropped from the project: its licence was unclear).
+//   NAME    Edo SZ, a brush face, for fighter names (HUD, selection, versus, menu, pause). Jorell wants it here.
+//           Edo SZ (Vic Fieger) is freeware with no written redistribution terms: settle its licence before the
+//           game is published; Black Ops One is the open fallback.
 //   NUMBER  Anton for the clock, health values, combo counter and button callouts.
 //   IMPACT  Black Ops One, an arcade display face, for big announcements (ROUND, ¡PELEA!, K.O., victory) and titles.
 //
@@ -15,7 +17,7 @@
 // created; BootScene waits for `loadGameFonts()` before the game goes on.
 
 export const FONT_UI = "Chivo, 'Trebuchet MS', sans-serif";
-export const FONT_NAME = "'Black Ops One', Impact, 'Arial Narrow', sans-serif";
+export const FONT_NAME = "'Edo SZ', 'Black Ops One', Impact, 'Arial Narrow', sans-serif";
 export const FONT_NUMBER = "Anton, Impact, 'Arial Black', sans-serif";
 export const FONT_IMPACT = "'Black Ops One', Impact, 'Arial Black', sans-serif";
 
@@ -23,6 +25,7 @@ const FACES: { family: string; file: string; weight: string }[] = [
   { family: 'Chivo', file: 'Chivo[wght].ttf', weight: '100 900' },
   { family: 'Anton', file: 'Anton-Regular.ttf', weight: '400' },
   { family: 'Black Ops One', file: 'BlackOpsOne-Regular.ttf', weight: '400' },
+  { family: 'Edo SZ', file: 'edosz.ttf', weight: '400' },
 ];
 
 let loading: Promise<void> | null = null;
