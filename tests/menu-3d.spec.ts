@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { FIGHTER_ROSTER } from '../src/config/roster';
 
 async function menu(page: Page) {
   await page.route(/\/src\/main\.ts(?:\?.*)?$/, async route => {
@@ -77,22 +78,22 @@ test('confirming twice during the exit transition opens the next screen only onc
 });
 
 test('the title screen starts on a roster fighter and rotates through the rest', async ({ page }) => {
-  test.setTimeout(60000);
+  // One showcase turn per fighter: the time grows with the roster.
+  test.setTimeout(30000 + FIGHTER_ROSTER.length * 15000);
   await menu(page);
   const featured = () => page.evaluate(() => {
     const s = (window as any).__game.scene.getScene('MenuScene');
     return { id: s.featured.id as string, art: s.hero.texture.key as string, name: s.heroTexts[0].text as string, order: s.showcase.map((f: any) => f.id) as string[] };
   });
   const first = await featured();
-  expect([...first.order].sort()).toEqual(['cesar', 'joako', 'jorell', 'tilin']);
+  expect([...first.order].sort()).toEqual(FIGHTER_ROSTER.map(f => f.id).sort());
   expect(first.art).toBe(`menu_${first.id}_3d`);
   await expect.poll(async () => (await state(page)).introDone, { timeout: 15000 }).toBe(true);
   await page.evaluate(() => (window as any).__game.scene.getScene('MenuScene').nextFighter());
-  const names: Record<string, string> = { cesar: 'CÉSAR', joako: 'JOAKO', jorell: 'JORELL', tilin: 'TILIN' };
   for (const other of first.order.slice(1)) {
     // The second entry follows the manual turn; the timer advances to the third.
     await expect.poll(async () => (await featured()).art, { timeout: 15000 }).toBe(`menu_${other}_3d`);
-    expect((await featured()).name).toBe(names[other]);
+    expect((await featured()).name).toBe(FIGHTER_ROSTER.find(f => f.id === other)!.name.toUpperCase());
   }
   // The automatic timer completes the cycle without skipping any fighter.
   await expect.poll(async () => (await featured()).art, { timeout: 20000 }).toBe(`menu_${first.id}_3d`);
